@@ -1,0 +1,7 @@
+node_modules/
+.env
+.PROJECT.md
+dist/
+.vitepress/cache/
+*.pdf
+.DS_Store
