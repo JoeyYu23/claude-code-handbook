@@ -1,0 +1,26 @@
+{
+  "name": "claude-code-handbook",
+  "version": "1.0.0",
+  "description": "The definitive guide to Claude Code — from zero to mastery.",
+  "main": "index.js",
+  "scripts": {
+    "docs:dev": "vitepress dev --port 5188",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview --port 5188",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JoeyYu23/claude-code-handbook.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JoeyYu23/claude-code-handbook/issues"
+  },
+  "homepage": "https://github.com/JoeyYu23/claude-code-handbook#readme",
+  "devDependencies": {
+    "vitepress": "^1.6.4"
+  }
+}

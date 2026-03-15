@@ -1,0 +1,438 @@
+/* ============================================================
+   Claude Code Handbook — Custom Theme
+   Inspired by Khan Academy's clean, educational design language
+   ============================================================ */
+
+/* --- Typography & Font Scale --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* --- Color Tokens --- */
+:root {
+  /* Primary brand — Anthropic-inspired teal/green */
+  --vp-c-brand-1: #1a7f64;
+  --vp-c-brand-2: #157a5f;
+  --vp-c-brand-3: #0f6b52;
+  --vp-c-brand-soft: rgba(26, 127, 100, 0.12);
+
+  /* Background */
+  --vp-c-bg: #fafaf8;
+  --vp-c-bg-soft: #f4f3ef;
+  --vp-c-bg-mute: #eeede8;
+
+  /* Text */
+  --vp-c-text-1: #1a1a1a;
+  --vp-c-text-2: #4a4a4a;
+  --vp-c-text-3: #767676;
+
+  /* Borders */
+  --vp-c-divider: #e2e0da;
+  --vp-c-border: #d0cec8;
+
+  /* Sidebar & Nav */
+  --vp-sidebar-bg-color: #fafaf8;
+  --vp-nav-bg-color: rgba(250, 250, 248, 0.95);
+
+  /* Custom spacing */
+  --handbook-content-max-width: 800px;
+
+  /* Code blocks */
+  --vp-code-font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --vp-code-font-size: 0.875em;
+  --vp-code-line-height: 1.7;
+  --vp-code-block-bg: #f6f5f0;
+
+  /* Heading font */
+  --vp-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.dark {
+  --vp-c-brand-1: #3dd8a8;
+  --vp-c-brand-2: #34c99a;
+  --vp-c-brand-3: #2bb88b;
+  --vp-c-brand-soft: rgba(61, 216, 168, 0.1);
+
+  --vp-c-bg: #16161a;
+  --vp-c-bg-soft: #1e1e24;
+  --vp-c-bg-mute: #26262e;
+
+  --vp-c-text-1: #e8e6df;
+  --vp-c-text-2: #b0ada6;
+  --vp-c-text-3: #76736e;
+
+  --vp-c-divider: #2e2e38;
+  --vp-sidebar-bg-color: #16161a;
+  --vp-nav-bg-color: rgba(22, 22, 26, 0.95);
+  --vp-code-block-bg: #1e1e24;
+}
+
+/* --- Global Typography --- */
+.vp-doc {
+  font-family: var(--vp-font-family-base);
+  font-size: 17px;
+  line-height: 1.75;
+  color: var(--vp-c-text-1);
+}
+
+.vp-doc h1 {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 2.2rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: var(--vp-c-text-1);
+}
+
+.vp-doc h2 {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.45rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--vp-c-divider);
+  color: var(--vp-c-text-1);
+}
+
+.vp-doc h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-top: 1.8rem;
+  color: var(--vp-c-text-1);
+}
+
+.vp-doc p {
+  margin: 1em 0;
+}
+
+/* --- Lead / First paragraph style --- */
+.vp-doc > div > p:first-of-type {
+  font-size: 1.1em;
+  color: var(--vp-c-text-2);
+  line-height: 1.7;
+}
+
+/* --- Blockquotes — Khan Academy callout style --- */
+.vp-doc blockquote {
+  background: var(--vp-c-brand-soft);
+  border-left: 4px solid var(--vp-c-brand-1);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  font-style: normal;
+  color: var(--vp-c-text-1);
+}
+
+.vp-doc blockquote p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* --- Tables --- */
+.vp-doc table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.vp-doc th {
+  background: var(--vp-c-bg-soft);
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 2px solid var(--vp-c-brand-1);
+  font-size: 0.875em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--vp-c-text-2);
+}
+
+.vp-doc td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+  vertical-align: top;
+}
+
+.vp-doc tr:last-child td {
+  border-bottom: none;
+}
+
+.vp-doc tr:hover td {
+  background: var(--vp-c-bg-soft);
+}
+
+/* --- Code blocks --- */
+.vp-doc div[class*="language-"] {
+  border-radius: 10px;
+  margin: 1.25rem 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+
+.vp-doc :not(pre) > code {
+  background: var(--vp-c-bg-mute);
+  border: 1px solid var(--vp-c-border);
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+  font-family: var(--vp-code-font-family);
+  font-size: 0.875em;
+  color: var(--vp-c-brand-1);
+  font-weight: 500;
+}
+
+.dark .vp-doc :not(pre) > code {
+  color: var(--vp-c-brand-1);
+  background: var(--vp-c-bg-mute);
+}
+
+/* --- Horizontal rules — decorative --- */
+.vp-doc hr {
+  border: none;
+  border-top: 1px solid var(--vp-c-divider);
+  margin: 2rem 0;
+}
+
+/* --- Navigation bar --- */
+.VPNav {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.VPNavBarTitle .title {
+  font-family: 'Lora', Georgia, serif;
+  font-weight: 600;
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+  color: var(--vp-c-text-1);
+}
+
+/* --- Sidebar --- */
+.VPSidebar {
+  border-right: 1px solid var(--vp-c-divider) !important;
+}
+
+.VPSidebarItem.level-0 > .item > .text {
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--vp-c-text-3);
+  padding-top: 0.5rem;
+}
+
+.VPSidebarItem.level-1 > .item > .link > .text {
+  font-size: 0.9rem;
+  color: var(--vp-c-text-2);
+}
+
+.VPSidebarItem.level-1.is-active > .item > .link > .text {
+  color: var(--vp-c-brand-1);
+  font-weight: 600;
+}
+
+/* Active sidebar item indicator */
+.VPSidebarItem.is-active > .item {
+  background: var(--vp-c-brand-soft);
+  border-radius: 6px;
+}
+
+/* --- Hero Section (landing page) --- */
+.VPHero {
+  padding-top: 3rem !important;
+  padding-bottom: 2rem !important;
+}
+
+.VPHero .name {
+  font-family: 'Lora', Georgia, serif !important;
+  font-size: clamp(2rem, 5vw, 3.5rem) !important;
+  letter-spacing: -0.03em !important;
+  line-height: 1.15 !important;
+}
+
+.VPHero .tagline {
+  font-size: clamp(1rem, 2.5vw, 1.3rem) !important;
+  color: var(--vp-c-text-2) !important;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.VPHero .text {
+  background: linear-gradient(135deg, var(--vp-c-brand-1) 0%, #2d9d7e 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* Hero action buttons */
+.VPButton.medium.brand {
+  background: var(--vp-c-brand-1) !important;
+  border-color: var(--vp-c-brand-1) !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  padding: 0 24px !important;
+  height: 44px !important;
+  line-height: 44px !important;
+  transition: all 0.2s ease !important;
+}
+
+.VPButton.medium.brand:hover {
+  background: var(--vp-c-brand-2) !important;
+  border-color: var(--vp-c-brand-2) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(26, 127, 100, 0.3);
+}
+
+.VPButton.medium.alt {
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  height: 44px !important;
+  line-height: 44px !important;
+  padding: 0 24px !important;
+}
+
+/* --- Feature cards --- */
+.VPFeatures .VPFeature {
+  border-radius: 12px !important;
+  border: 1px solid var(--vp-c-divider) !important;
+  background: var(--vp-c-bg) !important;
+  transition: all 0.2s ease !important;
+  padding: 1.5rem !important;
+}
+
+.VPFeatures .VPFeature:hover {
+  border-color: var(--vp-c-brand-1) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(26, 127, 100, 0.12);
+}
+
+.VPFeature .title {
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  color: var(--vp-c-text-1) !important;
+}
+
+.VPFeature .details {
+  color: var(--vp-c-text-2) !important;
+  font-size: 0.9rem !important;
+  line-height: 1.6 !important;
+  margin-top: 0.4rem !important;
+}
+
+/* --- Home content section --- */
+.VPHomeContent {
+  max-width: var(--handbook-content-max-width);
+}
+
+/* --- Doc page content width --- */
+.VPDoc .content-container {
+  max-width: var(--handbook-content-max-width) !important;
+}
+
+/* --- Badge styles (Coming Soon) --- */
+.VPBadge {
+  font-size: 0.7em !important;
+  padding: 1px 7px !important;
+  border-radius: 10px !important;
+  font-weight: 500 !important;
+  vertical-align: middle !important;
+  margin-left: 6px !important;
+}
+
+/* --- Outline / TOC --- */
+.VPDocAsideOutline .title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--vp-c-text-3);
+}
+
+.VPDocOutlineItem a {
+  font-size: 0.875rem;
+  color: var(--vp-c-text-2);
+  transition: color 0.15s;
+}
+
+.VPDocOutlineItem a:hover,
+.VPDocOutlineItem.active a {
+  color: var(--vp-c-brand-1);
+}
+
+/* --- Footer --- */
+.VPFooter {
+  border-top: 1px solid var(--vp-c-divider) !important;
+  background: var(--vp-c-bg-soft) !important;
+}
+
+/* --- Prev/Next nav --- */
+.VPDocFooter .pager-link {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.VPDocFooter .pager-link:hover {
+  border-color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+}
+
+.VPDocFooter .title {
+  color: var(--vp-c-brand-1) !important;
+  font-weight: 600 !important;
+}
+
+/* --- Search --- */
+.VPLocalSearchBox .search-input {
+  border-color: var(--vp-c-brand-1) !important;
+}
+
+/* --- Scrollbar (subtle) --- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--vp-c-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--vp-c-text-3);
+}
+
+/* --- Print styles --- */
+@media print {
+  .VPNav, .VPSidebar, .VPDocAside {
+    display: none !important;
+  }
+
+  .vp-doc {
+    font-size: 12pt;
+    line-height: 1.6;
+  }
+}
+
+/* --- Responsive tweaks --- */
+@media (max-width: 768px) {
+  .vp-doc h1 {
+    font-size: 1.8rem;
+  }
+
+  .vp-doc h2 {
+    font-size: 1.25rem;
+  }
+
+  .vp-doc table {
+    font-size: 0.85em;
+  }
+}
