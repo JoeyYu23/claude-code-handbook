@@ -114,7 +114,7 @@ allowed-tools: Bash(git *)
 
 ## 提交信息格式
 
-```
+```text
 <type>[optional scope]: <description>
 
 [optional body]
