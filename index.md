@@ -74,4 +74,12 @@ Deep dives into the skill system, sub-agent orchestration, hooks, MCP protocol, 
 
 [Start reading Book 2 →](/en/book2-advanced/)
 
+---
+
+### About the Author
+
+**Joey Yu** — Developer and heavy Claude Code user. Built 50+ projects with Claude Code including AI tools, optimization systems, and quant trading platforms. This handbook is based on 7 weeks of intensive usage consuming $3,400+ in API-equivalent tokens.
+
+[GitHub](https://github.com/JoeyYu23)
+
 </div>
