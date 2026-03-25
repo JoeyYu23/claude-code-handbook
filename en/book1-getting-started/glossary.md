@@ -88,6 +88,9 @@ A value stored in your system's environment, accessible to programs but not hard
 **.env file**
 A file containing environment variables for your project. Typically gitignored (not committed to version control) because it contains secrets. Named literally `.env` with no file extension.
 
+**Effort level**
+A setting that controls how much reasoning Claude applies to a task. Set with `/effort low|medium|high|max`. The `max` level uses Claude's extended thinking and is only available with Claude Opus.
+
 ---
 
 ## F
@@ -188,7 +191,7 @@ Another word for a library or dependency. A bundle of code you install and use i
 A tool for installing, updating, and managing packages. `npm`, `yarn`, and `pnpm` are JavaScript package managers. `pip` is Python's. `brew` is macOS's.
 
 **Permission mode**
-One of Claude Code's modes that controls how it asks for approval when using tools. The main modes are default, auto-accept, plan, and bypass. See Chapter 6.
+One of Claude Code's six modes that controls how it asks for approval when using tools. The modes are: Default, Auto-accept, Plan, Auto, DontAsk, and Bypass. See Chapter 6.
 
 **Plan mode**
 A permission mode where Claude Code can read and analyze your code but cannot modify anything. Claude produces a plan for you to review before it takes action. See Chapter 6.
@@ -223,10 +226,13 @@ A single conversation with Claude Code, from when you start it to when you exit.
 A program that interprets your terminal commands. Bash and Zsh are common shells on Unix systems. PowerShell is common on Windows.
 
 **Slash command**
-A command you type in Claude Code starting with `/`. Examples: `/help`, `/clear`, `/memory`, `/permissions`. See the Keyboard Shortcuts appendix for a full list.
+A command you type in Claude Code starting with `/`. Examples: `/help`, `/clear`, `/memory`, `/permissions`, `/effort`, `/vim`, `/agents`, `/mcp`. See the Keyboard Shortcuts appendix for a full list.
 
 **SSH**
 A protocol for securely connecting to remote computers. Used when deploying code or accessing servers.
+
+**Subagent**
+A Claude Code process launched by another Claude Code process to handle a subtask in parallel. Claude can spin up multiple subagents for independent pieces of work and coordinate their results. See `/agents`.
 
 **Stack trace**
 The list of function calls that were active when a crash occurred. Reading a stack trace from bottom to top shows you the path from the outermost code to the exact line where the error happened. See Chapter 12.
@@ -244,6 +250,9 @@ A text-based interface for interacting with your computer by typing commands. Al
 **Token**
 The basic unit Claude uses to process text. Roughly, one token is about 4 characters or 3/4 of a word. Tokens affect billing (you pay per token with the API) and context window limits.
 
+**Tool call**
+A request from Claude to use one of its tools (Read, Edit, Bash, WebSearch, etc.) during a conversation. Each tool call is shown to you before it executes in default permission mode.
+
 **Tool**
 In Claude Code, a tool is a specific capability Claude can invoke: reading files (Read tool), editing files (Edit/Write tools), running commands (Bash tool), searching the web (WebSearch tool). You control which tools Claude can use and when.
 
@@ -256,6 +265,9 @@ A version of JavaScript that adds type checking. TypeScript code catches many co
 
 **Version control**
 A system that tracks changes to files over time, allowing you to view history and revert to previous states. Git is the most popular version control system.
+
+**Vim mode**
+An optional editing mode inside Claude Code's prompt input that uses Vim-style key bindings. Enable with `/vim` or in `/config`. In NORMAL mode, you can navigate and edit with `h/j/k/l`, `w/b`, `dd`, `yy`, etc.
 
 **VS Code (Visual Studio Code)**
 A free, open-source code editor made by Microsoft. The most widely used code editor in the world. Has an official Claude Code extension. See Chapter 16.

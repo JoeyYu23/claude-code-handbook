@@ -49,7 +49,7 @@ JSON 输出结构：
 
 ### 结构化输出（JSON Schema）
 
-要求输出符合特定格式：
+用 `--json-schema` 约束输出格式，响应会被验证是否符合 schema，不符合时自动重试：
 
 ```bash
 claude -p "从 src/ 中提取所有公开函数名" \
@@ -71,6 +71,20 @@ claude -p "从 src/ 中提取所有公开函数名" \
     }
   }' | jq '.structured_output.functions'
 ```
+
+### 最小化模式（--bare）
+
+`--bare` 标志跳过所有项目配置：不加载 hooks、LSP 集成、插件、MCP servers、auto-memory 和 `CLAUDE.md`。启动最快，适合纯模型推理场景：
+
+```bash
+# 快速问答，不需要项目配置影响结果
+claude -p "二分查找的时间复杂度是多少？" --bare
+
+# 测试场景，确保不受项目 CLAUDE.md 影响
+claude -p "分析这段代码" --bare --output-format json
+```
+
+`--bare` 适用场景：快速查询、测试、以及明确不希望项目特定配置影响响应的情况。
 
 ### 工具权限控制
 

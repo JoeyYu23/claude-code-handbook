@@ -37,6 +37,7 @@
 20. [团队协作](./20-team-workflows.md) — 多人协作模式
 21. [远程连接](./21-remote-connection.md) — 跨机器工作
 22. [安全与隐私](./22-security.md) — 保护你的代码和数据
+23. [费用真相](./23-cost-reality.md) — Claude Code 到底要花多少钱（真实数据）
 
 ### 附录
 - [Agent 类型速查表](./agent-reference.md)

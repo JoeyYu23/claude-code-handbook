@@ -124,13 +124,21 @@ One of the most reassuring design choices in Claude Code is its **permission sys
 
 This is especially important for the Bash tool (running commands) and the Edit/Write tools (modifying files). Before Claude Code does any of these things, it shows you what it plans to do and waits for a "yes" from you.
 
-There are three levels of how this works:
+Claude Code supports six permission modes — from asking before every action all the way to fully automated pipelines. Here is a quick overview of the spectrum:
 
-**Default behavior (recommended for most people):** Claude Code asks before reading files in new directories, before editing files, and before running any command. You confirm each action individually.
+**Default (ask as needed):** Claude Code asks before editing files and before running commands. Reading is generally permitted freely. This is the right starting point for most people.
 
-**"Accept all" mode:** You can tell Claude Code "go ahead and do everything without asking me each time" for a session. This is faster for tasks where you trust Claude Code's judgment, but you lose visibility into each step.
+**Auto-accept edits:** File edits happen automatically without prompting, but shell commands still require approval. Good for large refactors where you trust Claude's direction.
 
-**"Plan" mode:** Claude Code first describes everything it plans to do — without doing any of it — and waits for your approval of the whole plan before starting. This is useful for complex, multi-step tasks where you want to review the approach before any changes are made.
+**Plan mode:** Claude Code reads and analyzes, but cannot modify files or run commands. It produces a plan for your review. You approve before anything changes.
+
+**Auto mode (Team and Enterprise plans):** Claude operates with greater autonomy, backed by Anthropic's built-in safety classifier that screens for harmful actions. Designed for teams that need Claude to run longer tasks unattended.
+
+**DontAsk mode:** Only explicitly pre-authorized tools are allowed; everything else is denied. Useful for locked-down environments where you want a precise allowlist.
+
+**Bypass permissions:** All permission checks are skipped entirely. Intended strictly for automation in isolated containers, CI/CD pipelines, and sandboxed environments — never for interactive use on your main machine.
+
+A full chapter (Chapter 6) covers each mode in depth, including how to switch between them and when to use which.
 
 Think of it this way: Claude Code is a contractor working in your home. A good contractor does not start knocking down walls the moment they arrive. They show you the plan, confirm you are happy, and check in when they encounter something unexpected.
 

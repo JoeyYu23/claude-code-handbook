@@ -32,9 +32,12 @@ The most common type. Runs a shell command when the hook fires. The command rece
 {
   "type": "command",
   "command": ".claude/hooks/validate-bash.sh",
-  "timeout": 30
+  "timeout": 30,
+  "async": false
 }
 ```
+
+Set `"async": true` to run the hook in the background without blocking Claude. Async hooks cannot influence decisions (their return values are ignored) but are useful for notifications, logging, and formatting.
 
 **Exit code behavior:**
 - `0` — Success. JSON in stdout is parsed for decisions.
@@ -140,11 +143,19 @@ Input includes everything from PreToolUse plus the tool output:
 }
 ```
 
+### PostToolUseFailure
+
+Fires when a tool call fails. Unlike `PostToolUse`, this fires on error. Useful for logging failures, alerting on unexpected errors, or triggering fallback actions.
+
 ### Stop
 
 Fires when Claude stops responding (the agentic loop ends). Can force Claude to continue by returning `{"decision": "block", "reason": "Tests must pass before stopping"}`.
 
 Common uses: enforce quality gates (tests must pass, no TODOs), require documentation updates, post-completion cleanup.
+
+### StopFailure
+
+Fires when the Stop hook itself fails or returns an error. Useful for monitoring hook health in critical automation pipelines.
 
 ### Notification
 
@@ -156,9 +167,21 @@ Fires when a sub-agent begins or completes. The matcher can target specific agen
 
 Common uses: set up database connections before a DB agent starts, clean up after analysis agents finish.
 
+### TeammateIdle
+
+Fires when a teammate (in Agent Teams experimental mode) finishes its current task and is waiting for more work. Useful for coordinating work distribution across teammates.
+
+### TaskCompleted
+
+Fires when a delegated task completes, regardless of whether it succeeded or failed. Provides a hook point for task-level logging and monitoring independent of the tool-level events.
+
 ### SessionStart / SessionEnd
 
 Fires at the beginning and end of a session. Useful for loading environment-specific context or triggering cleanup.
+
+### InstructionsLoaded
+
+Fires after `CLAUDE.md` files and other instruction sources are loaded at session start. Can be used to inject additional dynamic context after the static instructions are in place.
 
 ### UserPromptSubmit
 
@@ -172,13 +195,25 @@ Fires when Claude shows a permission dialog. Can auto-approve known-safe operati
 
 Fires when a settings file changes. Useful for auditing configuration changes in team environments.
 
-### WorktreeCreate
+### WorktreeCreate / WorktreeRemove
 
-Fires when a git worktree is created. Can be used to set up worktree-specific configuration.
+Fires when a git worktree is created or removed. Can be used to set up or tear down worktree-specific configuration and resources.
 
-### Elicitation
+### PreCompact / PostCompact
 
-Fires when an MCP server requests structured input. Can auto-provide credentials or other inputs.
+Fires before and after a `/compact` operation. `PreCompact` can add information to preserve in the summary. `PostCompact` can inject fresh context into the new conversation.
+
+### CwdChanged
+
+Fires when the current working directory changes during a session (for example, when `/add-dir` is used). Can be used to load directory-specific context or update environment variables.
+
+### FileChanged
+
+Fires when a file on disk changes outside of Claude's direct edits (for example, a build system output or an external tool writing to the project). Can be used to notify Claude of external changes.
+
+### Elicitation / ElicitationResult
+
+`Elicitation` fires when an MCP server requests structured input from the user. Can auto-provide credentials, configuration values, or other inputs without user intervention. `ElicitationResult` fires after the elicitation is resolved, with the value that was provided.
 
 ---
 

@@ -59,18 +59,32 @@ disable-model-invocation: true        # 只允许你手动触发，Claude 不会
 user-invocable: false                 # 只有 Claude 能调用，不出现在菜单
 allowed-tools: Read, Grep, Bash       # 此 skill 激活时允许的工具（无需确认）
 model: sonnet                         # 此 skill 使用的模型
+effort: high                          # 模型算力级别：low/medium/high/max/auto
 context: fork                         # 在独立子 agent 中运行
 agent: Explore                        # 搭配 context: fork 使用的 agent 类型
-hooks:                                # 此 skill 生命周期内的 hooks
-  PostToolUse:
-    - matcher: "Edit"
-      hooks:
+hooks:                                # 此 skill 执行生命周期内的 hooks
+  Stop:
+    - hooks:
         - type: command
-          command: "./lint.sh"
+          command: "./scripts/verify-deploy.sh"
 ---
 ```
 
 所有字段都是可选的。只有 `description` 是强烈推荐的——Claude 用它来判断何时自动激活这个 skill。
+
+| 字段 | 作用 |
+|---|---|
+| `name` | slash command 名称，默认为目录名。小写字母和连字符，最多 64 个字符。 |
+| `description` | skill 的功能和使用时机。Claude 读取此字段决定何时自动加载。 |
+| `argument-hint` | 自动补全提示，例如 `[issue-number]` 或 `[filename] [format]`。 |
+| `disable-model-invocation` | 设为 `true` 可阻止 Claude 自动触发此 skill。用于有副作用的工作流。 |
+| `user-invocable` | 设为 `false` 可从 `/` 菜单中隐藏。用于背景参考知识。 |
+| `allowed-tools` | 此 skill 激活时 Claude 可以无需确认使用的工具。 |
+| `model` | 此 skill 运行时使用的模型。接受别名如 `haiku` 或完整模型 ID。 |
+| `effort` | 此 skill 运行时的模型算力级别：`low`、`medium`、`high`、`max` 或 `auto`。 |
+| `context` | 设为 `fork` 可在独立的 subagent 上下文中运行。 |
+| `agent` | 设置 `context: fork` 时使用的 subagent 类型。 |
+| `hooks` | 限定在此 skill 执行生命周期内的 hooks。 |
 
 ---
 

@@ -27,6 +27,8 @@ CLAUDE.md files can exist at multiple levels, each with a different scope:
 | `./CLAUDE.md` or `./.claude/CLAUDE.md` | Project | Team via version control |
 | Subdirectory `./src/api/CLAUDE.md` | Subdirectory (loaded on demand) | Team via version control |
 
+The organization-wide managed policy location is deployed by IT administrators. Individual users cannot override it.
+
 More specific locations take precedence. The hierarchy lets you set organization-wide standards, personal preferences, and project-specific conventions all in the same coherent system.
 
 ### What Belongs in CLAUDE.md
@@ -166,7 +168,7 @@ Add this to CLAUDE.md: always use pnpm, not npm.
 
 ### Enabling and Disabling Auto Memory
 
-Auto memory is enabled by default. To disable it:
+Auto memory requires Claude Code v2.1.59 or later. It is enabled by default. To disable it:
 
 ```json
 // .claude/settings.json

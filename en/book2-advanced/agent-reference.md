@@ -156,12 +156,32 @@ Running three independent analysis agents in parallel produces results faster th
 
 ## Agent SDK
 
-For building fully custom agent workflows beyond Claude Code's built-in subagent system, the [Claude Agent SDK](https://platform.claude.com/docs/en/agent-sdk/overview) provides programmatic access to Claude Code's tools and orchestration capabilities. This is the right tool when you need:
+For building fully custom agent workflows beyond Claude Code's built-in subagent system, the [Claude Agent SDK](https://platform.claude.com/docs/en/agent-sdk/overview) provides programmatic access to Claude Code's tools and orchestration capabilities.
+
+The Agent SDK is the right tool when you need:
 
 - Custom orchestration logic that goes beyond simple delegation
 - Integration with external systems as part of the agent loop
 - Fine-grained control over tool access and permissions
 - Building a product powered by Claude Code's capabilities
+- Programmatic spawning and coordination of agent teams
+
+**Quick example:**
+
+```typescript
+import { AgentRuntime } from "@anthropic-ai/agent-sdk";
+
+const runtime = new AgentRuntime({
+  model: "claude-sonnet-4-6",
+  tools: ["Read", "Write", "Bash"],
+});
+
+const result = await runtime.run(
+  "Analyze src/auth/ and produce a security audit report"
+);
+```
+
+The SDK handles context management, tool execution, and result streaming. See the full documentation at [platform.claude.com/docs/en/agent-sdk/overview](https://platform.claude.com/docs/en/agent-sdk/overview).
 
 ---
 

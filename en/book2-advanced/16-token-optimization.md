@@ -18,7 +18,9 @@ Claude bills on three dimensions:
 
 **Output tokens:** Everything Claude writes — responses, code, explanations, tool call parameters. Output tokens cost more per token than input tokens. Verbosity in Claude's responses directly increases cost.
 
-**Extended thinking tokens:** When Claude uses extended thinking (deep reasoning before responding), those thinking tokens are billed separately. Extended thinking produces better results on complex reasoning tasks but at higher cost. For Claude Code, extended thinking is typically applied automatically for tasks that benefit from it.
+**Extended thinking tokens:** When Claude uses extended thinking (deep reasoning before responding), those thinking tokens are billed separately. Extended thinking produces better results on complex reasoning tasks but at higher cost. For Claude Code, extended thinking is typically applied automatically for tasks that benefit from it. To disable it: `CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1`.
+
+**Prompt cache read tokens:** Claude Code automatically caches frequently reused content (CLAUDE.md, system prompts). Cache reads cost approximately 10% of normal input token price. This happens transparently — you do not need to configure it.
 
 The practical implication: sessions that involve lots of large file reads (high input) and generate a lot of code (high output) are the most expensive. Sessions focused on targeted, specific edits are the most cost-efficient.
 
@@ -28,13 +30,14 @@ The practical implication: sessions that involve lots of large file reads (high 
 
 Claude Code gives you access to multiple Claude models, each with different capability/cost tradeoffs:
 
-**Claude Opus 4:** The most capable model. Best for:
+**Claude Opus 4.6:** The most capable model. Best for:
 - Complex architectural decisions requiring multi-step reasoning
 - Debugging subtle, hard-to-find issues
 - Tasks requiring synthesis across many files and concepts
 - Research and analysis tasks
+- Max/Team/Enterprise subscribers automatically get the 1M token context window version
 
-**Claude Sonnet 4 (default):** The best balance of capability and cost. This is the right model for the majority of coding tasks:
+**Claude Sonnet 4.6 (default):** The best balance of capability and cost. This is the right model for the majority of coding tasks:
 - Feature implementation
 - Bug fixing
 - Code review
@@ -42,7 +45,7 @@ Claude Code gives you access to multiple Claude models, each with different capa
 - Writing tests
 - Most day-to-day development work
 
-**Claude Haiku 3.5:** Fastest and cheapest. Best for:
+**Claude Haiku 4.5:** Fastest and cheapest. Best for:
 - Quick lookups and simple questions
 - High-volume automated tasks (CI pipelines, batch processing)
 - Tasks where speed matters more than depth
@@ -52,14 +55,16 @@ You can specify model per session:
 
 ```bash
 # Start a session with Opus for a complex architectural task
-claude --model claude-opus-4-5
+claude --model claude-opus-4-6
 
 # Default (Sonnet) for regular development
 claude
 
 # Haiku for a batch automation script
-claude --model claude-haiku-3-5 -p "Add type annotations to all functions in $(cat files.txt)"
+claude --model claude-haiku-4-5 -p "Add type annotations to all functions in $(cat files.txt)"
 ```
+
+Model aliases also work: `opus`, `sonnet`, `haiku`, `sonnet[1m]`, `opus[1m]`, `opusplan`.
 
 **The highest-leverage model decision:** use Opus selectively for tasks that genuinely require it. The cost difference between Opus and Sonnet is significant (roughly 5x). A developer who reflexively uses Opus for everything pays five times more than one who uses Sonnet by default and switches to Opus only for genuinely complex reasoning tasks.
 
@@ -168,6 +173,33 @@ Stopping Claude from completing a long explanation saves output tokens.
 
 ---
 
+## Visualizing Context with /context
+
+The `/context` command shows a visual breakdown of your current context window usage, with optimization suggestions:
+
+```text
+/context
+```
+
+This displays what is consuming the most tokens and suggests ways to reduce usage — which files are large, how much conversation history has accumulated, and whether compaction would help.
+
+---
+
+## Controlling Reasoning Effort
+
+For tasks where you want to trade response quality for speed and cost, use the `/effort` command:
+
+```text
+/effort low      # Fastest, cheapest — simple lookups
+/effort medium   # Balanced (default)
+/effort high     # More thorough reasoning
+/effort max      # Maximum effort — Opus only, not persistent
+```
+
+`/effort max` activates the highest reasoning depth and is only available with Claude Opus 4.6. It is not persistent across sessions — it applies to the current task only.
+
+---
+
 ## Monitoring Costs with /cost
 
 Track token usage in any session:
@@ -176,7 +208,7 @@ Track token usage in any session:
 /cost
 ```
 
-This displays token counts and approximate cost for the current session, broken down by input and output tokens.
+This displays token counts and approximate cost for the current session, broken down by input, output, and cache read tokens.
 
 For API users managing a team or automation budget:
 
@@ -199,8 +231,8 @@ In CLAUDE.md, specify the model appropriate for the project:
 
 ```markdown
 # Model Preference
-Default to claude-sonnet-4-5 for all tasks.
-Only use claude-opus-4-5 when explicitly asked to reason about architecture or
+Default to claude-sonnet-4-6 for all tasks.
+Only use claude-opus-4-6 when explicitly asked to reason about architecture or
 when debugging a persistent issue that requires deep analysis.
 ```
 
@@ -211,7 +243,7 @@ Non-interactive batch jobs using `claude -p` with Haiku can replace interactive 
 ```bash
 # Batch linting and fix suggestions — use Haiku for cost efficiency
 for file in $(git diff --name-only HEAD~1); do
-  claude --model claude-haiku-3-5 -p "Check $file for obvious bugs and style issues. Return a one-line summary."
+  claude --model claude-haiku-4-5 -p "Check $file for obvious bugs and style issues. Return a one-line summary."
 done
 ```
 

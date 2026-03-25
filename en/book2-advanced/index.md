@@ -37,6 +37,7 @@
 20. [Team Workflows](./20-team-workflows.md) — Collaboration patterns
 21. [Remote Connection](./21-remote-connection.md) — Working across machines
 22. [Security & Privacy](./22-security.md) — Keeping your code safe
+23. [Cost Reality](./23-cost-reality.md) — What Claude Code actually costs (real data)
 
 ### Appendix
 - [Agent Type Reference](./agent-reference.md)

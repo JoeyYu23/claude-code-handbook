@@ -1,290 +1,261 @@
-# 第七章：读代码
+# 第七章：读懂和理解代码
 
-## "帮我看懂这个项目" — 最被低估的用法
+## 接手代码的困境
 
-大多数人把 Claude Code 当成"写代码的工具"。但有一个用法同样强大，却常常被忽视：**让 Claude 帮你读懂别人的代码。**
+想象这个场景：你的同事把一个他们已经做了两年的项目交给你。文件夹里有几百个文件。几乎没有文档。你的同事现在联系不上了。你的经理要求你在本周末之前添加一个"简单"的功能。
 
-想象这几个场景：
+这种情况在软件开发中一再上演。就算是你自己写的代码，六个月后回来看也可能感觉像是在读别人的工作。
 
-- 你接手了一个前同事留下的老项目，没有文档，代码密密麻麻
-- 你在 GitHub 上找到一个有用的开源库，不知道从哪里入手
-- 你遇到一段报错，完全不知道 stack trace 在说什么
-- 你要学习一门新语言，看到别人的代码一头雾水
+Claude Code 读取和解释代码的能力，对很多用户来说是它立竿见影最有用的功能。不是写新代码，不是运行命令，就是这一件事：*告诉我这里到底是怎么回事。*
 
-Claude Code 可以成为你随时可以请教的"技术顾问"——它耐心、全面，而且不会因为你问了"傻问题"而皱眉头。
+本章向你展示如何把这种能力发挥到极致。
 
 ---
 
-## 快速了解一个陌生项目
+## 最佳开场白：给我一个概览
 
-当你第一次进入一个陌生的代码库，可以用这些 prompt 快速建立认知：
-
-### 问整体结构
+当你第一次把 Claude Code 投入一个陌生的项目时，最好的起手式是一个宽泛的问题：
 
 ```
-帮我看一下这个项目的目录结构，告诉我每个文件夹大概是做什么的。
+Give me an overview of this codebase
 ```
 
-Claude 会扫描目录，给出类似这样的解释：
+你得到的回答不只是一份文件列表。Claude 会浏览整个项目结构——查看文件名、文件夹组织、配置文件、依赖列表、入口点和关键源文件——并综合出一份摘要，涵盖：
+
+- 这个项目做什么
+- 它是如何组织的
+- 它使用什么技术
+- 主要组件是什么以及它们如何关联
+
+单单这一个问题，在一个空白会话里对着一个大型代码库问，就能给你比自己摸索一个小时更多的情境意识。
+
+从那里开始，你可以缩小范围：
 
 ```
-这个项目是一个 Node.js Web 应用，目录结构如下：
-
-src/           — 主要源码
-  routes/      — 路由定义，处理 HTTP 请求
-  models/      — 数据模型，对应数据库表结构
-  middleware/  — 中间件（认证、日志等）
-  utils/       — 工具函数
-
-public/        — 前端静态文件（HTML、CSS、图片）
-tests/         — 测试文件
-config/        — 配置文件（数据库连接、环境变量）
-package.json   — 项目依赖和脚本定义
+Explain the main architecture patterns used here
 ```
 
-### 问项目的核心功能
-
 ```
-这个项目是做什么的？它的核心业务逻辑在哪些文件里？
+What are the key data models in this project?
 ```
 
-### 问如何运行
-
 ```
-这个项目怎么在本地运行？有哪些命令需要先执行？
+How does the authentication system work?
 ```
 
-Claude 会找到 `package.json`、`README` 或 `Makefile`，帮你整理出启动步骤。
+每个后续问题都建立在前一个的基础上。你在进行一场有引导的代码库之旅，而 Claude 是你的向导。
 
 ---
 
-## 理解特定文件
+## 询问特定文件
 
-找到感兴趣的文件后，可以深入问：
-
-### 读懂一个文件的整体逻辑
+有时候你知道你关心哪个文件。你可以直接说：
 
 ```
-帮我解释一下 src/auth/login.js 这个文件是怎么工作的。
+Explain what src/api/handlers.js does
 ```
 
-### 理解某个函数
+或者使用 `@` 引用语法直接把文件拉入对话：
 
 ```
-getUserPermissions 这个函数是干什么的？它的参数是什么，返回什么？
+Walk me through the logic in @src/utils/validation.js
 ```
 
-### 追踪一个功能的执行路径
+`@` 前缀告诉 Claude 读取那个特定的文件并把对话集中在它上面。你可以一次提到多个文件：
 
 ```
-当用户点击"登录"按钮，代码会从哪里开始执行，经过哪些步骤，最终完成什么操作？
+How do @src/auth/login.js and @src/auth/session.js work together?
 ```
 
-这类"追踪流程"的问题非常有用——它帮你理解数据和控制流是怎么在代码里流动的，而不仅仅是看单个文件。
+这在你知道一个 bug 或功能涉及多个文件，并且想在改动任何东西之前理解它们的关系时很有用。
+
+---
+
+## 询问特定函数
+
+大文件可能让人不知所措。如果你想深入到特定的一段逻辑：
+
+```
+Explain what the processPayment function does, step by step
+```
+
+```
+What does the useFormValidation hook return, and when should I use it?
+```
+
+```
+Walk me through what happens when the exportToPDF function is called
+```
+
+Claude 会读取这个函数，追踪它的输入和输出，解释任何副作用，并告诉你它处理（或未处理）了哪些边界情况。如果你不熟悉这门语言或正在使用的模式，这比自己读代码要快得多。
 
 ---
 
 ## "这个报错是什么意思？"
 
-遇到报错时，最直接的做法就是把报错信息粘贴给 Claude：
+这是人们转向 Claude Code 的最常见原因之一。你运行了某个东西，得到了一墙红字，完全不知道从哪里开始。
+
+最简单的方式：
 
 ```
-运行 npm start 后出现了这个报错，是什么意思？怎么修？
+I got this error when I ran npm test:
 
-Error: Cannot find module './config/database'
-    at Function.Module._resolveFilename (node:internal/modules/cjs/loader:1039:15)
-    at Function.Module._load (node:internal/modules/cjs/loader:885:27)
-    at Module.require (node:internal/modules/cjs/loader:1105:19)
-    at require (node:internal/modules/cjs/helpers:103:18)
-    at Object.<anonymous> (/Users/xiaoming/my-project/src/app.js:3:21)
+TypeError: Cannot read properties of undefined (reading 'map')
+    at ProductList (/src/components/ProductList.jsx:23:15)
+    at renderWithHooks (/node_modules/react-dom/cjs/react-dom.development.js:16141:18)
+    ...
 ```
 
-Claude 会解释：
+Claude 会：
+1. 识别根本原因（某个东西是 `undefined`，而代码预期是一个数组）
+2. 把你指向确切的文件和行号（`ProductList.jsx` 第 23 行）
+3. 解释为什么可能会发生这种情况
+4. 建议修复方案
+
+你也可以粘贴错误并让 Claude 查看相关文件：
 
 ```
-这个报错的意思是：代码在 src/app.js 的第 3 行
-尝试导入 ./config/database 这个文件，但这个文件不存在。
-
-可能的原因：
-1. config/database.js 文件还没有创建
-2. 文件路径写错了（比如大小写不对）
-3. 文件被删除或移动了
-
-建议检查 src/app.js 第 3 行，看导入路径是否正确。
-同时确认 config/ 目录下是否存在 database.js 文件。
+I'm getting this error: [error text]. Can you look at @src/components/ProductList.jsx and tell me what's wrong?
 ```
 
-### Stack Trace 解读
-
-Stack trace（调用栈跟踪）是 Node.js、Python、Java 等语言报错时显示的一串信息，对新手来说往往看不懂。你可以直接问 Claude：
-
-```
-帮我解释一下这个 stack trace，从上往下每一行是什么意思？
-
-Traceback (most recent call last):
-  File "app.py", line 47, in process_order
-    result = calculate_price(items)
-  File "utils/pricing.py", line 23, in calculate_price
-    return sum(item.price for item in items)
-  File "utils/pricing.py", line 23, in <genexpr>
-    return sum(item.price for item in items)
-AttributeError: 'NoneType' object has no attribute 'price'
-```
-
-Claude 不仅会解释每行的含义，还会告诉你**错误根本原因**：某个 `item` 变量的值是 `None`（空），而不是一个有 `price` 属性的对象。
+当 Claude 能同时看到报错和代码时，它的诊断比只看其中一个要准确得多。
 
 ---
 
 ## 理解不熟悉的语言
 
-这是 Claude Code 特别厉害的地方：**你不需要懂那门语言，也能理解代码在做什么。**
+Claude Code 一个被低估的超能力：它读取任何编程语言的代码，并且会用普通语言解释那段代码，不管你懂什么语言。
 
-### 场景一：你主要写 Python，但需要读一段 Go 代码
-
-```
-我主要写 Python，帮我用 Python 的方式解释这段 Go 代码是在做什么：
-
-func processUser(db *sql.DB, userID int) (User, error) {
-    var user User
-    err := db.QueryRow(
-        "SELECT id, name, email FROM users WHERE id = ?", userID,
-    ).Scan(&user.ID, &user.Name, &user.Email)
-    if err != nil {
-        return User{}, fmt.Errorf("user not found: %w", err)
-    }
-    return user, nil
-}
-```
-
-Claude 会用你熟悉的方式解释：
+如果你是 Python 开发者，正在看一个 JavaScript 项目：
 
 ```
-用 Python 类比，这段代码等于：
-
-def process_user(db_connection, user_id):
-    cursor = db_connection.cursor()
-    cursor.execute(
-        "SELECT id, name, email FROM users WHERE id = %s", (user_id,)
-    )
-    row = cursor.fetchone()
-    if row is None:
-        raise ValueError(f"user not found")
-    return {"id": row[0], "name": row[1], "email": row[2]}
-
-主要功能：根据 user_id 从数据库查询用户信息并返回。
+I'm primarily a Python developer. Can you explain this JavaScript code in terms I would understand, drawing comparisons to Python where helpful?
 ```
 
-### 场景二：完全陌生的代码片段
+如果你完全是编程新手，正在看任何代码：
 
 ```
-这段代码我完全看不懂，用通俗语言告诉我它在做什么，
-不用解释语法，只要说清楚逻辑：
-
-const debounce = (fn, delay) => {
-    let timer;
-    return (...args) => {
-        clearTimeout(timer);
-        timer = setTimeout(() => fn(...args), delay);
-    };
-};
+I'm not a programmer. Can you explain what this code does in plain language, as if explaining it to someone who has never coded before?
 ```
+
+Claude 会把解释调整到你所说的水平。不要因为要求更简单的解释而觉得不好意思——总是比假装看懂了好。
 
 ---
 
-## 探索大型代码库的技巧
+## 探索大型代码库
 
-面对一个有几百个文件的大项目，如何高效使用 Claude Code？
+有些项目有几千个文件。你无法读完所有东西。Claude Code 给了你一种更聪明的导航方式。
 
-### 技巧一：从入口文件开始
-
-每个项目都有入口文件——Node.js 项目通常是 `app.js` 或 `index.js`，Python 项目通常是 `main.py`，网页项目是 `index.html`。
+**找到某样东西在哪里：**
 
 ```
-帮我从 app.js 这个入口文件开始，解释程序启动时都做了哪些初始化工作。
-```
-
-### 技巧二：用问题引导探索
-
-不要问"把这个项目都解释给我听"——这太泛了，Claude 的回答也会很泛。
-
-更好的方式是带着具体问题：
-
-```
-我想给这个项目添加一个"用户注销"功能，
-现有的代码里哪里处理了用户认证相关的逻辑？
+Where in this codebase is the email notification logic handled?
 ```
 
 ```
-这个项目是怎么连接数据库的？数据库配置在哪里？
+Which files would I need to modify to change how user profiles are displayed?
 ```
 
-### 技巧三：逐步深入
-
-先问宏观，再问微观：
+**追踪某个功能的流程：**
 
 ```
-第一步：帮我了解这个项目的架构是什么模式（MVC？分层架构？微服务？）
-
-（得到回答后）
-
-第二步：好的，你说它用了 MVC 模式，帮我找一下 Controller 层
-       的代码在哪里，并解释其中一个 Controller 是怎么写的。
+Trace what happens from when a user clicks "Submit Order" all the way to when the order is stored in the database
 ```
 
-### 技巧四：让 Claude 画出关系图（用文字）
+这种流程追踪——从用户操作通过代码到最终结果——能揭示很多关于系统如何工作、存在哪些依赖关系、以及 bug 可能藏在哪里的信息。
+
+**理解命名约定和模式：**
 
 ```
-用文字示意图的方式，画出这个项目里各个模块之间的依赖关系。
+What naming conventions does this project follow?
 ```
 
-Claude 可能会给你类似这样的结构：
-
 ```
-app.js
-  └── routes/
-        ├── userRoutes.js → controllers/UserController.js
-        │                      └── models/User.js → database/db.js
-        └── orderRoutes.js → controllers/OrderController.js
-                               └── models/Order.js → database/db.js
+What design patterns are used in this codebase? Are there any inconsistencies?
 ```
 
-### 技巧五：用 `@` 引用文件
-
-在 VS Code 的 Claude Code 插件里，你可以用 `@文件名` 来引用特定文件：
-
-```
-@src/auth/middleware.js 这个中间件的作用是什么？
-它和 @src/routes/protected.js 是怎么配合工作的？
-```
+理解一个项目的模式能帮助你写出融入其中的代码，而不是格格不入的代码。
 
 ---
 
-## 提问的好习惯
+## 更好代码阅读会话的技巧
 
-读代码时，这几个问题模板特别有用：
+### 先宽后窄
 
-| 目标 | 问法 |
-|------|------|
-| 了解文件用途 | "这个文件是干什么的？" |
-| 理解函数逻辑 | "XX 函数是怎么工作的？参数和返回值是什么？" |
-| 追踪数据流 | "变量 XX 是从哪里来的，最终用在哪里？" |
-| 理解依赖关系 | "这个模块依赖哪些其他模块？" |
-| 看懂报错 | "这个错误是什么意思，可能的原因有哪些？" |
-| 跨语言理解 | "用 [你熟悉的语言] 的方式解释这段 [陌生语言] 代码" |
+抵制直接跳到"我如何修复 X？"的冲动。从"这个系统做什么？"开始。理解上下文会让具体问题更容易正确回答。
+
+### 问"为什么"而不只是"是什么"
+
+```
+Why is the data being stored in localStorage instead of a database here?
+```
+
+```
+Why does this function make three API calls instead of one?
+```
+
+"为什么"的问题往往能揭示架构决策、历史背景或技术限制——这些是单纯读代码无法告诉你的。
+
+### 问什么是缺失的
+
+```
+What functionality would you expect to see in a module like this that seems to be missing?
+```
+
+```
+Are there any obvious error cases that this code doesn't handle?
+```
+
+Claude 能识别代码中的空缺——那些事情可能出错但没有处理的地方——就像它解释已有的内容一样容易。
+
+### 告诉 Claude 你的目标
+
+上下文帮助 Claude 给出更好的答案：
+
+```
+I need to add a bulk upload feature. Before I start, can you help me understand how the existing single-file upload works so I can build on it?
+```
+
+知道你的目标能帮助 Claude 把解释集中在对你特定任务重要的内容上，而不是把所有东西都解释得一样详细。
+
+### 随时提出后续问题
+
+你不必在第一遍就理解一切。如果 Claude 的解释里包含了你不认识的术语，就问：
+
+```
+You mentioned "middleware" — can you explain what that means in this context?
+```
+
+```
+I didn't understand the part about race conditions. Can you explain that more simply?
+```
+
+Claude 记住你们对话的上下文。你随时可以请求澄清而不会失去你的位置。
 
 ---
 
-## 小结
+## 当 Claude 出错时
 
-读代码是学习编程最重要的能力之一，而 Claude Code 让这件事变得容易得多：
+Claude Code 在读取你的代码并进行推断。有时候它会出错——特别是当代码不寻常、使用了出人意料的模式，或者依赖于文件中不可见的上下文时。
 
-- **新项目**：快速了解结构和功能，不用在代码里迷路
-- **报错调试**：贴上 stack trace，立刻得到人话解释
-- **陌生语言**：用你懂的语言来理解你不懂的代码
-- **大代码库**：带着具体问题探索，逐步深入
+如果 Claude 的解释和你实际运行代码时观察到的不符，相信你观察到的。告诉 Claude 有什么不同：
 
-下一章，我们来看如何让 Claude 帮你**修改**代码。
+```
+You said this function always returns an array, but when I call it, I sometimes get null. Can you look again?
+```
+
+Claude 会重新检查它的推理，通常能自我纠正。把它当作一场对话——你可以反驳——比不加批判地接受每一个解释要产生好得多的结果。
 
 ---
 
-**下一章：** [改文件](./08-editing-files.md)
+## 读代码教给你什么
+
+有经验的开发者知道一个秘密：学习一门编程语言或框架的最好方式是大量阅读用它写的代码。传统上，这既慢又令人沮丧，因为你必须自己解析一切。
+
+有了 Claude Code，你可以读代码快得多。你看到一个模式，问它是什么意思，在三十秒内理解它，然后继续。随着时间推移，这些模式积累起来。你自己对代码如何工作的心智模型快速成长。
+
+用 Claude Code 来理解代码不是作弊，这是加速学习。
+
+---
+
+**下一章：** [第八章 — 编辑文件](./08-editing-files.md) — Claude Code 如何修改你的代码，以及如何审查和控制这些改动。

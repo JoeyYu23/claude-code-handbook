@@ -118,6 +118,7 @@ const book2En = [
       { text: '20. Team Workflows', link: '/en/book2-advanced/20-team-workflows' },
       { text: '21. Remote Connection', link: '/en/book2-advanced/21-remote-connection' },
       { text: '22. Security & Privacy', link: '/en/book2-advanced/22-security' },
+      { text: '23. Cost Reality', link: '/en/book2-advanced/23-cost-reality' },
     ]
   },
   {
@@ -250,6 +251,7 @@ const book2Zh = [
       { text: '20. 团队协作', link: '/zh/book2-advanced/20-team-workflows' },
       { text: '21. 远程连接', link: '/zh/book2-advanced/21-remote-connection' },
       { text: '22. 安全与隐私', link: '/zh/book2-advanced/22-security' },
+      { text: '23. 费用真相', link: '/zh/book2-advanced/23-cost-reality' },
     ]
   },
   {
@@ -265,6 +267,14 @@ const book2Zh = [
 ]
 
 export default defineConfig({
+  base: '/claude-code-handbook/',
+
+  ignoreDeadLinks: [
+    /\.\/LICENSE/,
+    /\.\/en\//,
+    /\.\/zh\//,
+  ],
+
   title: 'Claude Code Handbook',
   description: 'The definitive guide to Claude Code — from zero to mastery.',
 
@@ -358,8 +368,8 @@ export default defineConfig({
     },
 
     footer: {
-      message: 'Released under the MIT License.',
-      copyright: 'Copyright 2025-present Claude Code Handbook'
+      message: 'Released under CC BY-SA 4.0.',
+      copyright: 'Copyright 2026-present Claude Code Handbook'
     },
 
     search: {

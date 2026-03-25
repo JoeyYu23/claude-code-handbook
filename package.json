@@ -13,9 +13,9 @@
     "type": "git",
     "url": "git+https://github.com/JoeyYu23/claude-code-handbook.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["claude-code", "anthropic", "ai-coding", "handbook", "tutorial", "bilingual"],
+  "author": "Chenyang Yu",
+  "license": "CC-BY-SA-4.0",
   "bugs": {
     "url": "https://github.com/JoeyYu23/claude-code-handbook/issues"
   },

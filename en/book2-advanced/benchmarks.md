@@ -71,11 +71,13 @@ The following estimates use approximate Anthropic API pricing as of early 2025. 
 
 **Pricing tiers (approximate, subject to change):**
 
-| Model | Input tokens (per 1M) | Output tokens (per 1M) |
-|-------|----------------------|------------------------|
-| Claude Haiku 3.5 | ~$1 | ~$5 |
-| Claude Sonnet 4 | ~$3 | ~$15 |
-| Claude Opus 4 | ~$15 | ~$75 |
+| Model | Input tokens (per 1M) | Output tokens (per 1M) | Cache read (per 1M) |
+|-------|----------------------|------------------------|---------------------|
+| Claude Haiku 4.5 | ~$1 | ~$5 | ~$0.10 |
+| Claude Sonnet 4.6 | ~$3 | ~$15 | ~$0.30 |
+| Claude Opus 4.6 | ~$15 | ~$75 | ~$1.50 |
+
+Prompt caching is automatic — Claude Code caches CLAUDE.md, system prompts, and other stable content. Cache reads cost approximately 10% of normal input price, which substantially reduces costs in long sessions where the same context is reused.
 
 **Typical task costs (Sonnet, approximate):**
 
@@ -90,7 +92,7 @@ The following estimates use approximate Anthropic API pricing as of early 2025. 
 | Architecture planning session | $1.00–$4.00 |
 
 **Model selection impact:**
-Running the same task on Opus vs Sonnet costs approximately 5x more. For tasks where Sonnet produces satisfactory results, the cost difference over a month of heavy use is substantial. A developer doing 20 medium features per month on Sonnet (~$10 in API costs) would pay ~$50 doing the same on Opus.
+Running the same task on Opus 4.6 vs Sonnet 4.6 costs approximately 5x more. For tasks where Sonnet produces satisfactory results, the cost difference over a month of heavy use is substantial. A developer doing 20 medium features per month on Sonnet (~$10 in API costs) would pay ~$50 doing the same on Opus.
 
 ---
 
@@ -115,13 +117,14 @@ Running 3 parallel subagents for independent tasks provides roughly 2.5–3x spe
 
 ## Context Window Reference
 
-Claude models have different context window sizes. As of early 2025:
+Claude models have different context window sizes. As of early 2026:
 
-| Model | Context Window |
-|-------|---------------|
-| Claude Haiku 3.5 | 200,000 tokens |
-| Claude Sonnet 4 | 200,000 tokens |
-| Claude Opus 4 | 200,000 tokens |
+| Model | Context Window | Notes |
+|-------|---------------|-------|
+| Claude Haiku 4.5 | 200,000 tokens | Standard |
+| Claude Sonnet 4.6 | 200,000 tokens | Standard |
+| Claude Opus 4.6 | 200,000 tokens | Standard |
+| Claude Opus 4.6 (1M) | 1,000,000 tokens | Max/Team/Enterprise automatically; disable with `CLAUDE_CODE_DISABLE_1M_CONTEXT=1` |
 
 200,000 tokens sounds large, but fills faster than expected:
 

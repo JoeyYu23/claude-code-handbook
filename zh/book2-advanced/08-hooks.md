@@ -14,28 +14,50 @@ Hook 的典型用途：
 
 ---
 
-## Hook 生命周期
+## 完整事件列表
+
+Claude Code 支持以下所有 hook 事件：
+
+**Session 生命周期：** `SessionStart`、`InstructionsLoaded`、`SessionEnd`
+
+**用户交互：** `UserPromptSubmit`、`Elicitation`、`ElicitationResult`、`Notification`
+
+**工具执行：** `PreToolUse`、`PermissionRequest`、`PostToolUse`、`PostToolUseFailure`
+
+**任务控制：** `Stop`、`StopFailure`、`TaskCompleted`
+
+**Sub-agent 与 Teammate：** `SubagentStart`、`SubagentStop`、`TeammateIdle`
+
+**上下文与配置：** `ConfigChange`、`PreCompact`、`PostCompact`、`CwdChanged`、`FileChanged`
+
+**Worktree：** `WorktreeCreate`、`WorktreeRemove`
+
+## Hook 生命周期图
 
 ```
-SessionStart
+SessionStart → InstructionsLoaded
     ↓
 UserPromptSubmit
     ↓
 [Agentic Loop]:
     PreToolUse → PermissionRequest → Tool 执行 → PostToolUse / PostToolUseFailure
     SubagentStart / SubagentStop
+    TeammateIdle（Agent Teams 模式下）
     TaskCompleted
     ↓
-Stop
+Stop / StopFailure
     ↓
 SessionEnd
 ```
 
-异步事件（可在任何时刻发生）：
+随时可能发生的异步事件：
 - `WorktreeCreate` / `WorktreeRemove`
 - `Notification`
 - `ConfigChange`
-- `InstructionsLoaded`
+- `CwdChanged`
+- `FileChanged`
+- `Elicitation` / `ElicitationResult`
+- `PreCompact` / `PostCompact`
 
 ---
 
@@ -404,6 +426,66 @@ exit 0
   }
 }
 ```
+
+### PostToolUseFailure — 工具调用失败时
+
+工具调用失败时触发（与 PostToolUse 不同，此事件在出错时触发）。用于记录失败日志、异常报警或触发备用行为：
+
+```json
+{
+  "hooks": {
+    "PostToolUseFailure": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/log-failure.sh",
+            "async": true
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### TeammateIdle — Teammate 等待时（实验性）
+
+在 Agent Teams 实验模式下，当一个 teammate 完成当前任务并等待新工作时触发。用于协调 teammate 之间的工作分配。
+
+### InstructionsLoaded — 指令加载后
+
+在 `CLAUDE.md` 文件和其他指令来源在 session 启动时加载完成后触发。可以用来在静态指令就位后注入额外的动态上下文：
+
+```bash
+#!/bin/bash
+# .claude/hooks/inject-dynamic-context.sh
+SPRINT=$(cat .current-sprint 2>/dev/null || echo "unknown")
+jq -n --arg sprint "$SPRINT" '{
+  hookSpecificOutput: {
+    hookEventName: "InstructionsLoaded",
+    additionalContext: ("当前 Sprint：" + $sprint)
+  }
+}'
+exit 0
+```
+
+### PreCompact / PostCompact — 压缩前后
+
+在 `/compact` 操作前后触发。`PreCompact` 可以添加需要在摘要中保留的信息；`PostCompact` 可以在新对话中注入新鲜的上下文。
+
+### CwdChanged — 工作目录变更时
+
+当 session 期间当前工作目录发生变更时触发（例如使用了 `/add-dir`）。可以用来加载特定目录的上下文或更新环境变量。
+
+### FileChanged — 外部文件变更时
+
+当磁盘上的文件在 Claude 直接编辑之外发生变更时触发（例如构建系统输出或外部工具写入项目）。可以用来通知 Claude 外部变更。
+
+### Elicitation / ElicitationResult — MCP 结构化输入请求
+
+`Elicitation` 在 MCP server 向用户请求结构化输入时触发，可以自动提供凭证、配置值或其他输入，无需用户手动干预。`ElicitationResult` 在 elicitation 解决后触发，包含所提供的值。
 
 ---
 

@@ -13,7 +13,8 @@ Memory 系统
 ├── CLAUDE.md 文件        # 你写给 Claude 的指令（主动配置）
 │   ├── 项目级：./CLAUDE.md 或 ./.claude/CLAUDE.md
 │   ├── 用户级：~/.claude/CLAUDE.md
-│   └── 组织级：/Library/Application Support/ClaudeCode/CLAUDE.md
+│   └── 组织级（托管策略）：/Library/Application Support/ClaudeCode/CLAUDE.md（macOS）
+│                         或 /etc/claude-code/CLAUDE.md（Linux）
 │
 ├── Auto Memory           # Claude 自动积累的学习（被动积累）
 │   └── ~/.claude/projects/<project>/memory/
@@ -124,6 +125,8 @@ Memory 系统
 ## 未解决问题
 - Safari 上的 FormData 兼容性问题，暂时用 polyfill 绕过
 ```
+
+Auto Memory 需要 Claude Code v2.1.59 或更高版本，默认启用。
 
 **让 Claude 写入 Auto Memory**：
 

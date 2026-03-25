@@ -25,7 +25,7 @@ For Team and Enterprise plans, an admin must enable Claude Code in admin setting
 
 ## Setting Up Remote Access
 
-Three ways to start a Remote Control session:
+Several ways to start a Remote Control session:
 
 **Server mode (dedicated remote session):**
 
@@ -44,12 +44,30 @@ claude --remote-control "Feature: OAuth Migration"
 
 This gives you a full interactive terminal session that you can also control from claude.ai or the Claude mobile app. Unlike server mode, you can type messages locally while the session is also available remotely.
 
+**Create a session on claude.ai cloud:**
+
+```bash
+claude --remote
+```
+
+This creates a cloud-based session hosted on Anthropic-managed infrastructure at claude.ai/code. The session is not tied to your local machine — you can connect to it from any browser, and it persists even if your local terminal closes.
+
+**Pull a cloud session to your local terminal:**
+
+```bash
+claude --teleport "session-name"
+```
+
+`--teleport` pulls an existing cloud session from claude.ai to your local terminal, making it available for local tool access (filesystem, MCP servers, local commands). This lets you start a session on your phone, then continue it with full local tool access from your terminal.
+
 **Enable remote control for an existing session:**
 
 If you are already in a session and want to enable remote access:
 
 ```text
 /remote-control My Project
+# Shorthand:
+/rc My Project
 ```
 
 This starts Remote Control within the current session, carrying over your existing conversation history.

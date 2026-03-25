@@ -100,46 +100,54 @@ Session 5: 更新相关文档和 CHANGELOG
 
 ---
 
-## 平行 Session：同时处理多个任务
+## Agent Teams：并行处理独立工作流
 
-Claude Code 支持在不同目录或不同 worktree 中同时运行多个 session。
+Claude Code 支持 Agent Teams——多个 agent 并行运行，每个 agent 拥有独立的 context window。这是处理可分解为独立工作流的大型任务时最高效的模式。
 
-### 使用 Git Worktrees（推荐）
+**启动并行 agent：**
 
-Git worktrees 让你在同一个 repo 中同时有多个工作目录，每个 session 互不干扰：
+```text
+并行启动三个 agent：
+1. Agent A：在 src/auth/ 中实现用户认证 endpoint
+2. Agent B：为所有认证 endpoint 编写单元测试
+3. Agent C：更新认证模块的 OpenAPI 文档
 
-```bash
-# 创建 worktrees
-git worktree add ../my-app-feature-auth feature/auth-refactor
-git worktree add ../my-app-bugfix-123 bugfix/issue-123
-
-# 在三个终端分别启动 Claude Code
-# 终端 1（主开发）
-cd ~/projects/my-app
-claude
-
-# 终端 2（功能开发）
-cd ~/projects/my-app-feature-auth
-claude
-
-# 终端 3（紧急修复）
-cd ~/projects/my-app-bugfix-123
-claude
+各 agent 独立工作，完成后汇报结果。
 ```
 
-三个 session 可以同时运行，修改各自的文件，互不冲突。
+每个 agent 在独立的 context window 中运行。一个 agent 中大量的文件读取、探索和分析不会影响其他 agent 的 context 预算。结果以摘要形式返回到协调 session。
 
-### 远程 Session 的平行工作
+**使用 Git Worktrees 进行并行开发：**
 
-结合 Remote Control，可以在手机上看一个 session 运行的同时，在电脑上工作另一个：
+对于需要在同一仓库中工作而不产生冲突的 agent，使用 git worktrees。`claude -w` 标志（或 `--worktree`）创建或使用命名的 worktree：
 
 ```bash
-# 在后台跑长时间任务
-claude remote-control --name "测试重构" &
+# 创建并进入名为 "feature-oauth" 的 worktree
+claude -w feature-oauth
 
-# 继续在前台工作
-claude
+# 或使用完整标志
+claude --worktree feature-auth
 ```
+
+Claude Code 在 `../<repo>-<name>/` 创建新的 git worktree 并在那里启动 session。每个 worktree 是指向同一仓库的独立工作目录——一个 worktree 中的更改不会影响另一个，直到显式合并。
+
+对于大型仓库的稀疏检出，配置要包含的路径：
+
+```json
+// .claude/settings.json
+{
+  "worktree": {
+    "sparsePaths": ["src/auth/", "tests/auth/", "docs/api/"]
+  }
+}
+```
+
+**何时使用 Agent Teams vs 顺序工作：**
+
+- **Agent Teams：** 真正独立的任务（不同模块、不同文件集、无共享状态）
+- **顺序工作：** 每一步依赖上一步的任务（设计→实现→测试，在同一代码库中）
+
+并行 agent 的效率提升在每个独立任务预计消耗 20,000+ token 时最为显著——将探索和分析委托给隔离 agent 可以防止主 session 的 context 压力。
 
 ---
 

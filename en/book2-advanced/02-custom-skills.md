@@ -88,6 +88,12 @@ argument-hint: [environment]
 context: fork
 agent: Explore
 model: opus
+effort: high
+hooks:
+  Stop:
+    - hooks:
+        - type: command
+          command: "./scripts/verify-deploy.sh"
 ---
 ```
 
@@ -100,9 +106,10 @@ model: opus
 | `user-invocable` | Set `false` to hide from the `/` menu. Use for background knowledge that users should not invoke directly. |
 | `allowed-tools` | Tools Claude can use without asking permission when this skill is active. |
 | `model` | Model to use when this skill runs. Accepts aliases like `haiku` or full model IDs. |
+| `effort` | Effort level for the model when this skill runs: `low`, `medium`, `high`, `max`, or `auto`. |
 | `context` | Set `fork` to run in an isolated subagent context. |
 | `agent` | Which subagent type to use when `context: fork` is set. |
-| `hooks` | Lifecycle hooks scoped to this skill. |
+| `hooks` | Lifecycle hooks scoped to this skill's execution lifetime. |
 
 ---
 

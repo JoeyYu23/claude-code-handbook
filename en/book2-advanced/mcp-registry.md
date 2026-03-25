@@ -46,7 +46,7 @@ A curated reference of popular MCP servers for Claude Code. For the full live re
 
 | Server | What It Does | Install Command | Use Case |
 |--------|-------------|-----------------|----------|
-| **Linear** | Read/write Linear issues, projects, cycles. | `claude mcp add --transport http linear https://mcp.linear.app/sse` | Linear-based team workflows |
+| **Linear** | Read/write Linear issues, projects, cycles. | `claude mcp add --transport http linear https://mcp.linear.app/mcp` | Linear-based team workflows |
 | **Jira** | Read/write Jira issues, sprints, boards. | `claude mcp add --transport http jira https://mcp.atlassian.com/rest/mcp/sse` | Atlassian Jira workflows |
 | **Asana** | Read/write Asana tasks, projects, teams. | `claude mcp add --transport sse asana https://mcp.asana.com/sse` | Asana task management |
 | **Notion** | Read/write Notion pages, databases, blocks. | `claude mcp add --transport http notion https://mcp.notion.com/mcp` | Notion-based documentation/PM |
@@ -59,7 +59,7 @@ A curated reference of popular MCP servers for Claude Code. For the full live re
 
 | Server | What It Does | Install Command | Use Case |
 |--------|-------------|-----------------|----------|
-| **Slack** | Read channels, post messages, search conversations. | `claude mcp add --transport stdio slack -- npx -y @modelcontextprotocol/server-slack` | Slack-based team communication |
+| **Slack** | Read channels, post messages, search conversations. | `claude mcp add --transport http slack https://mcp.slack.com/mcp` | Slack-based team communication |
 | **Gmail** | Read, send, and manage Gmail email. | `claude mcp add --transport http gmail https://mcp.gmail.com` | Email automation, digest creation |
 | **Google Calendar** | Read/write calendar events, check availability. | See [Google MCP docs](https://developers.google.com/workspace/mcp) | Scheduling automation |
 | **SendGrid** | Send transactional email, manage templates. | `claude mcp add --transport stdio sendgrid -- npx -y @sendgrid/mcp` | Email integration in apps |
@@ -129,6 +129,29 @@ claude mcp add --scope user ...
 
 ---
 
+## Security Checklist for MCP Servers
+
+Before adding any MCP server to your workflow:
+
+```
+Before installing:
+☐ Server is from a known organization or has verifiable open-source code
+☐ You understand what data the server can read or modify
+☐ Production/sensitive connections use read-only credentials
+
+When configuring:
+☐ Credentials passed via --env flags, not hardcoded in commands
+☐ Database connections use a dedicated, least-privilege user
+☐ Project-scope .mcp.json reviewed by team before committing
+
+Ongoing maintenance:
+☐ Update MCP server packages regularly
+☐ Remove servers no longer in use: `claude mcp remove <name>`
+☐ Rotate API keys used by MCP servers quarterly
+```
+
+---
+
 ## Installing from Claude Desktop
 
 If you have already configured MCP servers in Claude Desktop, import them to Claude Code:
@@ -144,5 +167,37 @@ Select which servers to import interactively. Works on macOS and WSL.
 ## Building Your Own
 
 When no existing server meets your needs, build a custom MCP server. See [Chapter 14 — Building Custom MCP Servers](./14-custom-mcp.md).
+
+**Quick-start template:**
+
+```bash
+# 1. Initialize project
+mkdir my-mcp-server && cd my-mcp-server
+npm init -y
+npm install @modelcontextprotocol/sdk zod
+
+# 2. Create server.js
+cat > server.js << 'EOF'
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { z } from "zod";
+
+const server = new McpServer({ name: "my-server", version: "1.0.0" });
+
+server.tool(
+  "my_tool",
+  "Description of what this tool does",
+  { input: z.string().describe("The input parameter") },
+  async ({ input }) => ({
+    content: [{ type: "text", text: `Processed: ${input}` }]
+  })
+);
+
+await server.connect(new StdioServerTransport());
+EOF
+
+# 3. Register with Claude Code
+claude mcp add --transport stdio my-server -- node server.js
+```
 
 Community MCP servers: [github.com/modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers)

@@ -131,6 +131,14 @@ Include specific file paths and line numbers.
 
 **`skills`** — List of skill names to preload into this agent's context at startup. The full skill content is injected, not just made available.
 
+**`effort`** — Effort level for this agent's model: `low`, `medium`, `high`, `max`, or `auto`.
+
+**`initialPrompt`** — An initial prompt automatically sent to the agent as its first user message when it starts. Useful for providing task context that changes per invocation.
+
+**`mcpServers`** — MCP server configurations available only to this agent. Defined inline in the same format as `.mcp.json`. This lets you give specialized agents access to tools the main conversation does not have.
+
+**`hooks`** — Lifecycle hooks scoped to this agent's execution. Same format as session-level hooks but only active during the agent's lifetime.
+
 ---
 
 ## Foreground vs Background Agents
@@ -230,6 +238,34 @@ Sub-agent transcripts are stored at:
 ```text
 ~/.claude/projects/{project}/{sessionId}/subagents/agent-{agentId}.jsonl
 ```
+
+---
+
+## Agent Teams (Experimental)
+
+Agent Teams is an experimental feature that enables multiple Claude instances to work in true parallel, each in its own terminal pane. Unlike the standard sub-agent model (where agents are spawned and return results), teammates are full Claude sessions running side-by-side and coordinating via shared state.
+
+To enable Agent Teams:
+
+```bash
+CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 claude
+```
+
+Three coordination modes are available:
+
+**`auto`** — Claude decides whether to work inline or spawn teammates based on task complexity.
+
+**`in-process`** — Teammates run as threads within the same process. Lower overhead, suitable for tightly coupled tasks.
+
+**`tmux`** — Each teammate runs in a separate tmux pane, visible in your terminal. Best for long-running parallel tasks where you want to monitor progress.
+
+To start a session in tmux teammate mode:
+
+```bash
+CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 claude --teammate-mode tmux
+```
+
+Agent Teams pairs with the built-in `/batch` skill, which automatically distributes work across multiple worktrees and runs agents in parallel. See Chapter 6 for detailed parallel orchestration patterns.
 
 ---
 

@@ -92,23 +92,45 @@ claude mcp list
 
 ---
 
-## 安全使用 MCP Server 的原则
+## Scope 选择快速参考
+
+```bash
+# local（默认）——只对你在此项目中可见
+claude mcp add --scope local ...
+
+# project——通过 .mcp.json 与团队共享（不要包含凭据）
+claude mcp add --scope project ...
+
+# user——在你所有项目中可用
+claude mcp add --scope user ...
+```
+
+**经验法则：**
+- 需要凭据的 → `local`
+- 整个团队共用的工具 → `project`（凭据存环境变量，不放配置文件）
+- 你个人到处用的工具 → `user`
+
+---
+
+## MCP Server 安全检查清单
+
+在将任何 MCP server 加入工作流之前：
 
 ```
 安装前确认：
-□ MCP server 来自知名组织或有良好 GitHub 记录
-□ 明确了解该 server 会访问哪些数据
-□ 生产环境敏感服务使用只读权限
+☐ MCP server 来自知名组织或有可验证的开源代码
+☐ 明确了解该 server 会读取或修改哪些数据
+☐ 生产/敏感连接使用只读凭据
 
 配置时注意：
-□ API keys 通过 --env 传入，不硬编码在命令中
-□ 生产 DB 连接只给读权限
-□ 将 project-scope 的 .mcp.json 提交到 Git 前，团队一起 review
+☐ API keys 通过 --env 传入，不硬编码在命令中
+☐ 数据库连接使用专用的最小权限用户
+☐ project-scope 的 .mcp.json 提交前经团队 review
 
 定期维护：
-□ 检查并更新 MCP server 版本
-□ 移除不再使用的 server（claude mcp remove <名称>）
-□ 定期轮换 MCP server 使用的 API keys
+☐ 定期更新 MCP server 包
+☐ 移除不再使用的 server：claude mcp remove <名称>
+☐ 定期轮换 MCP server 使用的 API keys
 ```
 
 ---
@@ -119,9 +141,11 @@ claude mcp list
 
 ```bash
 # 1. 初始化项目
-npm init -y && npm install @modelcontextprotocol/sdk zod
+mkdir my-mcp-server && cd my-mcp-server
+npm init -y
+npm install @modelcontextprotocol/sdk zod
 
-# 2. 创建 server（最小模板）
+# 2. 创建 server.js
 cat > server.js << 'EOF'
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -129,14 +153,19 @@ import { z } from "zod";
 
 const server = new McpServer({ name: "my-server", version: "1.0.0" });
 
-server.tool("hello", "Say hello", { name: z.string() }, async ({ name }) => ({
-  content: [{ type: "text", text: `Hello, ${name}!` }]
-}));
+server.tool(
+  "my_tool",
+  "描述此工具的功能",
+  { input: z.string().describe("输入参数") },
+  async ({ input }) => ({
+    content: [{ type: "text", text: `已处理：${input}` }]
+  })
+);
 
 await server.connect(new StdioServerTransport());
 EOF
 
-# 3. 注册
+# 3. 注册到 Claude Code
 claude mcp add --transport stdio my-server -- node server.js
 ```
 

@@ -195,7 +195,18 @@ claude mcp remove github
 
 ## Scoping and Configuration Files
 
-MCP servers can be configured at three scopes. Understanding the scopes is important for team collaboration.
+MCP servers can be configured at multiple scopes. Understanding the scopes is important for team collaboration.
+
+The full scope priority from highest to lowest is:
+
+| Scope | How specified | Storage location |
+|---|---|---|
+| CLI flag | `--mcp-config <path>` | Specified JSON file |
+| Local | default | `~/.claude.json` under your project's path |
+| Project | `.claude/.mcp.json` | Nested in the `.claude` directory |
+| Project (root) | `.mcp.json` | Project root |
+| User | `--scope user` | `~/.claude.json` global entry |
+| Plugin | Plugin definition | Plugin's config |
 
 **Local scope (default):** Stored in `~/.claude.json` under your project's path. Only you can see this server when working in this project. Use for personal credentials or experimental servers.
 
@@ -204,7 +215,7 @@ claude mcp add --transport http my-test-server https://localhost:8080/mcp
 # Stored in ~/.claude.json, private to you
 ```
 
-**Project scope:** Stored in `.mcp.json` in the project root. Committed to version control. Everyone on the team gets this server when they work on this project.
+**Project scope:** Stored in `.mcp.json` in the project root (or `.claude/.mcp.json`). Committed to version control. Everyone on the team gets this server when they work on this project.
 
 ```bash
 claude mcp add --transport http shared-tool --scope project https://tools.company.com/mcp
@@ -220,7 +231,7 @@ claude mcp add --transport http my-utility --scope user https://my-personal-mcp.
 
 ### Precedence
 
-When the same server name appears at multiple scopes, local wins over project wins over user. This means you can override a team server with your own version for testing.
+When the same server name appears at multiple scopes, higher-priority scopes win. The CLI `--mcp-config` flag takes highest precedence, allowing you to completely override all other MCP configuration for a single invocation.
 
 ### The `.mcp.json` Format
 
@@ -297,6 +308,52 @@ ENABLE_TOOL_SEARCH=auto:5 claude
 # Disable tool search, always load all tools
 ENABLE_TOOL_SEARCH=false claude
 ```
+
+---
+
+## MCP Elicitation
+
+MCP Elicitation is a protocol feature that allows MCP servers to request structured input from the user mid-task. Instead of hardcoding configuration or failing when it lacks information, a server can pause and ask Claude Code to collect a specific piece of data.
+
+When an MCP server sends an elicitation request, Claude Code shows a dialog asking the user for the required input. Common uses include:
+
+- Asking for database credentials on first use
+- Requesting confirmation before a destructive operation
+- Collecting parameters that the server cannot infer from context
+
+From your perspective, this looks like a normal permission or input prompt. The difference is that it is the MCP server requesting it, not Claude Code itself.
+
+You can automate elicitation responses using the `Elicitation` hook event (see Chapter 8). For example, to auto-provide a database password stored in an environment variable:
+
+```bash
+#!/bin/bash
+# .claude/hooks/auto-elicit.sh
+INPUT=$(cat)
+FIELD=$(echo "$INPUT" | jq -r '.elicitation.field // empty')
+
+if [ "$FIELD" = "db_password" ]; then
+  jq -n --arg val "$DB_PASSWORD" '{
+    hookSpecificOutput: {
+      hookEventName: "Elicitation",
+      response: { "db_password": $val }
+    }
+  }'
+fi
+exit 0
+```
+
+---
+
+## MCP Channels (Research Preview)
+
+MCP Channels is a research preview feature that enables MCP servers to push messages to Claude proactively, rather than only responding to Claude's requests. This inverts the normal request-response flow.
+
+With Channels, an MCP server can:
+- Alert Claude when a monitored condition occurs (a CI build fails, an error rate spikes)
+- Stream real-time data into the conversation (live log tailing, market data feeds)
+- Initiate a new task on Claude's behalf
+
+Channels are configured per-server and require the server to implement the channels capability in its MCP implementation. This feature is currently in research preview and the API may change.
 
 ---
 

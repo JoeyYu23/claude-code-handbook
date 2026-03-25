@@ -137,7 +137,7 @@ Aider is the closest existing tool to Claude Code in philosophy. Both are termin
 | `/ask` (read-only mode) | Plan Mode (Shift+Tab) |
 | `/architect` | Plan Mode for design, then Normal Mode for implementation |
 | `.aider.conf.yml` | CLAUDE.md and settings.json |
-| `--model gpt-4` | `claude --model claude-sonnet-4-5` |
+| `--model gpt-4` | `claude --model claude-sonnet-4-6` |
 | Repo map | Claude reads files on demand; auto memory accumulates structure |
 | `--watch` (auto mode) | Claude Code hooks for automated responses |
 

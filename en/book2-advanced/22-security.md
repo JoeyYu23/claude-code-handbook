@@ -67,11 +67,29 @@ export DATABASE_URL="postgresql://user:password@host/db"
 export API_SECRET_KEY="sk-..."
 ```
 
-**Verify Claude is not reading your .env:**
+**Review Claude's current file access permissions:**
 ```text
 /permissions
-# Check what file access Claude has in this session
 ```
+
+This command shows what files, directories, and tools Claude has been granted access to in the current session. Use it to verify Claude cannot access sensitive files before working with a codebase that contains credentials or private data.
+
+**Exclude files from Claude's view with .claudeignore:**
+
+Create a `.claudeignore` file in your project root to prevent Claude from reading specified files or directories:
+
+```
+# .claudeignore
+.env
+.env.local
+.env.production
+*.pem
+*.key
+secrets/
+credentials/
+```
+
+Files listed in `.claudeignore` are invisible to Claude's file reads and codebase exploration — even if you ask Claude to "explore the project," it will not read `.claudeignore`-listed files. This is distinct from `.gitignore` (which only affects git) and provides an additional safety layer for locally sensitive files.
 
 If you work with a `.env` file that contains sensitive values and Claude is exploring your codebase, be explicit:
 ```text
@@ -105,7 +123,11 @@ brew install git-secrets
 git secrets --install
 git secrets --register-aws
 
-# Or use detect-secrets
+# Or use gitleaks (recommended — more comprehensive)
+brew install gitleaks
+gitleaks protect --staged   # Check before commit
+
+# Or detect-secrets
 pip install detect-secrets
 detect-secrets scan > .secrets.baseline
 ```
@@ -237,7 +259,7 @@ For teams working under compliance frameworks (SOC 2, HIPAA, PCI DSS, etc.), sev
 
 **Data classification:** Identify what categories of data your codebase handles. If Claude Code sessions might expose regulated data (healthcare records, payment card data, personal information), ensure your use of Claude Code is covered by your compliance review.
 
-**Anthropic's compliance certifications:** Anthropic maintains SOC 2 Type 2 certification and ISO 27001 certification. These are available at [trust.anthropic.com](https://trust.anthropic.com). Enterprise contracts include a Business Associate Agreement (BAA) for HIPAA requirements.
+**Anthropic's compliance certifications:** Anthropic maintains SOC 2 Type 2 certification and ISO 27001 certification. These are available at [trust.anthropic.com](https://trust.anthropic.com). Enterprise contracts include a Business Associate Agreement (BAA) for HIPAA requirements. Security documentation and audit reports are available on request through Enterprise sales.
 
 **Audit logging:** For regulated environments, enable OpenTelemetry monitoring to capture Claude Code activity:
 ```json
@@ -273,8 +295,16 @@ claude --sandbox
 /bug
 ```
 
-Report through Anthropic's security disclosure channel at HackerOne for security vulnerabilities.
+Report through Anthropic's security disclosure channel at [hackerone.com/anthropic-vdp](https://hackerone.com/anthropic-vdp) for security vulnerabilities. Do not publicly disclose until Anthropic has confirmed and patched the issue.
 
 ---
 
 **Next:** See the [Appendix: Agent Type Reference](./agent-reference.md), [MCP Server Registry](./mcp-registry.md), [Performance Benchmarks](./benchmarks.md), and [Migration Guide](./migration-guide.md) for reference material.
+
+---
+
+You have completed the Claude Code Handbook. Every chapter is continuously updated as Claude Code evolves.
+
+- [Star this repo](https://github.com/JoeyYu23/claude-code-handbook) to follow updates
+- [Open an issue](https://github.com/JoeyYu23/claude-code-handbook/issues) if you found an error or have a suggestion
+- [Browse the appendices](/en/book2-advanced/agent-reference) for quick-reference material

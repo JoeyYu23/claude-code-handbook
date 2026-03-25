@@ -1,123 +1,188 @@
 # 附录 A：Agent 类型速查表
 
-> Claude Code 中可用的 Sub-agent 类型汇总，快速查找适合你任务的 agent。
+本附录涵盖 Claude Code 中可用的主要 agent 类型，包括内置 agent 角色和常见的自定义 subagent 模式。在设计多 agent 工作流时可作为快速参考。
 
 ---
 
-## 如何使用 Sub-agents
+## 内置 Agent 角色
 
-```bash
-# 启动 sub-agent 执行特定任务
-claude "使用 architect agent 设计这个新功能的技术方案"
+以下是 Claude Code 在不同配置下扮演的主要角色：
 
-# 显式指定 agent 类型
-claude --agent code-review "审查 src/payment/ 目录下所有文件"
-
-# 在已有 session 中启动 sub-agent
-> 启动一个 test-runner agent 持续监听测试结果
-```
-
----
-
-## 开发类 Agent
-
-| Agent 类型 | 核心职责 | 典型任务 |
-|-----------|---------|---------|
-| **architect** | 系统设计与技术决策 | 设计新功能架构、评估技术方案、创建 ADR |
-| **coder** | 代码实现 | 实现功能、修复 bug、代码重构 |
-| **code-reviewer** | 代码审查 | PR 审查、安全检查、最佳实践验证 |
-| **refactorer** | 代码重构 | 消除重复、改善结构、现代化老代码 |
-| **debugger** | 调试排查 | 定位 bug 根因、分析堆栈跟踪、复现问题 |
-| **test-writer** | 测试编写 | 单元测试、集成测试、E2E 测试 |
-| **test-runner** | 持续测试 | 监听变更、自动运行测试、报告失败 |
-| **doc-writer** | 文档编写 | API 文档、README、内联注释 |
+| Agent 类型 | 描述 | 适用场景 | 可用工具 |
+|------------|------|---------|---------|
+| **交互式 agent** | 标准 Claude Code session。接受指令、读取文件、编写代码、运行命令。 | 所有标准开发工作。 | 全部工具：Read、Write、Edit、Bash、Glob、Grep、WebFetch 及配置的 MCP 工具 |
+| **Subagent** | 在独立 context window 中运行的派生 agent，将结果报告给父 agent。 | 隔离会填满主 context 的探索；并行研究任务。 | 通过 agent 定义文件的 `tools:` 字段配置 |
+| **Plan-mode agent** | Claude 以只读分析模式运行（Shift+Tab 切换）。 | 架构审查、理解陌生代码库、变更前的安全探索。 | Read、Glob、Grep、WebFetch——无 Write/Edit/Bash |
+| **非交互式 agent** | 通过 `claude -p "..."` 调用，无交互 session，输出到 stdout。 | CI 流水线、脚本、批量处理、自动化工作流。 | 全部工具，或通过 `--allowedTools` 限制 |
+| **Remote Control agent** | 可通过 Web 或移动端访问的本地 Claude Code 进程。 | 从非本地设备继续工作。 | 与交互式 agent 相同（完整本地工具） |
+| **Cloud agent** | Web 端 Claude Code，在 Anthropic 托管的 VM 上运行。 | 无需本地环境工作；并行云端 session。 | 受 VM 环境限制；无本地文件系统 |
 
 ---
 
-## 分析类 Agent
+## Subagent 目录
 
-| Agent 类型 | 核心职责 | 典型任务 |
-|-----------|---------|---------|
-| **codebase-analyst** | 代码库分析 | 理解项目结构、依赖分析、技术债评估 |
-| **performance-analyst** | 性能分析 | 识别瓶颈、分析 profiling 数据、提出优化方案 |
-| **security-auditor** | 安全审计 | 漏洞扫描、依赖检查、安全最佳实践 |
-| **dependency-manager** | 依赖管理 | 升级依赖、解决冲突、移除未使用包 |
+Subagent 定义为 `.claude/agents/` 中的 markdown 文件。以下是按功能分类的常见 subagent 模式：
 
----
+### 代码质量类 Agent
 
-## 运维类 Agent
+| Subagent 名称 | 描述 | 适用场景 | 推荐工具 |
+|--------------|------|---------|---------|
+| **security-reviewer** | 审查代码中的注入漏洞、缺失的认证检查、暴露的 secrets、不安全的依赖。 | 合并任何涉及认证、支付或数据访问的 PR 之前。 | Read、Grep、Glob |
+| **test-writer** | 为现有代码生成单元测试和集成测试，遵循仓库中已有的测试模式。 | 实现功能后；为未测试的遗留代码添加覆盖率时。 | Read、Write、Bash（测试运行器） |
+| **type-checker** | 审查 TypeScript/Python 类型注解，发现缺失类型、错误泛型、不安全的类型转换。 | 大型重构后；向 JavaScript 代码库添加类型时。 | Read、Bash（tsc/mypy） |
+| **linter-fixer** | 修复多个文件中的 lint 错误和格式问题。 | 批量清理任务；迁移到新 lint 规则时。 | Read、Write、Bash（linters） |
+| **doc-writer** | 生成或更新内联文档、JSDoc/docstrings、README 文件。 | 实现公开 API 后；保持文档时效性时。 | Read、Write |
 
-| Agent 类型 | 核心职责 | 典型任务 |
-|-----------|---------|---------|
-| **devops** | CI/CD 配置 | 编写 GitHub Actions、优化构建流程 |
-| **database-admin** | 数据库管理 | Schema 设计、Migration 编写、查询优化 |
-| **infrastructure** | 基础设施 | Terraform/Docker 配置、环境搭建 |
-| **log-analyst** | 日志分析 | 分析错误日志、发现异常模式 |
+### 研究与分析类 Agent
 
----
+| Subagent 名称 | 描述 | 适用场景 | 推荐工具 |
+|--------------|------|---------|---------|
+| **codebase-explorer** | 探索陌生代码库，绘制架构图，识别关键文件和模式。 | 加入新项目时；理解继承的代码时。 | Read、Glob、Grep |
+| **dependency-auditor** | 审查 package.json/requirements.txt 中过时、存在漏洞或不必要的依赖。 | 重大发布前；季度依赖审查时。 | Read、Bash（npm audit / pip-audit）、WebFetch |
+| **performance-profiler** | 分析代码中的性能问题：N+1 查询、不必要的重渲染、算法复杂度。 | 性能调查；生产发布前。 | Read、Grep、Bash |
+| **migration-planner** | 分析代码库变更请求，产出带影响评估的逐步迁移计划。 | 大型重构；库升级；架构变更时。 | Read、Glob、Grep |
+| **dead-code-detector** | 查找未使用的函数、不可达代码、孤立文件。 | 清理 sprint；大型重构前。 | Read、Glob、Grep、Bash |
 
-## 协调类 Agent
+### 基础设施与 DevOps 类 Agent
 
-| Agent 类型 | 核心职责 | 典型任务 |
-|-----------|---------|---------|
-| **orchestrator** | 任务编排 | 分解复杂任务、协调多个 sub-agents |
-| **planner** | 计划制定 | 将需求分解为具体任务列表 |
-| **reviewer** | 工作验收 | 验证 sub-agent 的输出质量 |
+| Subagent 名称 | 描述 | 适用场景 | 推荐工具 |
+|--------------|------|---------|---------|
+| **ci-debugger** | 分析 CI/CD 失败：读取日志，识别根本原因，提出修复建议。 | 流水线失败原因不明显时。 | Read、Bash、WebFetch |
+| **dockerfile-reviewer** | 审查 Dockerfile 的最佳实践：层缓存、安全性、镜像大小。 | 构建生产镜像前；Dockerfile 重构时。 | Read |
+| **terraform-reviewer** | 审查 Terraform 配置的安全性、成本效率和最佳实践。 | 应用基础设施变更前。 | Read、Bash（terraform plan） |
+| **log-analyzer** | 分析应用日志或错误日志，识别模式和根本原因。 | 生产事故；错误率飙升时。 | Read、Bash、配置的 MCP 工具 |
 
----
+### 产品与设计类 Agent
 
-## 并行 Agent 工作流示例
-
-### 大型功能开发
-
-```
-用户请求："实现用户评论系统"
-
-Orchestrator Agent 分解任务：
-├── Architect Agent → 设计数据模型和 API
-├── Coder Agent A → 实现后端 API
-├── Coder Agent B → 实现前端组件（并行）
-├── Test-writer Agent → 编写测试（并行）
-└── Doc-writer Agent → 更新 API 文档（并行）
-
-最终：Reviewer Agent 验收所有输出
-```
-
-### 代码库健康检查
-
-```
-Health-check Workflow（并行）：
-├── Security-auditor Agent → 安全漏洞扫描
-├── Performance-analyst Agent → 性能问题识别
-├── Dependency-manager Agent → 过期依赖检查
-└── Codebase-analyst Agent → 技术债评估
-
-汇总报告生成
-```
+| Subagent 名称 | 描述 | 适用场景 | 推荐工具 |
+|--------------|------|---------|---------|
+| **accessibility-checker** | 审查 UI 代码的 WCAG 合规性、ARIA 属性、键盘导航。 | 发布 UI 功能前；无障碍审计时。 | Read、Bash（axe）、browser MCP |
+| **ui-reviewer** | 截取 UI 状态截图，与设计规范对比审查。 | 前端实现审查；视觉回归检查时。 | Read、browser MCP |
+| **api-designer** | 审查或设计 REST/GraphQL API 的一致性、REST 最佳实践、版本策略。 | 实现新 API 资源前。 | Read |
 
 ---
 
-## 在 CLAUDE.md 中定义 Agent 偏好
+## Subagent 定义格式
+
+所有 subagent 定义均为 `.claude/agents/` 目录下的 markdown 文件：
 
 ```markdown
-## Sub-agent 配置
+---
+name: agent-name
+description: 何时以及为何使用此 agent。Claude 用此决定何时委托任务。
+tools: Read, Grep, Glob, Bash    # 逗号分隔；默认为所有工具
+model: sonnet                     # 可选：sonnet（默认）、opus、haiku
+---
 
-### 默认并发数
-- 大型任务：最多 3 个并行 agent
-- 快速任务：1 个 agent 即可
+你是一个 [角色描述]。
 
-### 特定场景的 agent 选择
-- 修改认证相关代码时：必须同时运行 security-auditor
-- 修改数据库 schema 时：先运行 architect，再运行 coder
-- PR 提交前：必须运行 code-reviewer 和 test-runner
+[agent 应做什么的说明]
+[检查什么、如何分析、产出什么]
+[输出格式期望]
 ```
+
+**工具选项：**
+
+| 工具 | 描述 |
+|------|------|
+| `Read` | 读取文件内容 |
+| `Write` | 写入文件（创建或覆盖） |
+| `Edit` | 编辑现有文件（字符串替换） |
+| `Bash` | 执行 shell 命令 |
+| `Glob` | 查找匹配模式的文件 |
+| `Grep` | 用正则表达式搜索文件内容 |
+| `WebFetch` | 抓取并处理 Web URL |
+| `mcp__[server]__[tool]` | 特定 MCP 工具 |
+
+**模型选择指南：**
+
+- `haiku` — 简单重复任务；大批量作业；高并发自动化
+- `sonnet` — 默认；大多数编码任务；调查和审查
+- `opus` — 复杂架构推理；疑难调试；跨多文件的综合分析
 
 ---
 
-## Agent 使用注意事项
+## 多 Agent 编排模式
 
-**并发限制**：同时运行的 agent 越多，token 消耗越快，成本也成倍增加。建议只在真正可以并行的任务上使用多 agent。
+### 调查员 + 实现者模式
 
-**上下文共享**：Sub-agents 可以共享父 agent 的 context，但各有独立的工作空间。协调 agent 之间的工作成果需要明确设计交接机制。
+```
+主 session                      Subagent: codebase-explorer
+     |                               |
+     |-- "调查认证是如何工作的"       |
+     |                               |-- 读取多个文件
+     |                               |-- 绘制认证系统图
+     |<-- 摘要报告 ------------------|
+     |
+     |-- （基于摘要实现变更）
+```
 
-**错误处理**：如果一个 agent 失败，orchestrator 需要决定是重试、换策略，还是向上报错。在 CLAUDE.md 中定义错误处理策略可以减少中断。
+调查员 subagent 在隔离环境中进行昂贵的文件读取；只有摘要进入主 context。
+
+### 编写者 + 审查者模式
+
+```
+Session A（编写者）              Session B（审查者）
+     |                               |
+     |-- 实现功能                    |
+     |-- 提交到分支                  |
+     |                               |-- 读取分支 diff
+     |                               |-- 审查问题
+     |                               |-- 发布审查评论
+     |<-- 审查反馈 ------------------|
+     |-- 处理反馈                    |
+```
+
+### 并行研究模式
+
+```
+主 session
+     |
+     |-- 启动：security-reviewer
+     |-- 启动：performance-profiler
+     |-- 启动：dependency-auditor
+     |
+     |<-- 安全报告
+     |<-- 性能报告
+     |<-- 依赖报告
+     |
+     |-- 综合所有报告
+     |-- 优先排列问题
+```
+
+并行运行三个独立分析 agent 比在主 context 中顺序运行速度更快。
+
+---
+
+## Agent SDK
+
+对于需要超越 Claude Code 内置 subagent 系统的完全自定义 agent 工作流，[Claude Agent SDK](https://platform.claude.com/docs/en/agent-sdk/overview) 提供对 Claude Code 工具和编排能力的编程访问。
+
+Agent SDK 适用于以下场景：
+
+- 超越简单委托的自定义编排逻辑
+- 将外部系统集成到 agent 循环中
+- 对工具访问和权限的精细控制
+- 构建由 Claude Code 能力驱动的产品
+- 以编程方式启动和协调 agent teams
+
+**快速示例：**
+
+```typescript
+import { AgentRuntime } from "@anthropic-ai/agent-sdk";
+
+const runtime = new AgentRuntime({
+  model: "claude-sonnet-4-6",
+  tools: ["Read", "Write", "Bash"],
+});
+
+const result = await runtime.run(
+  "分析 src/auth/ 并生成安全审计报告"
+);
+```
+
+SDK 处理 context 管理、工具执行和结果流式传输。完整文档见 [platform.claude.com/docs/en/agent-sdk/overview](https://platform.claude.com/docs/en/agent-sdk/overview)。
+
+---
+
+*详细的多 agent 模式见[第四章——Sub-agents 详解](./04-subagents.md)和[第六章——并行 Agent 编排](./06-parallel-agents.md)。*

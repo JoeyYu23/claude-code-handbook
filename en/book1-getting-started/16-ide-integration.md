@@ -39,13 +39,15 @@ Beyond what the terminal CLI does, the extension provides:
 
 **Selection context:** When you highlight code in your editor, Claude automatically sees it. The prompt box shows how many lines are selected. Press `Option+K` (Mac) / `Alt+K` (Windows/Linux) to insert an @-mention with the file path and line numbers into your prompt.
 
-**Conversation history:** A dropdown at the top of the panel shows all your past conversations, searchable and resumable.
+**Conversation history:** A dropdown at the top of the panel shows all your past conversations, searchable and resumable. Sessions are given AI-generated descriptive titles so you can find them at a glance.
 
 **Multiple conversations:** Open additional Claude conversations in separate tabs or windows for working on different tasks simultaneously.
 
 **Checkpoints:** Hover over any message to reveal a rewind button. You can fork the conversation from a previous point, revert file changes to an earlier state, or do both simultaneously. This is more sophisticated version control for your Claude sessions.
 
 **Plan mode integration:** When Claude creates a plan (in plan mode — see Chapter 6), VS Code opens it as a full Markdown document where you can add inline comments before Claude proceeds.
+
+**Built-in MCP server:** VS Code 1.98.0+ includes a built-in MCP (Model Context Protocol) server. This means Claude Code can access open files, the current selection, diagnostics, and other editor state without any additional configuration — it connects automatically when you use the extension.
 
 ### Keyboard Shortcuts in VS Code
 
@@ -102,6 +104,8 @@ The JetBrains plugin provides:
 **Selection context sharing:** Like the VS Code extension, the JetBrains plugin passes your selected code to Claude automatically.
 
 **Conversation history:** All past conversations are accessible and resumable.
+
+**Remote Development and WSL support:** The JetBrains plugin works in JetBrains Gateway and WSL (Windows Subsystem for Linux) environments, so you can run Claude Code on a remote server or in a Linux environment while working locally in your IDE.
 
 The JetBrains plugin is labeled "Beta" — it is fully functional but may have occasional rough edges. If you encounter issues, file them on the GitHub repository.
 
@@ -161,3 +165,9 @@ Start a conversation in the terminal, continue it in VS Code, finish it on the w
 ---
 
 **Next up:** The [Glossary](./glossary.md) — Definitions for every term used in this book and throughout the Claude Code ecosystem.
+
+---
+
+You have completed Book 1. If this handbook has been useful, consider [starring the repo on GitHub](https://github.com/JoeyYu23/claude-code-handbook) — it helps others find it.
+
+Ready for more? [Start Book 2: Advanced Patterns →](/en/book2-advanced/)

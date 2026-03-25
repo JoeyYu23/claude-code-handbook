@@ -5,3 +5,6 @@ dist/
 .vitepress/cache/
 *.pdf
 .DS_Store
+*.log
+npm-debug.log*
+.vscode/

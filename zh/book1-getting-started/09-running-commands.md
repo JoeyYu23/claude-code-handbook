@@ -1,263 +1,248 @@
-# 第九章：跑命令
+# 第九章：运行命令
 
-## Claude Code 能运行真实的命令
+## 终端能做什么
 
-除了读写文件，Claude Code 还能在你的终端里直接运行命令——就像一个帮你操作电脑的助手。
+如果你不太熟悉终端，这里先简单介绍一下：终端是一种通过文字来控制电脑的界面。不需要点击图标，不需要找菜单，你只需要输入命令。
 
-这意味着你可以说：
+开发者使用终端，是因为许多强大的工具只存在于终端——构建系统、测试运行器、包管理器、版本控制、部署工具——而且很多复杂操作用一行命令就能完成，省去了反复点菜单的麻烦。
 
-```
-帮我安装项目依赖
-```
+Claude Code 可以代替你在终端运行命令。这让它从代码编辑器升级为能真正采取行动的助手：安装依赖、运行测试、启动开发服务器、查看项目状态。不只是建议——而是真正去做。
 
-Claude 会运行 `npm install`（或 `pip install -r requirements.txt`，取决于你的项目类型）。
-
-或者：
-
-```
-帮我跑一下测试，看看有没有报错
-```
-
-Claude 会运行测试命令，然后把结果告诉你，并解释哪些通过了、哪些失败了、为什么失败。
+本章解释这是如何工作的、什么时候有用，以及如何保持对它的掌控。
 
 ---
 
-## Claude 如何使用 Bash
+## Claude 如何使用终端
 
-Claude Code 使用一个叫做 **Bash 工具**的机制来执行命令。当它判断需要运行某个命令时，会先告诉你：
+当 Claude 需要运行命令时，它会使用 Bash 工具。在运行任何命令之前，它都会先告诉你它打算执行什么，并请求你的许可：
 
 ```
-Claude: 我需要安装项目依赖。我将运行以下命令：
+I need to install the date-fns library.
 
-        $ npm install
+Running: npm install date-fns
 
-        这个命令会下载 package.json 里列出的所有依赖包。
-        是否允许？ [y/n]
+Allow this command? [y/n]
 ```
 
-你同意后，命令才会真正执行。执行完毕，Claude 会把输出结果展示给你，并告诉你意味着什么。
+你能在命令运行之前看到具体内容，没有任何意外。
+
+你批准后，Claude 运行命令并读取输出结果。它通过这个输出来了解发生了什么——命令是否成功、打印了什么、是否有报错——然后继续任务或告诉你结果。
+
+这个反馈循环非常有价值。Claude 可以根据真实结果做出反应，而不是靠猜。如果命令失败，Claude 看到错误信息就能尝试不同的方案。
 
 ---
 
 ## 常见用例
 
-### 安装依赖
+### 安装包
 
 ```
-帮我安装这个项目的所有依赖
+Install the axios library for making HTTP requests
 ```
 
-Claude 会根据项目类型选择合适的命令：
-- Node.js 项目：`npm install` 或 `yarn install`
-- Python 项目：`pip install -r requirements.txt`
-- Ruby 项目：`bundle install`
-
-```
-帮我安装 axios 这个库
-```
-
-会运行 `npm install axios`，并自动更新 `package.json`。
+Claude 会为你的项目运行合适的安装命令（`npm install axios`、`pip install requests`、`yarn add axios` 等），并确认安装成功。
 
 ### 运行测试
 
 ```
-帮我跑一下所有测试
+Run the tests and tell me if any are failing
 ```
 
-```
-只跑 auth 相关的测试
-```
+Claude 运行你的测试套件，读取输出，告诉你哪些测试通过了、哪些失败了。如果有测试失败，它通常能找到原因并提出修复方案。
 
 ```
-测试失败了，帮我分析一下哪里出了问题
+Run just the tests in the auth module
 ```
 
-Claude 不只是帮你运行命令，还能理解测试输出，指出哪些测试失败、失败原因，并提出修复建议。
+大多数测试框架支持只运行特定文件或目录。Claude 会找出适合你项目的命令。
 
 ### 启动开发服务器
 
 ```
-帮我启动开发服务器
+Start the development server so I can preview my changes
 ```
 
-Claude 通常会运行 `npm start` 或 `npm run dev`。启动后，它会告诉你服务运行在哪个端口，如何访问。
+Claude 会运行合适的启动命令（`npm run dev`、`python manage.py runserver`、`rails server` 等）。对于开发服务器这样需要持续运行的进程，Claude 通常会启动它并告知状态，服务器在后台保持运行。
 
 ### 构建项目
 
 ```
-帮我打包构建一下项目
+Build the project and tell me if there are any errors
 ```
 
-对于 React、Vue 等前端项目，通常是 `npm run build`，会生成可以部署的生产版本。
+Claude 运行构建命令，读取输出，报告成功或失败。如果有编译错误，它会读取错误并进行修复。
 
-### 查看项目信息
-
-```
-这个项目现在安装了哪些依赖，版本分别是什么？
-```
-
-Claude 可能会运行 `npm list` 或直接读取 `package.json`。
-
-### Git 操作
+### 查看项目状态
 
 ```
-帮我看一下最近的提交记录
+What is the current git status of this project?
 ```
 
-Claude 会运行 `git log --oneline`，然后解释每次提交做了什么。
+```
+Show me which files have been modified recently
+```
+
+Claude 可以运行信息查询命令（`git status`、`git log`、`ls -la`），收集信息后报告给你。
+
+### 数据库操作
+
+```
+Run the database migrations
+```
+
+```
+Seed the database with test data
+```
+
+对于有数据库的项目，Claude 可以运行迁移和数据填充命令，帮助你设置或更新数据库结构。
 
 ---
 
 ## 理解命令输出
 
-这是 Claude Code 非常实用的地方——它不只是"帮你跑命令"，还能**帮你理解输出结果**。
+Claude 运行命令时会读取输出内容——即命令打印到屏幕上的文字——并将其纳入自己的理解中。对你来说，这意味着：
 
-### 看懂安装日志
-
-npm 的安装日志经常密密麻麻、充满警告。你可以问：
+**你可以让 Claude 解释输出：**
 
 ```
-刚才安装的时候出现了很多 warning，这些是什么意思？
-有没有需要担心的问题？
+I ran the build and got a bunch of warnings. What do they mean?
 ```
 
-Claude 会区分：哪些是可以忽略的（比如 `npm warn deprecated`），哪些需要注意（比如依赖版本冲突）。
+**Claude 利用输出来诊断问题：**
 
-### 分析测试结果
-
-```
-测试结果出来了，但我看不太懂，帮我解释一下哪些通过了、
-哪些失败了，以及失败的原因是什么。
-
-Test Suites: 3 failed, 5 passed, 8 total
-Tests:       7 failed, 42 passed, 49 total
-...（一大堆输出）
-```
-
-Claude 会解析测试框架的输出，给你一个清晰的摘要，并指出关键的失败位置。
-
-### 解读构建报错
-
-构建失败时，错误信息往往很难懂。把整段输出给 Claude：
+命令失败时，Claude 看到错误信息就通常能告诉你哪里出了问题：
 
 ```
-npm run build 报错了，帮我看看哪里出了问题：
-
-> my-app@1.0.0 build
-> webpack --config webpack.config.js
-
-ERROR in ./src/components/Header.js 45:5-15
-Module not found: Error: Can't resolve './logo.png'
+The npm install failed with an error about peer dependencies. Let me look at that...
 ```
+
+**你也能看到输出：**
+
+无论 Claude 运行什么，你都能看到真实的终端输出。你不是在一个黑盒里工作——每条命令和每个响应的完整文本都在你的终端里清晰可见。
 
 ---
 
 ## 长时间运行的命令
 
-有些命令不会立刻结束，比如开发服务器会一直运行，测试套件可能跑几分钟。
+有些命令需要一段时间。测试可能跑 30 秒，构建可能需要几分钟，数据库数据填充可能更长。
 
-**Claude Code 的处理方式：**
+Claude Code 会在这些命令运行时等待完成，然后再继续。等待期间，你通常可以看到实时输出流向终端。
 
-- 启动开发服务器等持续运行的命令后，Claude 会在后台维持，你可以继续对话
-- 对于需要等待的命令（比如安装大量依赖），Claude 会等待完成后再回应
+如果你启动了一个命令后改变了主意，按 `Ctrl+C` 取消它。
 
-**实用技巧：** 如果你需要在服务器运行的同时做其他事，可以问：
+对于需要持续运行的长时间进程（比如开发服务器），Claude 可以启动它们，说明它们正在后台运行，然后继续处理其他任务，同时服务器保持运行。
+
+**后台命令：**
+
+如果你想让 Claude 启动某个任务后不等待完成，可以明确说：
 
 ```
-开发服务器已经启动了，现在我想同时修改一个文件，
-你能在不停止服务器的情况下帮我修改吗？
+Start the development server in the background
 ```
 
-答案通常是可以的。
+Claude 会启动进程并将控制权交还给你，服务器在后台单独运行。在终端中也可以按 `Ctrl+B` 手动将正在运行的命令转到后台。
 
 ---
 
-## 安全：Claude 不会随便跑什么
+## 安全性：Claude 不会随意运行命令
 
-这里有一个重要的安全设计：**Claude Code 有明确的操作边界。**
+Claude Code 对运行命令采取保守策略。基本原则：
 
-### 总是需要你确认的操作
+- **读取命令**（如 `ls`、`cat`、`git status`）——Claude 可以较为自由地运行，因为它们不会改变任何东西
+- **写入或执行命令**（如安装包、修改文件、运行脚本）——Claude 每次都会请求你的许可
 
-- 运行任何 shell 命令（默认模式下）
-- 安装新的软件包
-- 删除文件
-- 修改系统配置
+此外，某些类型的命令会受到额外谨慎的对待：
 
-### Claude 不会主动做的事
+**敏感操作：** 可能删除数据、暴露密钥、修改系统设置或向外部服务发起网络请求的命令，需要你明确批准。
 
-- 访问互联网发送你的代码或数据到其他地方
-- 在没有你明确要求的情况下删除文件
-- 运行可能破坏系统的危险命令（比如 `rm -rf /`）
-- 修改 `.env` 文件（通常在拒绝列表里，保护你的密钥）
+**不可逆操作：** 任何难以撤销的操作——如删除文件或向远程服务器推送代码——都会提示你确认。
 
-### 遇到可疑命令怎么办
+**涉及敏感文件的命令：** 没有你的明确许可，Claude 不会读取 `.env` 文件（通常包含密码和 API 密钥）的内容或将其传递给命令。
 
-如果 Claude 要求运行一个你不理解的命令，**先问清楚再决定**：
-
-```
-你说要运行 npm run eject，我不太了解这个命令，
-先告诉我它会做什么、有没有风险，再让我决定要不要跑。
-```
-
-Claude 会解释命令的作用。如果这个命令是不可逆的（比如 `eject` 确实不可逆），它也会主动告知风险。
+你可以使用第六章描述的权限系统自定义哪些命令始终允许或始终拒绝。例如，你可以始终允许 `npm run test`，这样就不需要每次都确认测试运行了。
 
 ---
 
-## 命令工作流的一个完整示例
+## 用 `!` 自己运行命令
 
-**场景：** 你刚 clone 了一个开源项目，想在本地跑起来
+有时你想自己运行命令，不需要让 Claude 来做决定。你可以在 Claude Code 提示符里以 `!` 开头直接输入：
 
 ```
-步骤一：了解项目
-你：我刚 clone 了这个项目，怎么在本地把它运行起来？
-
-Claude：这是一个 Node.js 项目。需要以下步骤：
-        1. 安装依赖：npm install
-        2. 设置环境变量：复制 .env.example 为 .env
-        3. 启动服务：npm run dev
-
-        我可以帮你执行这些步骤，从安装依赖开始吗？
-
-步骤二：安装依赖
-你：好的
-
-Claude：运行 npm install ...
-        （等待安装完成）
-        安装完成！共安装了 247 个包。
-        有 3 个关于旧版本的 warning，都是次要依赖，不影响运行。
-
-步骤三：设置环境变量
-你：好，下一步
-
-Claude：我看到项目有 .env.example 文件。我需要把它复制为 .env。
-        注意：.env 文件里你需要填入真实的 API key，
-        我只会创建文件，不会填写内容。
-        是否允许复制？
-
-你：y
-
-Claude：已创建 .env 文件。请打开它，填入以下必填配置：
-        - DATABASE_URL（数据库连接地址）
-        - SECRET_KEY（随机字符串，用于加密）
-
-步骤四：启动服务
-你：我填好 .env 了，帮我启动服务
-
-Claude：运行 npm run dev ...
-        服务启动成功！
-        本地访问地址：http://localhost:3000
+! git status
+! ls -la
+! npm run build
 ```
+
+`!` 前缀告诉 Claude Code 直接运行这个命令，并将输出添加到对话上下文中。这意味着 Claude 能看到发生了什么，你也可以就此提问：
+
+```
+! npm run build
+[build output appears]
+There were 3 TypeScript errors in the output. Can you help me fix them?
+```
+
+当你知道自己想运行什么命令，但又想让 Claude 帮你理解或处理结果时，这个功能非常有用。
 
 ---
 
-## 小结
+## 实际示例：新建项目的完整流程
 
-- Claude Code 通过 Bash 工具运行真实的终端命令
-- **安装依赖、跑测试、启动服务**是最常见的三类用例
-- Claude 不只执行命令，还能**解释输出**——包括错误、警告、测试结果
-- 所有命令默认都需要你确认，保护你的系统安全
-- 不理解的命令**先问后跑**，这是最好的习惯
+下面是命令执行在真实场景中的流程。假设你刚开始一个新的 web 项目，想让 Claude 帮你搭建：
+
+```
+Me: Create a new React app called my-portfolio and set it up for development
+
+Claude: I'll set up a React app for you. Let me run a few commands:
+
+Running: npx create-react-app my-portfolio
+[npm install output... completes]
+
+Running: cd my-portfolio && npm install --save-dev prettier eslint
+[install output... completes]
+
+I've created the React app and added Prettier and ESLint for code formatting.
+The project is ready in the my-portfolio directory.
+
+To start the development server:
+npm start
+
+Shall I start the development server now?
+
+Me: Yes, start it up
+
+Running: npm start
+[server starting output...]
+
+The development server is running at http://localhost:3000.
+Open that URL in your browser to see your app.
+```
+
+注意 Claude 是怎样依次执行多个命令、报告每个命令的结果、在继续前与你确认的。整个搭建过程只需要你发一条消息，Claude 几秒钟就完成了。
 
 ---
 
-**下一章：** [Git 工作流](./10-git-workflows.md)
+## 命令出错时怎么办
+
+命令会失败，这很正常。依赖可能不可用，端口可能已被占用，配置文件可能缺失。
+
+命令失败时，Claude 读取错误输出，通常知道该怎么做：
+
+```
+The npm install failed:
+> npm ERR! peer dep missing: react@>=16.8.0
+
+This means the package requires a newer version of React than you have installed.
+I can update React first. Would you like me to do that?
+```
+
+如果 Claude 建议的修复方案没有效果，告诉它发生了什么：
+
+```
+That didn't work — I got the same error. Here is the new output: [paste output]
+```
+
+Claude 会尝试不同的方案。调试命令失败是一个来回交流的过程，Claude 在尝试多种策略时很有耐心。
+
+---
+
+**下一章：** [第十章 — Git 工作流](./10-git-workflows.md) — 使用 Claude 提交更改、管理分支和创建 Pull Request。

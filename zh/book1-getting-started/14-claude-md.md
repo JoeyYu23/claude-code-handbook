@@ -1,300 +1,262 @@
-# 第十四章：CLAUDE.md — AI 的说明书
+# 第十四章：CLAUDE.md — 你的 AI 说明书
 
-## 每次对话，Claude 都从零开始
+## 问题：Claude Code 还不了解你
 
-Claude Code 有一个特性：**每个新对话都是全新的开始**。它不会记得你上次告诉它的偏好，不知道你的项目惯例，也不了解你的团队规范——除非你每次都重新说一遍。
+每次你启动一个新的 Claude Code 对话，Claude 都是全新的开始。它不知道你更喜欢 TypeScript 而不是 JavaScript，不知道你用 Prettier 做格式化、用 Vitest 跑测试，不知道你项目的 API 处理函数在 `src/api/handlers/` 目录，也不知道你从不直接提交到 main 分支。
 
-这很麻烦。你不可能每次都从头解释："我们用 2 空格缩进，用 TypeScript，测试框架是 Jest，变量命名用驼峰……"
+在一个短暂的对话中，这没什么问题——你边工作边给 Claude 提供上下文。但在一个长期项目中，每次对话都重复同样的上下文很繁琐。而在团队中，确保每个开发者都得到一致的 Claude 行为，需要更系统化的方案。
 
-**CLAUDE.md 就是解决这个问题的工具。**
-
----
-
-## 什么是 CLAUDE.md？
-
-CLAUDE.md 是一个放在你项目里的 Markdown 文件。每次启动 Claude Code，它都会自动读取这个文件，把里面的内容作为"背景知识"加载进来。
-
-把它理解为：**你给 AI 写的一份岗位说明书**。
-
-就像你新入职时会收到一份公司规范手册，CLAUDE.md 告诉 Claude：
-- 这个项目是做什么的
-- 代码规范是什么
-- 常用命令有哪些
-- 有哪些特殊注意事项
-
-有了 CLAUDE.md，你不需要每次重复说明——Claude 一开始就知道这些。
+这个方案就是 `CLAUDE.md`。
 
 ---
 
-## 三个层级的 CLAUDE.md
+## 什么是 CLAUDE.md
 
-CLAUDE.md 有三个放置位置，覆盖不同范围：
+`CLAUDE.md` 是一个用 Markdown 编写的纯文本文件，你把它放在项目里。Claude Code 在每次对话开始时自动读取它。
 
-### 层级一：用户级（个人偏好）
+把它想象成员工入职文件——除了这个"员工"是 Claude，它每次都能完美地阅读这份文件，永远不会忘记任何东西。
 
-**位置：** `~/.claude/CLAUDE.md`
-
-**作用：** 对你使用的所有项目生效，只影响你自己。
-
-**适合放什么：**
-- 你个人的编码风格偏好
-- 你常用的工具和快捷方式
-- 你对 Claude 的通用要求（比如"总是解释修改原因"）
-
-**示例内容：**
-```markdown
-# 我的个人偏好
-
-## 编码风格
-- 所有注释用中文写
-- 函数要简短，超过 30 行要拆分
-- 变量命名用驼峰式（camelCase）
-
-## 沟通方式
-- 每次修改代码前，先解释修改思路
-- 对不确定的地方，列出 2-3 个方案让我选择
-```
-
-### 层级二：项目级（团队共享）
-
-**位置：** `./CLAUDE.md` 或 `./.claude/CLAUDE.md`（项目根目录）
-
-**作用：** 对这个项目的所有成员生效，通过 Git 共享给团队。
-
-**适合放什么：**
-- 项目架构说明
-- 代码规范（缩进、命名等）
-- 常用构建和测试命令
-- 重要的技术决策
-
-**这是最重要的一层。** 本章后面的示例主要针对项目级 CLAUDE.md。
-
-### 层级三：目录级（局部规范）
-
-**位置：** 项目内各子目录的 `CLAUDE.md`
-
-**作用：** 只在 Claude 处理该目录下的文件时生效。
-
-**适合放什么：**
-- 特定模块的注意事项
-- 不同技术栈的规范（比如前端目录和后端目录规范不同）
-
----
-
-## 写你的第一个 CLAUDE.md
-
-### 快速生成（推荐方式）
-
-最简单的方式：让 Claude 帮你生成！
-
-在项目目录启动 Claude Code，输入：
+你也可以自动生成一个初始的 CLAUDE.md。在 Claude Code 对话中运行：
 
 ```
 /init
 ```
 
-Claude 会分析你的项目（代码结构、依赖、配置文件），自动生成一个 CLAUDE.md 的初稿，包括：
-- 项目概述
+Claude 会分析你的项目并创建一个 `CLAUDE.md`，其中包含它发现的构建命令、测试说明和代码约定。然后你可以在此基础上补充 Claude 无法自行发现的内容：业务上下文、团队偏好、架构决策。
+
+无论你在 CLAUDE.md 中写什么，Claude 都将其视为当前对话的背景知识。写好指令，Claude 就会一致地遵循它们。写模糊的指令，结果就会参差不齐。
+
+---
+
+## 层级体系：全局、项目、目录
+
+CLAUDE.md 文件可以存在于三个不同位置，每个位置的作用范围不同。更具体的位置优先级高于更广泛的位置。
+
+### 全局 CLAUDE.md — 适用于你所有的项目
+
+位置：`~/.claude/CLAUDE.md`
+
+这是你的个人指令集，适用于所有项目。适合放：
+
+- 你的编码风格偏好（Tab 还是空格，引号风格）
+- 你常用任务的首选库
+- 你想让 Claude 了解的个人工作流快捷方式
+- 你希望解释以何种结构组织
+
+示例：
+```markdown
+## Personal Preferences
+
+- I prefer tabs for indentation, 2 spaces wide
+- Always use TypeScript, never plain JavaScript
+- I use pnpm as my package manager, not npm or yarn
+- When writing tests, use Vitest and the describe/it pattern
+- Explain things at an intermediate level — I know the basics
+  but do not assume deep expertise
+```
+
+### 项目 CLAUDE.md — 适用于单个项目
+
+位置：`./CLAUDE.md` 或 `./.claude/CLAUDE.md`（在你的项目文件夹中）
+
+这是日常工作中最重要的一个。它存在于你的项目仓库中，通常提交到版本控制系统，这样整个团队都能共享。
+
+适合放：
 - 构建和测试命令
-- 它发现的代码规范
+- 项目架构概述
+- 本项目的编码规范
+- 重要的文件位置
+- 本项目绝对不能做的事
 
-然后你可以在生成的基础上补充修改。
+这个文件通过 Git 与整个团队共享，所以要专注于项目级的规范，而不是个人偏好。
 
-### 手动编写
+### 目录级 CLAUDE.md — 适用于某个子目录
 
-如果你想从头写，以下是一个实用的模板：
+你也可以在子目录中放置 CLAUDE.md 文件。当 Claude 读取那些目录中的文件时，会加载它们。
+
+在大型项目中，代码库的不同部分有不同的约定时，这很有用——例如前端可能有与后端不同的规则。
+
+---
+
+## 编写你的第一个 CLAUDE.md
+
+在项目根目录创建一个名为 `CLAUDE.md` 的文件。以下是一个实用的起始模板：
 
 ```markdown
-# 项目名称
+# Project Name: My Portfolio Site
 
-## 项目概述
-这是一个 [一句话描述]，使用 [主要技术栈]。
+## Build & Run
 
-## 快速开始
-```bash
-npm install      # 安装依赖
-npm run dev      # 启动开发服务器（localhost:3000）
-npm test         # 运行测试
-npm run build    # 构建生产版本
-```
+- Install dependencies: `npm install`
+- Start development server: `npm run dev`
+- Build for production: `npm run build`
+- Run tests: `npm test`
 
-## 代码规范
-- 使用 TypeScript，禁止 any 类型
-- 缩进：2 个空格
-- 命名：组件用 PascalCase，变量和函数用 camelCase
-- 每个文件不超过 300 行，超出要拆分模块
+## Project Structure
 
-## 项目架构
-```
-src/
-  components/    前端 UI 组件
-  services/      业务逻辑层
-  utils/         工具函数
-  types/         TypeScript 类型定义
-```
+- `src/components/` — React components
+- `src/pages/` — Top-level page components
+- `src/api/` — API utility functions
+- `src/styles/` — Global CSS files
+- `public/` — Static assets
 
-## 重要规则
-- 不得直接修改 main 分支，所有改动通过 PR
-- 新功能必须有对应的测试
-- 环境变量必须在 .env.example 中有示例
-- 不要提交 console.log 到生产代码
+## Coding Standards
+
+- Use TypeScript for all new files
+- Components use functional style with hooks, no class components
+- Use 2-space indentation
+- All API functions should include error handling
+
+## Important Rules
+
+- Never commit directly to main branch
+- Never hardcode API keys or secrets in code
+- Run `npm test` before committing
+- All new components need a corresponding test file
+
+## Context
+
+This is a personal portfolio site for a graphic designer. The main
+goals are: visual appeal, fast loading, and easy content updates.
+We are not using a CMS — content is hard-coded for simplicity.
 ```
 
 ---
 
-## 常见的 CLAUDE.md 内容模式
+## 编写有效的指令
 
-### 模式一：构建和测试命令
+你编写指令的方式会显著影响 Claude 的遵循程度。以下是效果最好的模式：
 
-这是最重要的内容之一。Claude 需要知道如何运行你的项目：
+### 具体而明确
+
+不够具体："Format code properly."
+够具体："Use 2-space indentation. Single quotes for strings. Trailing commas in multi-line arrays and objects."
+
+不够具体："Keep things organized."
+够具体："API handlers live in `src/api/handlers/`. Database models live in `src/models/`. Utility functions live in `src/utils/`."
+
+### 使用可验证的指令
+
+描述可以检查的具体事项的指令比抽象指令效果更好：
+
+好："Every API endpoint must include a try/catch block"
+难以验证："Write robust code"
+
+### 保持文件简洁
+
+目标控制在 200 行以内。Claude 在每次对话开始时都会读取整个 CLAUDE.md。文件过长会：
+1. 消耗更多上下文（上下文窗口有限制）
+2. 稀释信号——重要规则会淹没在噪音中
+3. 让 Claude 更难始终如一地遵循
+
+如果你有很多需要记录的内容，使用对其他文件的引用：
 
 ```markdown
-## 常用命令
-- 开发：`npm run dev`
-- 测试全部：`npm test`
-- 测试单个文件：`npm test -- --testPathPattern=auth`
-- 代码检查：`npm run lint`
-- 构建：`npm run build`
-- 数据库迁移：`npm run db:migrate`
+## Architecture
+
+See @docs/architecture.md for the full architecture overview.
+
+## API Guidelines
+
+See @docs/api-guidelines.md for API design standards.
 ```
 
-### 模式二：技术架构决策
+`@` 语法告诉 Claude 也要读取那些文件。
 
-记录你的项目为什么这么设计，帮 Claude 做出一致的选择：
+### 避免矛盾
+
+如果两条规则对同一情况说了不同的事，Claude 可能会随机选择一条。定期检查你的 CLAUDE.md 是否有冲突。
+
+---
+
+## 来自真实项目的常见模式
+
+### 模式：团队工作流规则
 
 ```markdown
-## 架构决策
-- 状态管理：使用 Zustand（不用 Redux，太复杂）
-- HTTP 客户端：使用 axios（不用 fetch）
-- 样式方案：Tailwind CSS（不用 CSS modules）
-- 数据库：PostgreSQL + Prisma ORM
+## Git Workflow
+
+- Branch naming: `feature/description`, `fix/description`, `chore/description`
+- Commit messages follow Conventional Commits format
+- PRs require at least one review before merging
+- Never force-push to main or develop branches
+- Squash commits when merging feature branches
 ```
 
-### 模式三：代码风格规范
+### 模式：代码风格规则
 
 ```markdown
-## 代码规范
-### JavaScript/TypeScript
-- 使用 async/await，不使用 .then() 链式调用
-- 函数要有显式的返回类型注解
-- 错误处理：向上抛出，不在内层静默忽略
+## Code Style
 
-### 命名规范
-- 布尔变量：is/has/can 开头（isLoading, hasError）
-- 事件处理函数：handle 开头（handleSubmit, handleClick）
-- 异步函数：不需要特殊前缀，靠 async 关键字区分
-
-### 注释规范
-- 复杂业务逻辑必须有注释
-- 注释解释"为什么"，不解释"是什么"（代码本身就说明了"是什么"）
+- TypeScript strict mode is enabled — no `any` types
+- Use explicit return types on all functions
+- Prefer named exports over default exports
+- Keep files under 400 lines; split large files into modules
+- No console.log in production code; use the logger utility
 ```
 
-### 模式四：需要特别注意的事项
+### 模式：提供更好建议所需的项目上下文
 
 ```markdown
-## 注意事项
-- 用户密码相关代码必须使用 bcrypt，不得明文存储
-- 所有 API 接口必须有认证中间件保护
-- 文件上传大小限制：最大 5MB
-- 付款相关逻辑在 src/payments/ 目录，改动前必须先沟通
+## Project Context
 
-## 不要做的事
-- 不要直接修改 prisma/schema.prisma，改动需要评审
-- 不要在前端代码中写 API Key 或 Secret
-- 不要删除 types/ 目录下的类型定义文件
+This is a B2B SaaS application for construction project management.
+Users are primarily project managers and site supervisors, not
+technical users. Design decisions should prioritize clarity over
+cleverness. The main user action is reviewing and approving material
+orders.
+
+## Performance Constraints
+
+- This app is used on construction sites with slow mobile connections
+- Keep bundle size small; avoid large dependencies
+- Prefer lazy loading for non-critical features
+```
+
+### 模式：做/不做列表
+
+```markdown
+## Do
+
+- Use the existing `Button` component for all buttons
+- Check the `src/utils/validators.js` file before writing new validation
+- Add JSDoc comments to all exported functions
+
+## Don't
+
+- Don't install new dependencies without team discussion
+- Don't modify files in `src/generated/` — they are auto-generated
+- Don't use the old `fetch` wrapper in `src/legacy/` — use `src/api/client.js`
 ```
 
 ---
 
-## 一个完整的 CLAUDE.md 示例
+## 查看已加载的指令
 
-以下是一个个人博客项目的示例：
+要查看当前对话中哪些 CLAUDE.md 文件已加载并生效，在对话中运行：
 
-```markdown
-# 个人博客（my-blog）
-
-## 关于这个项目
-使用 Next.js + Prisma + PostgreSQL 搭建的个人博客。
-主要功能：文章发布、标签管理、评论系统。
-
-## 技术栈
-- 前端：Next.js 14（App Router）
-- 样式：Tailwind CSS
-- 数据库：PostgreSQL，ORM 用 Prisma
-- 认证：NextAuth.js
-- 部署：Vercel
-
-## 常用命令
-```bash
-npm run dev          # 启动开发服务器 http://localhost:3000
-npm run db:studio    # 打开 Prisma Studio 查看数据库
-npm run db:migrate   # 运行数据库迁移
-npm test             # 运行所有测试
-npm run type-check   # TypeScript 类型检查
+```
+/memory
 ```
 
-## 目录结构
-```
-app/                 Next.js App Router 页面
-  (auth)/            认证相关页面（登录/注册）
-  (blog)/            博客公开页面
-  admin/             管理后台（需认证）
-components/          可复用 UI 组件
-lib/                 工具函数和服务层
-prisma/              数据库 Schema 和迁移文件
-```
-
-## 代码规范
-- TypeScript 严格模式，禁止 any
-- 组件文件：PascalCase（PostCard.tsx）
-- 工具函数：camelCase（formatDate.ts）
-- 每个组件不超过 150 行，复杂组件拆分子组件
-
-## 重要规则
-- Prisma Schema 变更必须生成迁移文件（不要直接改数据库）
-- 管理员权限检查在 middleware.ts 统一处理
-- 图片上传走 /api/upload，不要引入其他上传库
-- 评论功能暂未开发，不要在这个方向花时间
-```
+这会显示 Claude 从三个层级加载的每一个指令文件。如果某条指令没有被遵循，首先检查这里——文件可能不在正确的位置。
 
 ---
 
-## 维护你的 CLAUDE.md
+## CLAUDE.md 与直接在聊天中告诉 Claude
 
-CLAUDE.md 不是写完就不管了的文档，它需要随项目一起成长。
+你可能会想：为什么不在每次对话开头告诉 Claude 我需要什么？
 
-**建议定期更新的情况：**
-- 引入了新的依赖或工具
-- 做出了重要的架构决策
-- 规范发生了变化
-- 踩了坑，需要提醒未来的自己（或 Claude）避开
+对于一次性任务，这完全没问题。但 CLAUDE.md 有几个优势：
 
-**让 Claude 帮你更新：**
+1. **一致性。** 每次对话、每个团队成员、每个代理子进程——它们都自动获得相同的指令。
 
-```
-这个项目最近引入了 React Query 来管理服务端状态，
-帮我更新 CLAUDE.md，加入相关说明。
-```
+2. **受版本控制。** 当你更新规范时，这个更新在 Git 中有提交信息说明为什么做了改变。
 
-```
-我们刚开完技术评审，决定把测试框架从 Jest 换成 Vitest，
-帮我更新 CLAUDE.md 中的测试相关内容。
-```
+3. **不占用你的注意力。** 你不需要花心理精力想"我记得告诉 Claude 我的偏好了吗？"——这些指令永远都在那里。
 
-**控制文件大小：** CLAUDE.md 建议控制在 200 行以内。太长的内容会降低 Claude 遵循规则的准确性，也会消耗更多对话上下文。
+4. **在上下文压缩中留存。** 如果你运行 `/compact` 压缩一个很长的对话，你的 CLAUDE.md 指令会保留下来。在聊天中一次性给出的指令不会。
 
 ---
 
-## 小结
-
-- CLAUDE.md 是你给 AI 的说明书，**每次对话自动加载**
-- 三个层级：用户级（个人偏好）→ 项目级（团队规范）→ 目录级（局部规则）
-- 用 `/init` 让 Claude 帮你生成初稿，比手写快得多
-- 内容越具体越好：`npm run test` 比 "运行测试" 有用
-- 保持 200 行以内，定期随项目更新
-
-一个好的 CLAUDE.md 能让每次对话都更高效——你不需要重复说明，Claude 直接在正确的上下文里工作。
-
----
-
-**下一章：** [Memory 系统](./15-memory.md)
+**下一章：** [第十五章 — 记忆系统](./15-memory.md) — Claude 如何自动随时间积累对你项目的了解。

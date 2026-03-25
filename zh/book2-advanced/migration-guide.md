@@ -119,7 +119,7 @@ Claude Code: 直接告诉 Claude 任务，让它自己找相关文件
 
 ```yaml
 # .aider.conf.yml（Aider）
-model: claude-3-5-sonnet-20241022
+model: claude-sonnet-4-6
 auto-commits: true
 dirty-commits: false
 ```
@@ -233,3 +233,15 @@ claude
 **障碍四：担心 Claude 直接修改文件出错**
 
 解法：使用 git，每次修改前 Claude Code 都会提示你确认。出了问题 `git checkout -- .` 一键还原。
+
+---
+
+## 共存：与其他工具并行使用
+
+Claude Code 不要求你放弃其他工具。许多有经验的开发者会同时使用：
+
+- **Copilot 做行内补全**（打字辅助）+ **Claude Code 处理大型任务**（多文件变更、调试）
+- **Cursor 作为编辑器** + **终端中的 Claude Code** 处理复杂任务
+- **Aider 处理 git 为核心的工作流** + **需要 MCP 集成时用 Claude Code**
+
+这些工具是互补的，并非互斥的。为工作流优化，而非为工具排他性优化。

@@ -1,244 +1,173 @@
 # 第十六章：IDE 集成
 
-## 在哪里使用 Claude Code？
+## 使用 Claude Code 的两条路径
 
-Claude Code 最初是一个纯命令行工具。但现在，它已经能在多种开发环境里运行，包括你可能已经在用的代码编辑器。
+使用 Claude Code 主要有两种方式：在终端中（命令行界面，CLI），或者在代码编辑器（IDE，集成开发环境）中。
 
-本章介绍几种主要的使用方式，帮你选择最适合自己的。
+两者都没有绝对的优劣之分。它们有不同的优势，很多开发者会根据当时的任务两者都用。本章介绍主要的 IDE 集成方式，让你决定哪种设置——或者哪种组合——最适合你。
 
 ---
 
 ## VS Code 插件
 
-VS Code 是目前最流行的代码编辑器，Claude Code 为它提供了官方插件，体验非常完整。
+Visual Studio Code 是全球最流行的代码编辑器，有数以千万计的开发者使用。官方 Claude Code 插件将 Claude 直接带入 VS Code 界面。
 
-### 安装
+### 安装插件
 
-在 VS Code 里按 `Cmd+Shift+X`（Mac）或 `Ctrl+Shift+X`（Windows/Linux）打开扩展市场，搜索 "Claude Code"，点击安装。
+打开 VS Code，按 `Cmd+Shift+X`（Mac）或 `Ctrl+Shift+X`（Windows/Linux）打开扩展面板。搜索"Claude Code"并安装 Anthropic 发布的插件。
 
-或者直接访问：
-```
-VS Code 扩展市场 → 搜索 "Claude Code" → 安装
-```
+或者，在浏览器中访问此类链接：`vscode:extension/anthropic.claude-code`——VS Code 会打开并提示你直接安装。
 
-安装后，你会在编辑器里看到几个新的入口：
-- 右上角编辑器工具栏：一个闪光图标（打开文件时可见）
-- 左侧活动栏：Claude Code 图标（随时可见）
-- 底部状态栏：右下角的 "✱ Claude Code" 字样
+该插件需要 VS Code 1.98.0 或更高版本。在 Help → About 中检查你的版本。
 
-### 核心功能
+### 在 VS Code 中打开 Claude
 
-**直观的代码差异显示**
+安装后，你有以下几种方式打开 Claude 面板：
 
-VS Code 插件最大的优势是：当 Claude 要修改你的代码时，它会以**左右对比**的方式显示修改前后的差异，而不是终端里的 `+/-` 符号。这让你能更直觉地看清楚改了什么。
+- 点击任何打开文件右上角的火花图标（Claude 标志）
+- 点击左侧活动栏中的火花图标，查看对话历史
+- 按 `Cmd+Shift+P` / `Ctrl+Shift+P` 打开命令面板，输入"Claude Code"并选择一个选项
+- 点击右下角状态栏中的"✱ Claude Code"——即使没有打开文件也有效
 
-**选中代码直接提问**
+### VS Code 插件额外提供的功能
 
-在编辑器里选中一段代码，Claude Code 自动感知到你的选择。然后在对话框里直接问：
+除了终端 CLI 的功能外，插件还提供：
 
-```
-解释一下这段代码是做什么的
-```
+**内联差异视图：** 当 Claude 想要编辑文件时，它会显示原始内容和建议改动的并排视图——就像代码评审一样。在任何内容改变之前，你可以接受、拒绝或要求修改。
 
-```
-这里有没有潜在的性能问题？
-```
+**@-提及：** 在消息中，输入 `@` 后跟文件名来引用特定文件。模糊匹配意味着你可以输入部分名称：`@auth` 可能匹配 `auth.js`、`AuthService.ts` 和 `auth.test.ts`。Claude 会提供补全建议。
 
-插入文件引用快捷键：`Option+K`（Mac）/ `Alt+K`（Windows），会自动插入 `@文件名#行号范围`。
+**选区上下文：** 当你在编辑器中高亮代码时，Claude 会自动看到它。提示框显示选中了多少行。按 `Option+K`（Mac）/ `Alt+K`（Windows/Linux）可以将文件路径和行号的 @-提及插入到你的提示中。
 
-**@-mention 文件**
+**对话历史：** 面板顶部的下拉菜单显示你所有过去的对话，可搜索并可恢复。对话会被自动生成有描述性的标题，方便你一眼找到需要的会话。
 
-在对话框里输入 `@` 然后跟文件名，可以引用特定文件。支持模糊匹配：
+**多个对话：** 在单独的标签页或窗口中打开额外的 Claude 对话，同时处理不同的任务。
 
-```
-@auth 这个文件里的 validateToken 函数有什么问题？
-```
+**检查点：** 将鼠标悬停在任何消息上，就会出现回退按钮。你可以从之前的某个时间点分叉对话、将文件改动恢复到之前的状态，或者两者同时进行。这是你 Claude 会话更复杂的版本控制。
 
-**会话历史**
+**计划模式集成：** 当 Claude 创建计划时（在计划模式下——见第六章），VS Code 将其作为一个完整的 Markdown 文档打开，你可以在 Claude 继续执行前添加内联注释。
 
-VS Code 插件保存了你所有的对话历史。点击顶部的下拉菜单，可以按时间（今天、昨天、最近 7 天）浏览历史，点击任意一条即可恢复。
+**内置 MCP 服务器：** VS Code 1.98.0+ 包含内置的 MCP（Model Context Protocol）服务器。这意味着 Claude Code 无需任何额外配置就能访问打开的文件、当前选区、诊断信息和其他编辑器状态——使用插件时会自动连接。
 
-**计划模式（Plan Mode）**
-
-在 VS Code 里，计划模式有额外的体验提升：Claude 的计划会**自动打开为一个完整的 Markdown 文档**，你可以在文档里加注释、做修改，然后让 Claude 按修改后的计划执行。
-
-### 常用快捷键
+### VS Code 中的键盘快捷键
 
 | 快捷键 | 功能 |
-|--------|------|
-| `Cmd+Shift+X` / `Ctrl+Shift+X` | 打开扩展市场 |
-| `Cmd+Shift+P` / `Ctrl+Shift+P` | 命令面板，输入 "Claude Code" |
-| `Cmd+Esc` / `Ctrl+Esc` | 在编辑器和 Claude 对话框之间切换焦点 |
-| `Option+K` / `Alt+K` | 插入当前文件和选中行的 @-mention |
-| `Cmd+Shift+Esc` / `Ctrl+Shift+Esc` | 在新标签页打开 Claude |
-| `Cmd+N` / `Ctrl+N` | 新建对话（在 Claude 对话框聚焦时） |
-| `Shift+Enter` | 多行输入（不发送） |
+|---|---|
+| `Cmd+Esc` / `Ctrl+Esc` | 在编辑器和 Claude 之间切换焦点 |
+| `Cmd+Shift+Esc` / `Ctrl+Shift+Esc` | 在编辑器标签中打开新的 Claude 对话 |
+| `Cmd+N` / `Ctrl+N` | 开始新对话（当 Claude 获得焦点时） |
+| `Option+K` / `Alt+K` | 为当前文件/选区插入 @-提及 |
 
-### 在 VS Code 里切换权限模式
+### VS Code 中的权限模式
 
-点击对话框底部的模式指示器，可以在三种模式之间切换。或者在设置里搜索 `claudeCode.initialPermissionMode` 设置默认模式。
+VS Code 提示框底部有一个模式指示器。点击它可以在以下模式间切换：
+- **默认模式** — Claude 在每个操作前询问
+- **计划模式** — Claude 描述它要做什么，你批准后才开始
+- **自动接受** — Claude 无需每次询问就能进行编辑
+
+你可以在 VS Code 设置的 Extensions → Claude Code → `initialPermissionMode` 中设置默认模式。
 
 ---
 
 ## Cursor 集成
 
-Cursor 是一个基于 VS Code 构建的 AI 编辑器，内置了 AI 功能。
+Cursor 是一个专为 AI 辅助开发构建的代码编辑器——它是 VS Code 的一个分支，深度嵌入了 AI 功能。如果你已经是 Cursor 用户，Claude Code 在那里同样可用。
 
-Claude Code 也可以在 Cursor 里运行，安装方式和 VS Code 几乎完全一样：
+### 在 Cursor 中安装
 
-在 Cursor 的扩展市场搜索 "Claude Code" 并安装，所有功能都相同。
+安装过程与 VS Code 相同。在 Cursor 的扩展面板中，搜索"Claude Code"并安装。或者使用直接链接：`cursor:extension/anthropic.claude-code`。
 
-```
-Cursor 扩展市场 → 搜索 "Claude Code" → 安装
-```
+### 在 Cursor 中使用 Claude Code
 
-**Cursor 用户注意：** Cursor 本身已经有 AI 辅助功能。安装 Claude Code 插件后，你有了两套 AI 工具。你可以：
-- 用 Cursor 内置的功能做行内补全
-- 用 Claude Code 做需要跨文件、多步骤的复杂任务
+Cursor 中的体验与 VS Code 几乎相同——相同的面板、相同的 @-提及语法、相同的键盘快捷键。由于 Cursor 和 VS Code 共享相同的扩展架构，Claude Code 插件在两者中的工作方式完全一样。
 
-两者可以互补，不必非选其一。
+一点说明：Cursor 有自己内置的 AI 助手。Claude Code 和 Cursor 的内置 AI 可以共存——它们服务于不同目的，使用不同界面。Claude Code 的优势在于它能运行命令、使用 Git、读取整个代码库并采取代理行动。Cursor 的内置助手处理快速内联补全。很多开发者两者都用。
 
 ---
 
 ## JetBrains 插件
 
-如果你用 IntelliJ IDEA、PyCharm、WebStorm 或其他 JetBrains 系列 IDE，也有官方插件可用。
+JetBrains 提供一系列强大的编辑器：Java/Kotlin 的 IntelliJ IDEA、Python 的 PyCharm、JavaScript/TypeScript 的 WebStorm、Go 的 GoLand 等。Claude Code 插件适用于所有这些编辑器。
 
-### 安装
+### 安装插件
 
-1. 打开 JetBrains IDE
-2. 菜单：Settings → Plugins
-3. 搜索 "Claude Code Beta"
-4. 点击 Install，重启 IDE
+打开任意 JetBrains IDE，进入 Settings（Mac 上是 Preferences）→ Plugins → Marketplace。搜索"Claude Code Beta"并安装。安装后重启 IDE。
 
-或者访问 JetBrains 插件市场：https://plugins.jetbrains.com 搜索 "Claude Code"
+或者访问 JetBrains Marketplace 网站，找到 Claude Code 插件，从那里安装。
 
-### 主要功能
+### JetBrains 插件提供的功能
 
 JetBrains 插件提供：
-- 对话面板（类似 VS Code）
-- 代码差异可视化查看
-- 选中代码传入对话上下文
 
-注意：JetBrains 插件目前标注为 Beta 版，功能相对 VS Code 版本略少，但核心功能已完整可用。
+**交互式差异查看：** 当 Claude 提议修改文件时，改动会以差异形式显示在 JetBrains 的差异查看器中——与你用于常规 Git 差异的查看器相同。如果你熟悉 JetBrains 的差异界面，Claude Code 的编辑体验会感觉很自然。
+
+**选区上下文共享：** 与 VS Code 插件一样，JetBrains 插件会自动将你选中的代码传递给 Claude。
+
+**对话历史：** 所有过去的对话都可访问并可恢复。
+
+**Remote Development 和 WSL 支持：** JetBrains 插件可在 JetBrains Gateway 和 WSL（Windows Subsystem for Linux）环境中工作，让你在远程服务器或 Linux 环境中运行 Claude Code，同时在本地 IDE 中工作。
+
+JetBrains 插件标注为"Beta"——它功能完整，但偶尔可能有些小问题。如果你遇到问题，请在 GitHub 仓库上提交反馈。
 
 ---
 
 ## 纯终端工作流
 
-如果你喜欢纯命令行环境，不需要任何 IDE，Claude Code 的终端体验同样完整——事实上，CLI 有一些插件版本没有的功能。
+使用 Claude Code 最原始、至今仍最强大的方式是终端 CLI。IDE 集成在各方面并不超过它——它们增加了视觉便利性，但 CLI 有一些插件没有的功能。
 
-### 启动
+### 开发者选择纯终端的原因
 
-```bash
-cd 你的项目目录
-claude
-```
+**完整的命令访问。** CLI 提供所有 Claude Code 命令。IDE 插件只支持其中的一个子集——最常用的那些——但某些高级功能只能在终端中访问。
 
-### 终端专属功能
+**Shell 集成。** 在终端中，你可以通过管道向 Claude 传递数据（`cat errors.log | claude -p "explain this"`），串联命令，并将 Claude 用于 Shell 脚本中。
 
-**Tab 补全**
+**`!` bash 快捷方式。** 在输入开头输入 `!` 可以直接运行 Shell 命令并将其输出添加到对话中。这只在终端中可用。
 
-在终端里，Claude Code 支持 Tab 键补全命令、文件名和 slash 命令（`/` 开头的命令），这在图形界面版本里没有。
+**Tab 补全。** CLI 有文件路径和命令历史的 Tab 补全功能。
 
-**`!` 快捷方式**
+### 在 VS Code 或 JetBrains 内部运行 CLI
 
-在终端里，在 Claude 对话框内输入 `!` 开头的内容，会直接当作 shell 命令执行，不需要让 Claude 来做判断：
+你不需要做选择。如果你想要 VS Code 的图形界面，但偶尔也需要 CLI 访问，可以使用 VS Code 的集成终端：
 
-```
-! git status
-! ls -la
-! npm list
-```
+- 在 VS Code 中：按 `` Ctrl+` ``（Mac 上是 `` Cmd+` ``）打开集成终端
+- 运行 `claude` 在 VS Code 内启动 CLI 会话
+- 在 CLI 会话中输入 `/ide` 将其连接到 VS Code 编辑器（用于差异查看等功能）
 
-这在需要快速查看某些信息时很方便。
-
-**管道（Pipe）**
-
-终端版本可以通过管道接收输入：
-
-```bash
-# 把日志内容传给 Claude 分析
-tail -n 100 app.log | claude -p "有没有异常信息？"
-
-# 让 Claude 审查 git diff
-git diff | claude -p "这些改动有没有明显的问题？"
-```
-
-**非交互模式**
-
-终端版本支持单次命令模式，适合脚本或 CI：
-
-```bash
-claude -p "帮我检查 src/utils.js 里有没有未使用的变量"
-```
-
-### 在终端里接入 VS Code
-
-如果你主要用终端，但偶尔想用 VS Code 的可视化差异界面，可以运行：
-
-```
-/ide
-```
-
-这会把当前终端会话连接到已打开的 VS Code，文件差异会在 VS Code 里展示。
+这让你同时拥有两种界面。CLI 和插件共享相同的对话历史，你可以无缝地在两者之间切换。
 
 ---
 
-## 选择适合你的方式
+## 选择合适的设置
 
-没有绝对的最佳选择，取决于你的使用习惯和需求：
+以下是一个简单的决策框架：
 
-### 推荐 VS Code 插件，如果：
-- 你已经在用 VS Code 或 Cursor
-- 你是新手，想要更直观的界面
-- 你重视代码差异的可视化显示
-- 你希望在编辑代码和问 Claude 之间快速切换
+| 如果你… | 考虑… |
+|---|---|
+| 是代码编辑器新手 | VS Code 插件——它有最好的入门体验，用户基础最广，最容易找到帮助 |
+| 已经在用 Cursor | Cursor 插件——与 VS Code 体验相同 |
+| 已经在用 IntelliJ、PyCharm 或 WebStorm | JetBrains 插件——留在你现有的环境中 |
+| 偏好极简配置和最大控制权 | 纯终端——CLI 是最强大的界面 |
+| 想要两全其美 | VS Code + 其中的终端——用插件进行可视化差异审查，用 CLI 处理其他一切 |
+| 在运行自动化任务或 CI | 纯终端——CLI 专为脚本和自动化设计 |
 
-### 推荐 JetBrains 插件，如果：
-- 你的主力 IDE 是 IntelliJ、PyCharm 等
-- 不想额外开一个终端窗口
+### 一个可以先试试的设置
 
-### 推荐纯终端，如果：
-- 你已经习惯命令行工作流
-- 你需要用到管道（pipe）功能
-- 你在远程服务器上工作（SSH）
-- 你希望把 Claude Code 集成到脚本或 CI 流程里
-
-### 混合使用
-
-很多用户的实际做法是：
-- 平时写代码用 VS Code + 插件
-- 需要复杂的自动化任务时切换到终端
-
-两种方式共享同样的配置文件（CLAUDE.md、Memory、settings.json），切换没有任何代价。
+如果你不确定，从 VS Code 插件开始。仅内联差异视图就值得一试——能在熟悉的分栏视图中看到 Claude 正在修改什么，让你更有信心地审查编辑内容。你随时可以针对特定任务回退到终端。
 
 ---
 
-## 各平台功能对比
+## 共同的基础
 
-| 功能 | 终端 CLI | VS Code 插件 | JetBrains 插件 |
-|------|----------|--------------|----------------|
-| 基本对话 | 完整 | 完整 | 完整 |
-| 代码差异显示 | 文字形式 | 可视化对比 | 可视化对比 |
-| @-mention 文件 | 支持 | 支持 | 支持 |
-| Tab 补全 | 支持 | 不支持 | 不支持 |
-| `!` 命令快捷方式 | 支持 | 不支持 | 不支持 |
-| 管道（Pipe）输入 | 支持 | 不支持 | 不支持 |
-| 会话历史 | 支持 | 支持（可视化更好） | 支持 |
-| 计划模式 | 支持 | 支持（Markdown 展示）| 支持 |
-| 检查点/回滚 | 支持 | 支持（鼠标操作）| 支持 |
+有一点很重要：所有这些界面都连接到同一个底层的 Claude Code 引擎。无论你使用终端、VS Code、Cursor 还是 JetBrains，你的 `CLAUDE.md` 文件、设置、记忆和 MCP 服务器配置的工作方式都是一样的。
+
+在终端开始一个对话，在 VS Code 中继续，在网页上结束——都是同一个 Claude Code。选择适合你当下需求的界面，而不是固定的使用方式。
 
 ---
 
-## 小结
-
-- **VS Code 插件**：最完整的图形界面体验，推荐大多数用户
-- **Cursor**：与 VS Code 插件完全相同，可与 Cursor 内置 AI 互补
-- **JetBrains**：适合 JetBrains 用户，功能完整（Beta 版）
-- **纯终端**：最灵活，有独特的管道和脚本功能
-- 所有方式**共享配置**，可以自由混合使用
+**下一步：** [术语表](./glossary.md) — 本书及整个 Claude Code 生态系统中所有术语的定义。
 
 ---
 
-**下一步：** [术语表](./glossary.md) | [常见问题](./troubleshooting.md) | [快捷键](./keyboard-shortcuts.md)
+你已完成第一册。如果这本手册对你有帮助，欢迎在 GitHub 上 [Star 这个项目](https://github.com/JoeyYu23/claude-code-handbook)，帮助更多人发现它。
+
+准备好了？[开始第二册：进阶篇 →](/zh/book2-advanced/)

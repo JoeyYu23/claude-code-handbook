@@ -71,6 +71,22 @@ claude -p "Analyze this PR" --no-session-persistence
 claude -p "Review this code" --append-system-prompt "You are reviewing for PCI-DSS compliance. Flag any credit card data handling."
 ```
 
+**`--json-schema`** — Constrains the output to match a JSON Schema. The response is validated against the schema and retried if it does not conform:
+
+```bash
+claude -p "Extract all function names from this file" \
+  --output-format json \
+  --json-schema '{"type":"object","properties":{"functions":{"type":"array","items":{"type":"string"}}},"required":["functions"]}'
+```
+
+**`--bare`** — Minimal headless mode. Skips hooks, LSP integration, plugins, MCP servers, auto-memory, and `CLAUDE.md` loading. Fastest startup; use when you want pure model inference without any project configuration:
+
+```bash
+claude -p "What is the time complexity of binary search?" --bare
+```
+
+`--bare` is useful for quick queries, testing, and cases where you explicitly do not want project-specific configuration to influence the response.
+
 ---
 
 ## Output Formats

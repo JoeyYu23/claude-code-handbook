@@ -260,6 +260,57 @@ Write a brief session summary to WORK_IN_PROGRESS.md.
 
 ---
 
+## Agent Teams: Parallel Work Across Independent Contexts
+
+Claude Code supports Agent Teams — multiple agents working in parallel, each with their own independent context window. This is the highest-leverage pattern for large tasks that can be decomposed into independent workstreams.
+
+**Spawning parallel agents:**
+
+```text
+Spawn three agents in parallel:
+1. Agent A: Implement the user authentication endpoints in src/auth/
+2. Agent B: Write unit tests for all auth endpoints
+3. Agent C: Update the OpenAPI documentation for the auth module
+
+Each agent should work independently. Report back when complete.
+```
+
+Each agent runs with its own context window. Long file reads, exploration, and analysis in one agent do not affect the context budget of the others. The results come back to the orchestrating session as summaries.
+
+**Git worktrees for parallel development:**
+
+For agents that need to work on the same repository without conflicting, use git worktrees. The `claude -w` flag (or `--worktree`) creates or uses a named worktree:
+
+```bash
+# Create and enter a worktree named "feature-oauth"
+claude -w feature-oauth
+
+# Or use the full flag
+claude --worktree feature-auth
+```
+
+Claude Code creates a new git worktree at `../<repo>-<name>/` and starts a session there. Each worktree is a separate working directory pointing to the same repository — changes in one do not affect another until explicitly merged.
+
+For sparse checkouts on large repositories, configure which paths to include:
+
+```json
+// .claude/settings.json
+{
+  "worktree": {
+    "sparsePaths": ["src/auth/", "tests/auth/", "docs/api/"]
+  }
+}
+```
+
+**When to use Agent Teams vs. sequential work:**
+
+- **Agent Teams:** Tasks that are genuinely independent (different modules, different file sets, no shared state)
+- **Sequential:** Tasks where each step depends on the previous (design → implement → test in the same codebase)
+
+The efficiency gain from parallel agents is most pronounced when individual tasks would each consume 20,000+ tokens — delegating exploration and analysis to isolated agents prevents context pressure in the main session.
+
+---
+
 ## Session History and Recovery
 
 Claude Code persists all conversation history locally in `~/.claude/`. This history is preserved indefinitely until you clear it.

@@ -12,9 +12,98 @@ Skills you or your team have created also appear in the `/` menu alongside built
 
 ---
 
-## Session Management
+## Complete Command Reference
 
-### `/clear`
+### Session Management
+
+| Command | What it does |
+|---|---|
+| `/clear` | Clears conversation history and frees context. Aliases: `/reset`, `/new` |
+| `/compact [instructions]` | Summarizes the conversation to reclaim context; optional instructions focus what is preserved |
+| `/fork [name]` | Creates a branch of the current conversation at this point |
+| `/resume [session]` | Resumes a previous session by name or ID, or opens a session picker. Alias: `/continue` |
+| `/rename [name]` | Renames the current session for easier identification in `/resume` |
+| `/rewind` | Rewinds the conversation and code to a previous checkpoint. Alias: `/checkpoint` |
+| `/export [filename]` | Exports the current conversation as plain text |
+| `/loop` | Enters continuous loop mode where Claude keeps working until a stopping condition is met |
+| `/schedule` | Schedules a task or reminder for later execution |
+
+### Information and Diagnostics
+
+| Command | What it does |
+|---|---|
+| `/help` | Shows help and available commands |
+| `/cost` | Shows token usage statistics for the current session |
+| `/context` | Visualizes context usage as a colored grid with optimization suggestions |
+| `/doctor` | Diagnoses and verifies your Claude Code installation and settings |
+| `/status` | Shows version, model, account, and connection status |
+| `/stats` | Shows daily usage history, session streaks, and overall usage patterns |
+| `/insights` | Generates a session analysis report (interaction patterns, friction points) |
+| `/usage` | Shows current plan usage limits and rate limit status |
+| `/release-notes` | Shows what changed in the current Claude Code version |
+
+### Code and Git
+
+| Command | What it does |
+|---|---|
+| `/diff` | Opens an interactive diff viewer showing uncommitted changes and per-turn diffs |
+| `/security-review` | Analyzes pending branch changes for security vulnerabilities |
+| `/pr-comments [PR]` | Fetches and displays GitHub PR comments (requires `gh` CLI) |
+| `/branch [name]` | Creates a new git branch. Alias: `/fork` (when used with a branch name) |
+| `/plan` | Enters plan mode where Claude proposes changes without executing them |
+
+### Configuration and Personalization
+
+| Command | What it does |
+|---|---|
+| `/config` | Opens the Settings interface. Alias: `/settings` |
+| `/model [model]` | Selects or changes the AI model mid-session |
+| `/effort [low\|medium\|high\|max\|auto]` | Sets the model effort level |
+| `/theme` | Changes the color theme (light, dark, colorblind, ANSI variants) |
+| `/color [color\|default]` | Sets the prompt bar color for the current session |
+| `/vim` | Toggles Vim / Normal editing modes for the input prompt |
+| `/keybindings` | Opens or creates a keybindings configuration file |
+| `/memory` | Edits `CLAUDE.md` files and manages auto-memory entries |
+| `/init` | Initializes the project with a `CLAUDE.md` guide |
+| `/mobile` | Optimizes the interface for mobile or narrow-screen use |
+| `/sandbox` | Configures the sandboxing mode for code execution |
+
+### Agents and Tools
+
+| Command | What it does |
+|---|---|
+| `/agents` | Views, creates, and edits sub-agent configurations |
+| `/tasks` | Lists and manages background tasks |
+| `/permissions` | Views or updates tool permissions for the current session. Alias: `/allowed-tools` |
+| `/hooks` | Shows all hook configurations organized by event type |
+| `/skills` | Lists available skills |
+| `/mcp` | Manages MCP server connections and OAuth authentication |
+| `/plugin` | Manages Claude Code plugins |
+| `/reload-plugins` | Reloads all plugins without restarting the session |
+
+### Quick Queries and Utilities
+
+| Command | What it does |
+|---|---|
+| `/btw <question>` | Asks a side question without adding it to the conversation history |
+| `/copy` | Copies the last assistant response to the clipboard |
+| `/fast [on\|off]` | Toggles fast mode (lower latency, reduced thoroughness) |
+| `/feedback [report]` | Submits feedback or a bug report. Alias: `/bug` |
+| `/remote-control` | Enables remote control of the current session. Alias: `/rc` |
+
+### IDE and Integrations
+
+| Command | What it does |
+|---|---|
+| `/chrome` | Configures Chrome browser integration |
+| `/install-github-app` | Sets up the Claude GitHub Actions app for a repository |
+| `/install-slack-app` | Installs the Claude Slack app via OAuth flow |
+
+---
+
+## Key Commands in Depth
+
+### `/clear` — Reset Context
 
 Clears the conversation history and frees up context window space. Aliases: `/reset`, `/new`.
 
@@ -26,36 +115,34 @@ Use this when a conversation has grown stale, you have solved one problem and ar
 
 This is not the same as quitting and restarting — it preserves your MCP connections, tool permissions, and session settings while wiping the message history.
 
-### `/compact [instructions]`
-
-Summarizes the conversation into a compressed form to reclaim context space while retaining the key decisions, code changes, and conclusions. Unlike `/clear`, you keep a working memory of what happened.
+**The difference from `/compact`:** `/clear` completely discards history. `/compact` compresses it into a summary, keeping the essence. If you are mid-task and need to reduce context without losing your place, use `/compact`.
 
 ```text
 /compact focus on the authentication changes we made
 ```
 
-The optional instructions tell Claude which parts of the conversation are most important to preserve in the summary. Without instructions, Claude summarizes everything.
+### `/resume [session]` — Continue Previous Work
 
-### `/resume [session]`
-
-Resume a previous conversation by name or ID, or open an interactive session picker.
+Resumes a previous conversation by name or ID, or opens an interactive session picker. Alias: `/continue`.
 
 ```text
 /resume
 /resume auth-refactor
 ```
 
-Sessions are named automatically unless you used `/rename` or the `--name` flag at launch. Resuming is one of the most powerful features for long-running projects — you can pick up a multi-day refactor exactly where you left off. Alias: `/continue`.
+Sessions are named automatically unless you used `/rename` or the `--name` flag at launch. Resuming is one of the most powerful features for long-running projects — you can pick up a multi-day refactor exactly where you left off.
 
-### `/fork [name]`
+### `/fork [name]` — Explore Without Risk
 
-Creates a fork of the current conversation at this point. Both the original and the fork continue independently from here. This is invaluable for exploring two different approaches to the same problem without losing either path.
+Creates a fork of the current conversation at this point. Both the original and the fork continue independently from here.
 
 ```text
 /fork try-approach-b
 ```
 
-### `/rewind`
+This is invaluable for exploring two different approaches to the same problem without losing either path.
+
+### `/rewind` — Go Back in Time
 
 Rewinds the conversation and code to a previous checkpoint. Alias: `/checkpoint`.
 
@@ -63,31 +150,9 @@ Rewinds the conversation and code to a previous checkpoint. Alias: `/checkpoint`
 /rewind
 ```
 
-Use this when Claude took a wrong turn several steps ago and you want to go back and try a different direction. Claude Code automatically creates checkpoints as it works.
+Running this shows the conversation history so you can select where to rewind to. Claude Code automatically creates checkpoints as it works.
 
-### `/rename [name]`
-
-Renames the current session for easier identification in `/resume`. Without a name argument, Claude auto-generates one from the conversation history.
-
-```text
-/rename payment-gateway-refactor
-```
-
----
-
-## Context and Cost Visibility
-
-### `/cost`
-
-Shows token usage statistics for the current session. Helps you understand how much context you have consumed and what it has cost.
-
-```text
-/cost
-```
-
-The output varies by subscription type. API key users see dollar amounts; subscription users see relative usage metrics.
-
-### `/context`
+### `/context` — Understand Context Usage
 
 Visualizes current context usage as a colored grid. Shows which tools and memory sources are consuming the most tokens. Includes warnings when you are approaching context limits and optimization suggestions.
 
@@ -97,98 +162,15 @@ Visualizes current context usage as a colored grid. Shows which tools and memory
 
 This is the command to reach for when Claude seems to be forgetting earlier parts of the conversation, or when you want to preemptively check whether you need to compact.
 
-### `/stats`
+### `/cost` — Monitor Token Usage
 
-Shows daily usage history, session streaks, model preferences, and overall usage patterns. Useful for understanding how your Claude Code usage trends over time.
-
-```text
-/stats
-```
-
-### `/usage`
-
-Shows your current plan's usage limits and rate limit status. Useful when you are approaching limits and want to know how much headroom remains.
+Shows token usage statistics for the current session. The output varies by subscription type — API key users see dollar amounts; subscription users see relative usage metrics.
 
 ```text
-/usage
+/cost
 ```
 
----
-
-## Project Setup
-
-### `/init`
-
-Initializes the current project with a `CLAUDE.md` guide. Claude analyzes your project structure, existing code, and configuration files to generate a tailored memory file that it will read at the start of every future session.
-
-```text
-/init
-```
-
-Run this once when you start using Claude Code on an existing project. The generated `CLAUDE.md` will contain detected build commands, test commands, coding conventions, and architecture notes. You can edit it afterward to add anything Claude missed.
-
-### `/memory`
-
-Opens an interface for editing `CLAUDE.md` files, enabling or disabling auto-memory, and viewing auto-memory entries. This is the central place for managing what Claude remembers about your project.
-
-```text
-/memory
-```
-
-Auto-memory is Claude's ability to automatically save learnings — like the test command or a key architectural decision — without you manually editing `CLAUDE.md`. This command lets you review and curate those auto-saved entries.
-
-### `/add-dir <path>`
-
-Adds a new working directory to the current session. Claude can then read, edit, and create files in that directory.
-
-```text
-/add-dir ../shared-lib
-/add-dir /absolute/path/to/other-repo
-```
-
-Useful for monorepos or multi-repository workflows where the relevant code spans more than one directory.
-
----
-
-## Code Review and Quality
-
-### `/pr-comments [PR]`
-
-Fetches and displays comments from a GitHub pull request. Automatically detects the PR for your current branch, or you can pass a PR URL or number directly. Requires the `gh` CLI to be installed.
-
-```text
-/pr-comments
-/pr-comments 456
-/pr-comments https://github.com/acme/backend/pull/456
-```
-
-After this command loads the PR comments, you can ask Claude to address them: "Go through these review comments and fix each one."
-
-### `/security-review`
-
-Analyzes pending changes on the current branch for security vulnerabilities. Reviews the git diff and identifies risks like injection vulnerabilities, authentication issues, and data exposure.
-
-```text
-/security-review
-```
-
-Run this before merging any branch that touches authentication, user input handling, or external API calls. It is faster and more focused than a general code review.
-
-### `/diff`
-
-Opens an interactive diff viewer showing uncommitted changes and per-turn diffs. Use left/right arrows to switch between the current git diff and individual Claude turns. Use up/down to browse files.
-
-```text
-/diff
-```
-
-Particularly useful for reviewing what Claude has changed across multiple turns before committing.
-
----
-
-## Diagnostics and Configuration
-
-### `/doctor`
+### `/doctor` — Diagnose Problems
 
 Diagnoses and verifies your Claude Code installation and settings. Checks for common configuration problems, connectivity issues, and version mismatches.
 
@@ -198,15 +180,7 @@ Diagnoses and verifies your Claude Code installation and settings. Checks for co
 
 Run this first when anything is behaving unexpectedly. It often surfaces the problem immediately.
 
-### `/config`
-
-Opens the Settings interface where you can adjust theme, model, output style, and other preferences. Alias: `/settings`.
-
-```text
-/config
-```
-
-### `/model [model]`
+### `/model [model]` — Change the Model
 
 Selects or changes the AI model mid-session. Supports model aliases (`sonnet`, `opus`, `haiku`) or full model IDs. For models that support effort levels, use left/right arrows to adjust.
 
@@ -216,87 +190,21 @@ Selects or changes the AI model mid-session. Supports model aliases (`sonnet`, `
 /model claude-sonnet-4-6
 ```
 
-The change takes effect immediately — you do not need to wait for the current response to finish.
+### `/effort [level]` — Control Reasoning Depth
 
-### `/effort [low|medium|high|max|auto]`
-
-Sets the model effort level without changing the model. Higher effort means more careful reasoning, at the cost of speed and token usage. `max` applies to the current session only and requires Opus 4.6.
+Sets the model effort level without changing the model. Higher effort means more careful reasoning, at the cost of speed and token usage.
 
 ```text
+/effort low
+/effort medium
 /effort high
 /effort max
 /effort auto
 ```
 
-Without an argument, shows the current level.
+`max` applies to the current session only and requires Opus 4.6. Without an argument, shows the current level.
 
-### `/permissions`
-
-Views or updates tool permissions for the current session. Lets you allow or deny specific tools or tool patterns. Alias: `/allowed-tools`.
-
-```text
-/permissions
-```
-
-### `/hooks`
-
-Shows all hook configurations for the current session, organized by event type. Tells you which settings file each hook comes from and what command it runs.
-
-```text
-/hooks
-```
-
----
-
-## MCP and Integrations
-
-### `/mcp`
-
-Manages MCP server connections and handles OAuth authentication flows for remote servers.
-
-```text
-/mcp
-```
-
-Use this to check server status, authenticate with servers that require OAuth, and diagnose connection problems.
-
-### `/agents`
-
-Manages subagent configurations. View available agents, create new ones with guided setup or Claude-generated prompts, edit existing configurations, and see which agents are active when duplicates exist.
-
-```text
-/agents
-```
-
-### `/install-github-app`
-
-Sets up the Claude GitHub Actions app for a repository. Walks you through selecting a repo and configuring the integration, including creating the required secrets.
-
-```text
-/install-github-app
-```
-
-### `/install-slack-app`
-
-Installs the Claude Slack app by opening a browser to complete the OAuth flow.
-
-```text
-/install-slack-app
-```
-
----
-
-## Navigation and Utilities
-
-### `/help`
-
-Shows help and available commands. A good starting point if you are not sure what is available.
-
-```text
-/help
-```
-
-### `/btw <question>`
+### `/btw <question>` — Side Questions
 
 Asks a quick side question without adding it to the conversation history. Claude uses its current context to answer but the exchange is discarded afterward.
 
@@ -306,53 +214,88 @@ Asks a quick side question without adding it to the conversation history. Claude
 
 This is ideal for quick clarifying questions while you are in the middle of a task. Unlike a regular prompt, `/btw` does not accumulate in your context.
 
-### `/copy`
+### `/diff` — Interactive Diff Viewer
 
-Copies the last assistant response to the clipboard. When code blocks are present, shows an interactive picker so you can choose a specific block or the full response.
-
-```text
-/copy
-```
-
-### `/export [filename]`
-
-Exports the current conversation as plain text. With a filename writes directly to a file; without opens a dialog.
+Opens an interactive diff viewer showing uncommitted changes and per-turn diffs. Use left/right arrows to switch between the current git diff and individual Claude turns. Use up/down to browse files.
 
 ```text
-/export
-/export session-notes.txt
+/diff
 ```
 
-### `/plan`
+Particularly useful for reviewing what Claude has changed across multiple turns before committing.
 
-Enters plan mode directly from the prompt. In plan mode, Claude analyzes your codebase and proposes changes without executing them, letting you review before anything is modified.
+### `/security-review` — Security Scan Before Merging
+
+Analyzes pending changes on the current branch for security vulnerabilities. Reviews the git diff and identifies risks like injection vulnerabilities, authentication issues, and data exposure.
+
+```text
+/security-review
+```
+
+Run this before merging any branch that touches authentication, user input handling, or external API calls.
+
+### `/plan` — Review Before Acting
+
+Enters plan mode directly from the prompt. Claude analyzes your codebase and proposes changes without executing them, letting you review before anything is modified.
 
 ```text
 /plan
 ```
 
-### `/vim`
+### `/loop` — Continuous Execution Mode
 
-Toggles between Vim and Normal editing modes for the input prompt.
+Enters continuous loop mode where Claude keeps working autonomously until a defined stopping condition is met. Useful for long-running tasks like processing all files in a directory or completing a series of related fixes.
 
 ```text
-/vim
+/loop
 ```
 
-### `/theme`
+### `/schedule` — Deferred Tasks
 
-Changes the color theme. Includes light and dark variants, colorblind-accessible daltonized themes, and ANSI themes that use your terminal's palette.
+Schedules a task or reminder to run at a later time, letting you queue work without blocking your current session.
 
 ```text
-/theme
+/schedule
 ```
 
-### `/exit`
+### `/permissions` — Tool Access Control
 
-Exits the CLI. Alias: `/quit`.
+Views or updates tool permissions for the current session. Alias: `/allowed-tools`.
 
 ```text
-/exit
+/permissions
+```
+
+### `/hooks` — View Hook Configuration
+
+Shows all hook configurations for the current session, organized by event type. Tells you which settings file each hook comes from and what command it runs.
+
+```text
+/hooks
+```
+
+### `/mcp` — MCP Server Management
+
+Manages MCP server connections and handles OAuth authentication flows for remote servers. Use this to check server status, authenticate with servers that require OAuth, and diagnose connection problems.
+
+```text
+/mcp
+```
+
+### `/agents` — Sub-agent Management
+
+Manages sub-agent configurations. View available agents, create new ones with guided setup or Claude-generated prompts, edit existing configurations, and see which agents are active when duplicates exist.
+
+```text
+/agents
+```
+
+### `/install-github-app` — GitHub Actions Setup
+
+Sets up the Claude GitHub Actions app for a repository. Walks you through selecting a repo and configuring the integration, including creating the required secrets.
+
+```text
+/install-github-app
 ```
 
 ---
@@ -368,6 +311,10 @@ Exits the CLI. Alias: `/quit`.
 **Use `/btw` aggressively.** Many developers do not realize `/btw` exists. It is perfect for quick clarifying questions mid-task without polluting context.
 
 **Set effort explicitly for complex tasks.** For architecture decisions or security reviews, `/effort high` or `/effort max` gives you Claude's most careful reasoning. Drop back to `/effort auto` for routine tasks to preserve speed.
+
+**Use `/fork` to explore alternatives.** Before committing to a major refactor direction, fork the conversation and try both paths. You can always return to the original fork.
+
+**Rename sessions for multi-project workflows.** When working across multiple projects or long-running tasks, use `/rename` to give sessions meaningful names, then use `/resume` to switch between them by name.
 
 ---
 

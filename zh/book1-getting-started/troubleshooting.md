@@ -1,328 +1,331 @@
-# 附录 B：常见问题与解决方案
+# 常见问题排查
 
-本附录收录了 Claude Code 使用过程中最常遇到的问题，以及经过验证的解决方案。
+Claude Code 最常见问题的解决方案。按类别组织。从你看到的错误信息开始，按照步骤操作。
 
 ---
 
-## 安装和启动问题
+## 认证问题
 
-### Q1：运行 `claude` 后提示"command not found"
+### "Not logged in"或"Authentication required"
 
-**症状：**
-```
-zsh: command not found: claude
-```
+**症状：** Claude Code 说你需要登录，或者当你运行 `claude` 时立即要求认证。
 
-**原因：** Claude Code 没有安装，或者安装路径没有加入系统 PATH。
+**解决方案：**
+1. 在终端运行 `claude auth login`
+2. 浏览器窗口会打开——完成登录
+3. 回到终端；它应该确认你已登录
+4. 再次尝试运行 `claude`
+
+如果浏览器没有自动打开，Claude Code 会打印一个 URL。手动复制粘贴到浏览器中。
+
+---
+
+### "Authentication expired"或"Session invalid"
+
+**症状：** Claude Code 之前能用，但现在说你的会话已过期。
+
+**解决方案：**
+1. 运行 `claude auth logout` 清除旧会话
+2. 运行 `claude auth login` 重新登录
+3. 在 claude.ai 检查你的账户状态——确保你的订阅是活跃的
+
+---
+
+### "API key not found"或"ANTHROPIC_API_KEY not set"
+
+**症状：** 你在尝试直接用 API 密钥使用 Claude Code（而不是 Claude.ai 账户），但它找不到密钥。
+
+**解决方案：**
+1. 在终端设置环境变量：`export ANTHROPIC_API_KEY=your-key-here`
+2. 要使其永久生效，将这行添加到你的 `~/.zshrc` 或 `~/.bashrc` 文件中
+3. 编辑文件后，运行 `source ~/.zshrc`（或重启终端）
+
+---
+
+## 安装问题
+
+### "claude: command not found"
+
+**症状：** 你输入 `claude`，终端说这个命令不存在。
 
 **解决方案：**
 
-方案 A — 重新安装：
+首先，检查 Claude Code 是否已安装：
 ```bash
-# macOS/Linux
+which claude
+ls ~/.claude/bin/
+```
+
+如果没有安装，安装它：
+```bash
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
-方案 B — 手动检查安装：
+如果已安装但找不到命令，安装目录可能不在你的 PATH 中。添加它：
 ```bash
-# 检查 claude 命令在哪里
-which claude
-ls ~/.local/bin/claude
-
-# 如果文件存在但命令找不到，重新加载 shell 配置
-source ~/.zshrc    # macOS (zsh)
-source ~/.bashrc   # Linux (bash)
+echo 'export PATH="$HOME/.claude/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
 ```
 
-方案 C — 用 Homebrew：
-```bash
-brew install --cask claude-code
-```
+修改 PATH 后重启终端。
 
 ---
 
-### Q2：启动后卡在登录界面，无法完成认证
+### Claude Code 安装后立即崩溃
 
-**症状：** 浏览器打开了登录页面，但完成后 Claude Code 没有反应。
+**症状：** 运行 `claude` 在任何事情发生之前就报错，或者立即退出。
 
 **解决方案：**
-
-1. 确认网络连接正常
-2. 关闭 Claude Code（`Ctrl+C`），重新运行 `claude`
-3. 如果公司有 VPN 或防火墙，尝试断开后重试
-4. 清除 Claude Code 的认证缓存：
-```bash
-rm -rf ~/.claude/.auth*
-```
-然后重新运行 `claude` 进行登录。
+1. 检查 Node.js 是否已安装且是最新的：`node --version`（需要 18 或更高版本）
+2. 尝试更新 Claude Code：`claude update`
+3. 尝试全新重装：用卸载脚本卸载，然后用安装脚本重装
+4. 查看错误信息——它通常会准确告诉你哪里出了问题
 
 ---
 
-### Q3：VS Code 插件安装后看不到 Claude 图标
+### 安装过程中出现"Permission denied"
 
-**症状：** 安装了扩展，但编辑器里找不到 Claude Code 的图标或面板。
+**症状：** 安装脚本因权限错误而失败。
 
 **解决方案：**
+不要在 Claude Code 安装脚本中使用 `sudo`。原生安装程序设计为安装到你的 home 目录，不需要管理员权限。
 
-1. 确认已打开至少一个文件（只打开文件夹不够，编辑器工具栏的图标需要有文件打开）
-2. 尝试重载 VS Code：按 `Cmd+Shift+P`，输入 "Reload Window"
-3. 检查 VS Code 版本，需要 1.98.0 或更高
-4. 在状态栏右下角找 "✱ Claude Code"（这个位置始终可见，不需要文件）
-5. 如果有其他 AI 扩展（Cline、Continue 等），尝试临时禁用它们
-
----
-
-### Q4：Claude Code 很慢，响应需要很长时间
-
-**可能原因及解决方案：**
-
-- **网络问题：** 检查网络连接，或尝试更换 DNS
-- **项目太大：** 避免在极大的代码库（数万个文件）里不加过滤地让 Claude 扫描全部文件
-- **上下文太长：** 运行 `/compact` 压缩当前对话上下文
-- **服务繁忙：** Anthropic 服务有时会有延迟，稍等再试
+如果你看到权限错误，检查：
+1. 你对 `~/.claude/` 有写权限吗？
+2. 你的 home 目录是否在只读文件系统上？
+3. 尝试：`mkdir -p ~/.claude && chmod u+w ~/.claude`
 
 ---
 
-## 对话和功能问题
+## 运行时错误
 
-### Q5：Claude 不遵守 CLAUDE.md 里的规则
+### "Rate limit exceeded"
 
-**症状：** 明明在 CLAUDE.md 里写了规则，但 Claude 好像没有看到。
+**症状：** Claude Code 在任务中途停止，出现关于速率限制或"too many requests"的消息。
+
+**含义：** 你在短时间内发送了太多请求。这是 Anthropic API 为防止滥用而设置的限制。
 
 **解决方案：**
-
-1. 运行 `/memory` 确认你的 CLAUDE.md 出现在加载的文件列表里
-2. 检查文件位置是否正确：
-   - 项目级：`./CLAUDE.md` 或 `./.claude/CLAUDE.md`
-   - 用户级：`~/.claude/CLAUDE.md`
-3. 让规则更具体：
-   - 模糊："正确格式化代码"
-   - 具体："使用 2 空格缩进，不用 Tab"
-4. 检查 CLAUDE.md 有没有相互矛盾的规则
-5. 文件如果超过 200 行，效果会下降，考虑拆分或精简
+1. 等待几分钟后重试
+2. 对于长时间的自动化任务，考虑在请求之间添加暂停
+3. 如果你经常遇到速率限制，在 console.anthropic.com 检查你的使用情况（如果使用 API 密钥计费）
+4. Claude.ai 订阅用户有按账单周期重置的使用限额——查看你的使用量仪表板
 
 ---
 
-### Q6：对话历史很长后，Claude 开始"忘记"之前说过的内容
+### "Context length exceeded"或"Conversation too long"
 
-**症状：** 之前明确说过某个要求，后来 Claude 好像不知道了。
+**症状：** Claude Code 说对话太长了，或者在很长的会话后响应被截断或质量下降。
 
-**原因：** 对话超出了上下文窗口长度，早期内容被压缩了。
+**含义：** 对话已超过 Claude 的上下文窗口——它无法再保存整个对话历史。
 
 **解决方案：**
-
-1. 重要的规则写进 CLAUDE.md，而不是只在对话里说
-2. 手动运行 `/compact` 压缩对话，让 Claude 保留关键信息
-3. 开始新对话前，用 `/clear` 清空历史，在新对话开头重申关键要求
+1. 运行 `/compact` 压缩对话历史。Claude 会总结较早的部分，同时保留最近的上下文。
+2. 全新开始：运行 `/clear` 开始新对话（你需要重新建立上下文）
+3. 对于大型代码库：每次会话专注于一个任务，而不是试图在一个很长的对话中完成所有事情
+4. 避免反复粘贴大文件——改用 `@filename` 引用它们
 
 ---
 
-### Q7：Claude 修改了我不想让它修改的文件
+### "Tool execution failed"或"Command failed"
+
+**症状：** Claude Code 尝试运行一个命令，但失败了。
 
 **解决方案：**
+1. 读取错误信息——它通常会准确告诉你哪里失败了
+2. 问 Claude："Why did that command fail? Can you try a different approach?"
+3. 自己运行命令（使用 `!` 前缀）查看完整错误输出
+4. 检查是否安装了所需工具：`which npm`、`which python` 等
 
-事后补救：
-```bash
-# 查看哪些文件被修改
-git status
+---
 
-# 恢复特定文件
-git checkout -- 文件路径
+### "File not found"或"No such file or directory"
 
-# 或者让 Claude 帮你恢复
-# 在对话里说："把 xxx 文件改回之前的版本"
-```
+**症状：** Claude Code 找不到它想要读取或编辑的文件。
 
-事前预防：
-- 在 CLAUDE.md 里明确列出不应修改的文件
-- 使用默认模式（每次确认），不要用自动接受模式处理重要项目
-- 在 `.claude/settings.json` 的 `deny` 列表里加入敏感文件：
+**解决方案：**
+1. 确保你在正确的目录中（`pwd` 检查）
+2. 检查文件名或路径拼写是否正确
+3. 问 Claude："What directory are you looking in? What files exist here?"
+4. 运行 `ls` 或 `find . -name "filename"` 来定位文件
+
+---
+
+## 权限问题
+
+### 编辑文件时出现"Permission denied"
+
+**症状：** Claude Code 尝试编辑文件，但收到操作系统的权限拒绝错误。
+
+**解决方案：**
+1. 检查文件权限：`ls -la filename`
+2. 使文件可写：`chmod u+w filename`
+3. 如果文件属于 root 或其他用户，你可能需要 `sudo`——但在 Claude Code 中使用 `sudo` 要小心
+
+---
+
+### "Denied by permission rules"——Claude 拒绝做某事
+
+**症状：** Claude Code 告诉你它不被允许执行某个特定操作，因为你的设置。
+
+**解决方案：**
+1. 运行 `/permissions` 查看当前的允许/拒绝规则
+2. 找到阻止该操作的拒绝规则
+3. 要么删除拒绝规则，要么添加一个更具体的允许规则
+4. 检查你的用户设置（`~/.claude/settings.json`）和项目设置（`.claude/settings.json`）
+
+---
+
+### Claude 反复询问同一个命令的权限
+
+**症状：** 你之前已经批准了 `npm run test`，但 Claude 在下一次会话中又问了。
+
+**解决方案：**
+将命令添加到你的允许列表，这样它就总是被批准：
+
+在 `.claude/settings.json` 中：
 ```json
 {
   "permissions": {
-    "deny": [
-      "Edit(./.env)",
-      "Edit(./prisma/schema.prisma)"
-    ]
+    "allow": ["Bash(npm run test)"]
   }
 }
 ```
 
+或者当 Claude 询问权限时，寻找"don't ask again"选项。
+
 ---
 
-### Q8：Claude 在改代码时产生了语法错误
+## VS Code 插件问题
+
+### Claude Code 插件不可见
+
+**症状：** 你安装了插件，但找不到火花图标。
 
 **解决方案：**
-
-1. 直接告诉 Claude：
-   ```
-   刚才的修改让代码报了语法错误，帮我修复：
-   [粘贴错误信息]
-   ```
-
-2. 让 Claude 自检：
-   ```
-   改完之后先帮我检查一下有没有语法问题
-   ```
-
-3. 用 Git 回滚后重新尝试：
-   ```bash
-   git checkout -- 文件路径
-   ```
+1. 确保编辑器中有文件打开——工具栏图标只在有文件打开时出现
+2. 检查 VS Code 版本：需要 1.98.0 或更高（Help → About）
+3. 重启 VS Code：命令面板 → "Developer: Reload Window"
+4. 尝试暂时禁用其他 AI 插件（Cline、Continue、GitHub Copilot）——它们有时可能冲突
+5. 状态栏图标（右下角："✱ Claude Code"）即使没有文件打开也始终可见
 
 ---
 
-### Q9：运行命令时出现权限错误
+### Claude Code 插件对提示没有响应
 
-**症状：**
-```
-Error: EACCES: permission denied
-```
+**症状：** 你输入提示，什么都没发生。
 
 **解决方案：**
-
-对于 npm 全局安装权限问题：
-```bash
-# 修改 npm 全局目录的权限（推荐方式）
-mkdir ~/.npm-global
-npm config set prefix '~/.npm-global'
-# 然后把 ~/.npm-global/bin 加入 PATH
-```
-
-对于其他权限问题，不要用 `sudo npm install`——这会引起更多问题。让 Claude 帮你分析具体的权限错误，找到正确的解决方法。
+1. 检查网络连接
+2. 开始一个新对话，排除会话过时的可能
+3. 在 VS Code 的集成终端中尝试运行 `claude`——那里会显示更详细的错误
+4. 重新安装插件：通过扩展面板卸载，重载 VS Code，重新安装
 
 ---
 
-### Q10：Claude Code 的 Auto Memory 保存了错误的信息，如何删除？
+## Git 和 GitHub 问题
+
+### 尝试创建 Pull Request 时出现"gh: command not found"
+
+**症状：** Claude Code 无法创建 Pull Request，因为 `gh` CLI 未安装。
 
 **解决方案：**
-
-1. 运行 `/memory` 打开记忆管理界面，找到相关文件并打开编辑
-2. 或者直接在文件系统里编辑：
-   ```bash
-   # 打开 memory 文件所在目录
-   open ~/.claude/projects/
-   ```
-3. 找到对应项目的 `MEMORY.md` 或相关主题文件，用文本编辑器删除错误内容
-4. 也可以直接告诉 Claude：
-   ```
-   你之前记录的 "项目用 npm" 是错的，我们用 pnpm。
-   帮我更新一下记忆文件。
-   ```
+1. 安装 GitHub CLI：https://cli.github.com/
+2. Mac：`brew install gh`
+3. 安装后，认证：`gh auth login`
+4. 再次尝试 Pull Request 命令
 
 ---
 
-## Git 相关问题
+### "Remote origin not found"或"No remote configured"
 
-### Q11：Claude 提交了我不想提交的内容（比如调试代码）
+**症状：** Claude Code 无法推送到 GitHub，因为没有配置远程仓库。
 
 **解决方案：**
-
-如果只是最近一次提交，可以撤销：
-```bash
-# 撤销最近一次提交（保留文件改动）
-git reset --soft HEAD~1
-
-# 然后选择性地暂存和提交
-git add 你想提交的文件
-git commit -m "提交信息"
-```
-
-如果已经推送到远程，情况更复杂，建议让 Claude 根据你的具体情况给出方案。
-
-**预防：** 提交前让 Claude 帮你检查：
-```
-帮我在提交前检查一下，有没有调试代码（console.log 等）
-或者不应该提交的内容。
-```
+1. 先在 github.com 创建一个新仓库
+2. 然后添加远端：`git remote add origin https://github.com/username/repo-name.git`
+3. 或者告诉 Claude："Help me connect this project to a new GitHub repository"
 
 ---
 
-### Q12：出现 Git 合并冲突，不知道如何解决
+### Git 显示"nothing to commit"
+
+**症状：** 你让 Claude 提交，但 Git 说没有东西可以提交。
+
+**含义：** 你所有的文件要么已经提交，要么被 `.gitignore` 排除了。
 
 **解决方案：**
-
-把冲突的文件内容展示给 Claude：
-```
-出现了合并冲突，帮我解决：
-[粘贴包含冲突标记的文件内容]
-
-<<<<<<< HEAD
-[现有代码]
-=======
-[另一个分支的代码]
->>>>>>> feature-branch
-```
-
-Claude 会解释两个版本的区别，并建议保留哪个版本或如何合并。
+1. 运行 `git status` 查看 Git 能看到什么
+2. 如果你有 Git 没有追踪的新文件，运行 `git add .` 来暂存它们
+3. 问 Claude："What is the current git status? Why does it say nothing to commit?"
 
 ---
 
-## 项目相关问题
+## CLAUDE.md 问题
 
-### Q13：Claude 误解了我的需求，做了很多不对的改动，如何快速恢复？
+### Claude 没有遵循 CLAUDE.md 中的指令
 
-**解决方案（按情况选择）：**
-
-1. **用 Git 撤销所有未提交改动（核弹按钮）：**
-   ```bash
-   git checkout .
-   ```
-   这会把所有文件恢复到上次 commit 的状态。
-
-2. **用 VS Code 检查点回滚：**
-   在对话里把鼠标悬停到出错前的那条消息，选择"Rewind code to here"。
-
-3. **让 Claude 纠错：**
-   ```
-   你刚才做的改动偏了，主要问题是 [描述问题]。
-   请帮我把这些改动撤销，我们重新从 [某个具体点] 开始。
-   ```
-
----
-
-### Q14：Claude 在大型项目中响应变慢，且理解出现偏差
-
-**原因：** 大型项目有很多文件，Claude 需要处理大量上下文，可能导致效率下降。
+**症状：** 你在 CLAUDE.md 中有指令，但 Claude 似乎在忽略它们。
 
 **解决方案：**
-
-1. 写一个好的 CLAUDE.md，清晰描述项目架构，帮 Claude 快速定位
-2. 在提问时指定具体文件，而不是让 Claude 自己去找：
-   ```
-   请查看 src/auth/login.js，解释里面的 verifyToken 函数
-   ```
-3. 一次只做一件事，避免大而全的任务
-4. 定期运行 `/compact` 压缩对话上下文
+1. 运行 `/memory` 验证 CLAUDE.md 文件确实被加载了——如果加载了，它会在列表中显示
+2. 确保文件在正确位置：`./CLAUDE.md` 或 `./.claude/CLAUDE.md`
+3. 让指令更具体："Use 2-space indentation"比"write clean code"效果更好
+4. 将文件控制在 200 行以内——更长的文件遵循率更低
+5. 检查矛盾：两条规则说不同的事可能会相互抵消
 
 ---
 
-### Q15：如何让 Claude Code 更新到最新版本？
+### CLAUDE.md 的更改没有生效
 
-**方案（取决于安装方式）：**
+**症状：** 你编辑了 CLAUDE.md，但 Claude 似乎在使用旧版本。
 
-通过官方安装脚本安装的（推荐，自动更新）：
-```bash
-# 自动更新，通常无需手动操作
-# 如果想立即更新：
-claude update
-```
-
-通过 Homebrew 安装的：
-```bash
-brew upgrade claude-code
-```
-
-通过 WinGet 安装的（Windows）：
-```powershell
-winget upgrade Anthropic.ClaudeCode
-```
-
-查看当前版本：
-```bash
-claude --version
-```
+**解决方案：**
+1. 开始一个新的 Claude Code 会话——CLAUDE.md 在每次会话开始时读取
+2. 运行 `/memory` 确认加载的是哪个版本
+3. 确保在开始会话前已保存文件
 
 ---
 
-*遇到本附录未涵盖的问题？可以直接问 Claude Code，或者访问 Anthropic 官方社区寻求帮助。*
+## 性能和响应缓慢
+
+### Claude Code 响应非常慢
+
+**症状：** 响应需要 30 秒或更长时间；感觉很迟钝。
+
+**可能的原因和解决方案：**
+1. **需求量高：** Anthropic 的服务器可能负载很高。等几分钟后重试。
+2. **对话非常长：** 使用 `/compact` 压缩历史。长对话会拖慢速度。
+3. **上下文中有大文件：** 避免不必要地让 Claude 在内存中保留非常大的文件。
+4. **网络问题：** 检查你的网络连接。尝试 `ping claude.ai`。
+
+---
+
+### Claude Code 在会话中间"忘记"东西
+
+**症状：** Claude 停止引用它在同一对话早些时候知道的上下文。
+
+**含义：** 对话可能已经自动压缩（Claude 总结了较旧的消息以释放上下文空间）。
+
+**解决方案：**
+1. 提醒 Claude 关键上下文："Earlier in this session you were working on X. Here's a quick summary of where we are..."
+2. 将重要事实放在 CLAUDE.md 中，这样它们在压缩后仍然保留
+3. 在开始一个新的主要任务之前手动使用 `/compact`，按你的时间节点压缩
+
+---
+
+## 获取更多帮助
+
+如果以上方法都解决不了你的问题：
+
+1. **直接问 Claude：** "I'm having trouble with [description]. What should I try?" Claude 可以访问自己的文档，可以帮助排查自身的问题。
+
+2. **查看官方文档：** https://code.claude.com/docs
+
+3. **提交问题：** 对于 Bug，GitHub 仓库 https://github.com/anthropics/claude-code 接受详细的错误报告。
+
+4. **社区：** Claude Code 开发者社区在在线论坛和 Discord 服务器中分享技巧和解决方案——搜索"Claude Code community"。
+
+---
+
+*发现这里没有列出的问题？第十二章的调试思维方式同样适用：精确描述症状，记录你已经尝试过的内容，并用 Claude 本身来帮助诊断问题。*

@@ -6,7 +6,7 @@ Every time Claude Code asks "Can I do this?", there is a deeper question underne
 
 That question does not have a single universal answer. Sometimes you want Claude to ask for permission on every action so you can learn what is happening. Other times you are deep in a flow state and you just want things to happen quickly. And sometimes you want to read a plan before anything gets changed at all.
 
-Permission modes are how Claude Code handles all three of these situations. They give you a volume knob — from "ask me about everything" to "just do it" — so you can match Claude's behavior to your current context.
+Permission modes are how Claude Code handles all of these situations. They give you a volume knob — from "ask me about everything" to "just do it" — so you can match Claude's behavior to your current context.
 
 ---
 
@@ -22,9 +22,9 @@ The permission system is a safety layer. It makes sure you are in the loop befor
 
 ---
 
-## The Four Permission Modes
+## The Six Permission Modes
 
-### Default Mode: Ask As Needed
+### 1. Default Mode: Ask As Needed
 
 This is the standard mode. Claude Code will:
 - Read files without asking (reading is generally safe)
@@ -35,7 +35,9 @@ Think of this as having a contractor in your house who walks around freely but r
 
 For most people most of the time, default mode is exactly right. It keeps you informed without being annoying.
 
-### Auto-Accept Mode: Trust and Go
+---
+
+### 2. Auto-Accept Edits: Trust and Go
 
 In auto-accept mode (sometimes called `acceptEdits`), Claude automatically applies file edits without asking for each one. It still asks before running shell commands, but file changes happen immediately.
 
@@ -48,7 +50,9 @@ This is great when:
 
 **The tradeoff:** You see changes happening in real time, but you are not reviewing each one before it lands. Keep an eye on what is happening, and know that `Ctrl+C` will stop Claude mid-task if something looks wrong.
 
-### Plan Mode: Eyes Before Hands
+---
+
+### 3. Plan Mode: Eyes Before Hands
 
 Plan mode is almost the opposite of auto-accept. In this mode, Claude Code can read and analyze as much as it wants, but it cannot modify any files or run any commands. All it can do is look and think — then give you a plan.
 
@@ -69,11 +73,62 @@ claude --permission-mode plan
 
 **A practical tip:** When Claude presents its plan in plan mode, you can press `Ctrl+G` to open the plan in your text editor. Add comments, strike things out, ask follow-up questions, then return to Claude and tell it what you want changed.
 
-### Bypass Mode: No Guardrails
+---
 
-There is a fourth mode — `bypassPermissions` — that skips all permission prompts entirely. Claude does everything without asking anything.
+### 4. Auto Mode: Autonomous Operation (Team and Enterprise)
+
+Auto mode is available on Claude's Team and Enterprise plans. In this mode, Claude operates with significantly greater autonomy — it can read files, make edits, run commands, and handle multi-step tasks without stopping to ask for permission at each step.
+
+What makes Auto mode safe despite its autonomy is Anthropic's built-in safety classifier. This classifier runs continuously in the background, screening Claude's planned actions for anything that would be harmful or irreversible. If the classifier flags an action, Claude pauses and asks — even in Auto mode.
+
+Auto mode is designed for:
+- Teams running longer, more complex tasks where constant interruptions would be counterproductive
+- Workflows where Claude's judgment has been validated and trusted over time
+- Scenarios where a human reviewer is watching the output rather than approving each step
+
+**Important:** Auto mode is not the same as Bypass mode (described below). Auto mode still has safety rails — they are just more sophisticated and less intrusive than the default prompts.
+
+---
+
+### 5. DontAsk Mode: Allowlist-Only Operation
+
+DontAsk mode flips the permission model on its head. Instead of asking about everything and letting you allow or deny, DontAsk mode starts from a position of denial: only tools that have been explicitly pre-authorized are permitted. Everything else is denied without prompting.
+
+This is useful for:
+- Locked-down environments where you want precise control over exactly what Claude can do
+- Enterprise deployments where IT or security teams define a specific approved toolset
+- Situations where you want Claude to be helpful in a narrowly scoped way without any risk of it going outside those boundaries
+
+You configure the allowlist in your settings file or through your organization's Claude configuration:
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run test *)",
+      "Bash(npm run build)",
+      "Read(**/*.ts)",
+      "Edit(**/*.ts)"
+    ]
+  }
+}
+```
+
+With DontAsk mode active, Claude can only do those specific things. Anything not on the list is simply declined — no prompting, no asking, no workarounds.
+
+---
+
+### 6. Bypass Mode: No Guardrails
+
+There is a sixth mode — `bypassPermissions` — that skips all permission prompts entirely. Claude does everything without asking anything.
 
 This mode exists for automation scenarios: running Claude in scripts, CI/CD pipelines, or isolated containers where there is no human watching anyway.
+
+**How to activate it:**
+
+```bash
+claude --dangerously-skip-permissions
+```
 
 **Important:** Only use bypass mode in environments where Claude cannot cause lasting damage — containers, throwaway VMs, sandboxed systems. Do not use it on your main development machine for interactive work. The permission system exists for a reason.
 
@@ -83,13 +138,15 @@ This mode exists for automation scenarios: running Claude in scripts, CI/CD pipe
 
 You do not have to commit to a mode for an entire session. You can switch as your needs change.
 
-The quickest way is `Shift+Tab`, which cycles through the modes in order:
+The quickest way is `Shift+Tab`, which cycles through the main interactive modes in order:
 1. Default mode (normal prompts)
 2. Auto-accept mode (`⏵⏵ accept edits on`)
 3. Plan mode (`⏸ plan mode on`)
 4. Back to default
 
 So if you are in the middle of a session and decide you want to just let Claude rip through 20 file changes, hit `Shift+Tab` once to enable auto-accept. When it is done, hit it again to go back to normal.
+
+For Auto mode, DontAsk mode, and Bypass mode, you configure them at startup or through your settings — they are not part of the `Shift+Tab` cycle.
 
 ---
 
@@ -143,6 +200,14 @@ You have a clear goal and you trust Claude's direction. Switch to auto-accept mo
 **Scenario: You inherited a messy codebase**
 
 Start in plan mode. Ask Claude to analyze the architecture and tell you what it would do to add your new feature. Read the plan carefully before a single byte changes. This is caution as a superpower.
+
+**Scenario: You are on a team running longer tasks**
+
+With a Team or Enterprise plan, Auto mode lets Claude handle complex multi-step tasks while the safety classifier watches for anything problematic. Good for tasks that would be tedious to supervise step by step.
+
+**Scenario: You need a precisely constrained environment**
+
+Use DontAsk mode with a carefully defined allowlist. Claude can only do what is on the list — nothing more, nothing less. Ideal for shared environments or regulated workplaces.
 
 **Scenario: You are running automated tests in CI**
 

@@ -6,17 +6,22 @@
 
 ## 说明
 
-以下数据基于 Claude Sonnet 4 的实际使用统计，采集自典型的开发场景。数值为区间估算，实际消耗受以下因素影响：
+以下数据基于 Claude Sonnet 4.6 的实际使用统计，采集自典型的开发场景。数值为区间估算，实际消耗受以下因素影响：
 - 代码库大小和复杂度
 - 对话轮数
 - 文件读取数量
 - 命令输出长度
 - 使用的模型
 
-价格参考 Claude Sonnet 4 定价（2025年，实际价格以 Anthropic 官网为准）：
-- Input: $3 / MTok
-- Output: $15 / MTok
-- Cache read: $0.30 / MTok
+价格参考 Claude Sonnet 4.6 定价（2026年，实际价格以 Anthropic 官网为准）：
+
+| 模型 | Input（每 1M token） | Output（每 1M token） | Cache read（每 1M token） |
+|------|---------------------|----------------------|--------------------------|
+| Claude Haiku 4.5 | ~$1 | ~$5 | ~$0.10 |
+| Claude Sonnet 4.6 | ~$3 | ~$15 | ~$0.30 |
+| Claude Opus 4.6 | ~$15 | ~$75 | ~$1.50 |
+
+Prompt caching 自动生效——CLAUDE.md、system prompt 等稳定内容被缓存后，读取成本约为正常 input 价格的 10%。长 session 中重复使用相同 context 可显著降低费用。
 
 ---
 
@@ -112,9 +117,10 @@ Prompt Caching 对重复使用相同 CLAUDE.md 的场景有显著成本降低：
 
 | 模型 | 相对质量 | 相对速度 | 相对成本 | 适合场景 |
 |------|---------|---------|---------|---------|
-| Claude Haiku 3.5 | 70% | 5x | 0.1x | 简单重复任务 |
-| Claude Sonnet 4 | 90% | 2x | 1x（基准） | 日常开发 |
-| Claude Opus 4 | 100% | 1x | 5x | 复杂架构、深度调试 |
+| Claude Haiku 4.5 | 70% | 5x | 0.1x | 简单重复任务 |
+| Claude Sonnet 4.6 | 90% | 2x | 1x（基准） | 日常开发 |
+| Claude Opus 4.6 | 100% | 1x | 5x | 复杂架构、深度调试 |
+| Claude Opus 4.6 (1M) | 100% | 1x | 5x | 超大代码库；Max/Team/Enterprise 自动获得 |
 
 ---
 

@@ -75,21 +75,34 @@ Waiting for remote connection...
 
 ```bash
 # 启动一个同时支持本地和远程控制的 session
-claude --remote-control
-
-# 或简写
-claude --rc "My Project"
+claude --remote-control "Feature: OAuth Migration"
 ```
 
 这种模式下，本地终端和远程浏览器/手机可以同时发送消息，session 保持同步。
 
-### 方式三：为已有 session 启用远程控制
+### 方式三：在 claude.ai 云端创建 session
+
+```bash
+claude --remote
+```
+
+这会在 Anthropic 托管的云基础设施上创建一个 session，托管于 claude.ai/code。该 session 不依赖你的本地机器——可从任意浏览器访问，即使本地终端关闭也会持续存在。
+
+### 方式四：将云端 session 拉取到本地终端
+
+```bash
+claude --teleport "session-name"
+```
+
+`--teleport` 将 claude.ai 上的现有云端 session 拉取到本地终端，使其可以访问本地工具（文件系统、MCP server、本地命令）。这让你可以在手机上开始一个 session，然后在终端中以完整本地工具访问权限继续。
+
+### 方式五：为已有 session 启用远程控制
 
 如果你正在一个 session 里工作，临时需要远程访问：
 
 ```
-/remote-control
-# 或
+/remote-control My Project
+# 或使用简写
 /rc My Project
 ```
 

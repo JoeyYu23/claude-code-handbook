@@ -58,7 +58,7 @@ This handbook is organized as two standalone books. Read in order, or jump to wh
 
 Takes you from "what is a terminal?" all the way to building your first real project with Claude Code. Every step explained clearly, nothing assumed.
 
-**Chapters available now:** What is Claude Code · Why Claude Code · How It Works · Installation · Your First Conversation
+**16 chapters available now:** What is Claude Code · Why Claude Code · How It Works · Installation · Your First Conversation · Permission Modes · Reading Code · Editing Files · Running Commands · Git Workflows · Building a Website · Debugging · Working with APIs · CLAUDE.md · Memory · IDE Integration
 
 [Start reading Book 1 →](/en/book1-getting-started/01-what-is-claude-code)
 
@@ -70,8 +70,8 @@ Takes you from "what is a terminal?" all the way to building your first real pro
 
 Deep dives into the skill system, sub-agent orchestration, hooks, MCP protocol, token optimization, and battle-tested patterns from real projects.
 
-**Coming soon** — table of contents already published.
+**22 chapters available now:** Slash Commands · Custom Skills · Skill Composition · Sub-agents · Parallel Agents · Hooks · MCP · Token Optimization · Team Workflows · Security and more.
 
-[Preview Book 2 →](/en/book2-advanced/)
+[Start reading Book 2 →](/en/book2-advanced/)
 
 </div>
