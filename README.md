@@ -61,4 +61,6 @@ PRs welcome. Whether it's fixing a typo, improving an explanation, or translatin
 
 ## Author
 
-[Chenyang Yu](https://github.com/JoeyYu23)
+**Joey Yu** — Developer and heavy Claude Code user. Built 50+ projects with Claude Code including AI tools, optimization systems, and quant trading platforms.
+
+- GitHub: [@JoeyYu23](https://github.com/JoeyYu23)
