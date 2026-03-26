@@ -58,7 +58,7 @@ features:
 
 带你从"什么是终端"一路到用 Claude Code 完成第一个真实项目。每个步骤讲解清晰，不做任何假设。
 
-**现已上线章节：** 什么是 Claude Code · 为什么选它 · 工作原理 · 安装教程 · 第一次对话
+**16 章已上线：** 什么是 Claude Code · 为什么选它 · 工作原理 · 安装教程 · 第一次对话 · 权限模式 · 读代码 · 改文件 · 跑命令 · Git 工作流 · 从零搭网站 · Debug 技巧 · 对接 API · CLAUDE.md · Memory 系统 · IDE 集成
 
 [开始阅读 Book 1 →](/zh/book1-getting-started/01-what-is-claude-code)
 
@@ -70,8 +70,16 @@ features:
 
 深入 Skill 系统、Sub-agent 编排、Hooks 机制、MCP 协议、Token 优化，以及来自真实项目的实战 Patterns。
 
-**即将上线** —— 目录已发布。
+**23 章已上线：** Slash Commands · 自定义 Skills · Skill 组合 · Sub-agents · 并行 Agents · Hooks · 自动化工作流 · MCP 协议 · 浏览器 MCP · 数据库 MCP · 自定义 MCP · Context 管理 · Token 优化 · Memory 架构 · 多 Session · CLAUDE.md 最佳实践 · 团队协作 · 远程连接 · 安全与隐私 · 费用真相 等
 
-[预览 Book 2 →](/zh/book2-advanced/)
+[开始阅读 Book 2 →](/zh/book2-advanced/)
+
+---
+
+### 关于作者
+
+**Joey Yu** — 开发者，Claude Code 重度用户。用 Claude Code 构建了 50+ 个项目，涵盖 AI 工具、优化系统和量化交易平台。本手册基于 7 周密集使用、$3,400+ API 等价 token 消耗的真实经验。
+
+[GitHub](https://github.com/JoeyYu23)
 
 </div>
