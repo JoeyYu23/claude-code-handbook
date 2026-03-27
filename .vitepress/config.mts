@@ -51,7 +51,7 @@ const book1En = [
   },
   {
     text: 'Appendix',
-    collapsed: true,
+    collapsed: false,
     items: [
       { text: 'Glossary', link: '/en/book1-getting-started/glossary' },
       { text: 'Troubleshooting', link: '/en/book1-getting-started/troubleshooting' },
@@ -166,7 +166,7 @@ const book3En = [
   },
   {
     text: 'Appendix',
-    collapsed: true,
+    collapsed: false,
     items: [
       { text: 'Agent Type Reference', link: '/en/book3-architect/agent-reference' },
       { text: 'MCP Server Registry', link: '/en/book3-architect/mcp-registry' },
@@ -227,7 +227,7 @@ const book1Zh = [
   },
   {
     text: '附录',
-    collapsed: true,
+    collapsed: false,
     items: [
       { text: '术语表', link: '/zh/book1-getting-started/glossary' },
       { text: '常见问题', link: '/zh/book1-getting-started/troubleshooting' },
@@ -342,7 +342,7 @@ const book3Zh = [
   },
   {
     text: '附录',
-    collapsed: true,
+    collapsed: false,
     items: [
       { text: 'Agent 类型速查表', link: '/zh/book3-architect/agent-reference' },
       { text: 'MCP Server 清单', link: '/zh/book3-architect/mcp-registry' },
