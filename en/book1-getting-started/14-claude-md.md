@@ -83,43 +83,40 @@ This is useful in large projects where different parts of the codebase have diff
 Create a file named `CLAUDE.md` in your project root. Here is a solid template to start from:
 
 ```markdown
-# Project Name: My Portfolio Site
+# My Portfolio Site
 
 ## Build & Run
 
-- Install dependencies: `npm install`
-- Start development server: `npm run dev`
-- Build for production: `npm run build`
-- Run tests: `npm test`
+- `npm install` — install dependencies
+- `npm run dev` — start dev server on port 3000
+- `npm run build` — production build
+- `npm test` — run tests (must pass before committing)
 
-## Project Structure
+## Tech Stack
 
-- `src/components/` — React components
-- `src/pages/` — Top-level page components
-- `src/api/` — API utility functions
-- `src/styles/` — Global CSS files
-- `public/` — Static assets
+React 18 + TypeScript + Vite. Styling with Tailwind CSS (no CSS modules, no styled-components). State management with Zustand — no Redux. Deployment on Vercel, auto-deploys from main branch.
 
-## Coding Standards
+## Project-Specific Rules
 
-- Use TypeScript for all new files
-- Components use functional style with hooks, no class components
-- Use 2-space indentation
-- All API functions should include error handling
+- Image assets go in `public/images/` and must be WebP format, max 200KB each
+- The site has exactly 4 pages: Home, Work, About, Contact — do not add new pages without asking
+- Color palette is defined in `tailwind.config.ts` under `theme.extend.colors` — use those tokens, never hardcode hex values
+- Contact form submits to Formspree (endpoint in `.env`), do not build a backend
+- All text content lives in `src/content/data.ts` — the client updates this file directly, so keep the format simple
 
-## Important Rules
+## Architecture Decisions
 
-- Never commit directly to main branch
-- Never hardcode API keys or secrets in code
-- Run `npm test` before committing
-- All new components need a corresponding test file
+- No SSR — this is a fully static SPA, pre-rendered at build time via `vite-plugin-ssr`
+- No authentication — the site is public, no login needed
+- No database — all content is in `data.ts`
+- We chose Zustand over React Context because the theme toggle and language state need to persist across page navigations without prop drilling
 
-## Context
+## What Claude Should Know
 
-This is a personal portfolio site for a graphic designer. The main
-goals are: visual appeal, fast loading, and easy content updates.
-We are not using a CMS — content is hard-coded for simplicity.
+This is a portfolio for a graphic designer. Visual polish matters more than feature count. The client is not technical — any content they need to update must be editable in `data.ts` without touching React components. Performance budget: Lighthouse score must stay above 95.
 ```
+
+The key principle: **write things Claude cannot figure out by reading the code.** Build commands and file structure are discoverable — but "images must be WebP under 200KB" and "the client edits data.ts directly" are decisions only you know.
 
 ---
 
