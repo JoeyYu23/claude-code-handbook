@@ -119,7 +119,7 @@ claude status --provider vertex-ai
 
 Vertex AI uses the same Claude models as Bedrock, but with GCP-native integrations. For example, you can directly read from BigQuery datasets:
 
-```claude
+```text
 Read the file data/customers.csv and load it into BigQuery dataset 'analytics.staging'.
 ```
 

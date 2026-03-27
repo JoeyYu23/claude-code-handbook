@@ -1,93 +1,93 @@
-# 第 1 章：工程化系统
+# 第 1 章：工作框架工程
 
-工程化系统是设计一个*工程化系统*的实践，该系统规范了 Claude Code 在项目、会话和团队中的行为方式。与其接受 Claude 的默认行为，你故意将 CLAUDE.md 指令、钩子、技能、智能体和设置组合成一个"工程化系统" — 一个可编程的 AI 工作环境，强制你的标准、自动化繁琐的检查并使复杂的工作流可靠。
+工作框架工程（Harness Engineering）是指设计一套*工程化系统*，使 Claude Code 在项目、会话和团队中的行为方式得到规范和管控。你不必接受 Claude 的默认行为，而是主动将 CLAUDE.md 指令、Hooks、Skills、Agents 和 Settings 组合成一个"工作框架"——一个可编程的 AI 工作环境，强制执行你的质量标准、自动化繁琐检查，并让复杂工作流变得可靠。
 
-隐喻是恰当的：工程化系统不是马或骑手。这是仔细设计的设备连接它们 — 控制方向、强制安全并有效分配负载。没有它，原始力量是不可预测的。有了它，即使新手也可以引导强大的机器。
+这个比喻非常贴切：工作框架既不是马，也不是骑手，而是连接两者的精心设计的装备——控制方向、保障安全、均匀分配负荷。没有它，原始力量难以驾驭；有了它，即便是新手也能指挥强大的机器。
 
-本章教你构建工程化系统，使 Claude Code 以*你*想要的方式工作。
-
----
-
-## 什么是工程化系统？
-
-工程化系统是一个多层配置，它：
-
-1. **声明行为期望** — CLAUDE.md 告诉 Claude 什么对你很重要
-2. **强制质量门** — 钩子防止不安全或未经审查的更改
-3. **教授可复用模式** — 技能为 Claude 提供可靠的工作流
-4. **委托专注工作** — 智能体在独立上下文中隔离离散任务
-5. **限制危险操作** — 设置和权限建立安全栏
-
-没有工程化系统，Claude 隔离运行。每次对话都是新的。你必须重新解释你的优先级、你的代码风格、你的测试标准、你的团队实践。Claude 经常做不必要的决定，因为它缺乏关于什么对你很重要的上下文。
-
-有了工程化系统，Claude 在一个*设计的系统*内运行。它以你的偏好的上下文启动。在提交代码之前自动运行质量检查。它知道哪些技能要使用。它理解何时分叉到专门智能体而不是在主上下文中猜测。
-
-结果：较少的上下文解释、较少的失败、较少的惊喜。
+本章教你构建工作框架，让 Claude Code 按照*你*想要的方式运行。
 
 ---
 
-## 工程化系统的五个层
+## 什么是工作框架？
 
-一个完整的工程化系统有五个层，每个服务于一个不同的角色：
+工作框架是一套多层配置，它：
 
-### 第 1 层：CLAUDE.md — 行为指令
+1. **声明行为期望** — CLAUDE.md 告诉 Claude 什么对你重要
+2. **强制质量门禁** — Hooks 阻止不安全或未经审查的变更
+3. **传授可复用模式** — Skills 为 Claude 提供可靠的工作流
+4. **委派专项工作** — Agents 在独立上下文中隔离处理特定任务
+5. **限制危险操作** — Settings 和权限建立安全边界
 
-CLAUDE.md 是 `~/.claude/`（个人）或 `.claude/`（项目级）中的纯文本文件，教 Claude 你的价值观、风格和限制。
+没有工作框架，Claude 在孤立状态下运行。每次对话都从零开始，你必须重新解释你的优先级、代码风格、测试标准和团队规范。Claude 往往因缺乏上下文而做出不必要的判断。
 
-**它包含：**
-- 开发理念（例如，"倾向编辑现有文件；最小更改"）
-- 代码质量标准（函数大小、命名、评论）
-- 项目特定上下文（技术栈、测试命令、部署过程）
-- 应急过程（某些东西破裂时做什么）
-- 价值观（隐私、自动化、团队实践）
+有了工作框架，Claude 在一个*有设计的系统*中运行。它启动时就带有你的偏好上下文，在提交代码前自动执行质量检查，知道该调用哪些 Skills，也明白何时应该分叉到专门的 Agent 而非在主上下文中猜测。
 
-**它如何工作：**
-Claude 在每个会话启动时读取 CLAUDE.md 并将其视为"系统上下文"，形成所有决定。它是声明性的，不是命令性的 — 你陈述什么很重要，不是 Claude 应该采取的每个行动。
+结果：更少的上下文说明，更少的失败，更少的意外。
+
+---
+
+## 工作框架的五个层次
+
+一个完整的工作框架包含五个层次，各自承担不同职责：
+
+### 第一层：CLAUDE.md — 行为指令
+
+CLAUDE.md 是位于 `~/.claude/`（个人级）或 `.claude/`（项目级）的纯文本文件，用于告知 Claude 你的价值观、风格和约束。
+
+**它包含什么：**
+- 开发理念（例如"优先编辑已有文件；保持最小改动"）
+- 代码质量标准（函数大小、命名规范、注释规则）
+- 项目特定上下文（技术栈、测试命令、部署流程）
+- 应急处理方案（出问题时怎么办）
+- 价值观（隐私、自动化、团队规范）
+
+**工作原理：**
+Claude 在每次会话启动时读取 CLAUDE.md，并将其视为影响所有决策的"系统上下文"。它是声明式的，而非命令式的——你陈述什么重要，而不是规定 Claude 的每一个具体动作。
 
 **示例个人 CLAUDE.md（虚构用户 alice）：**
 
 ```markdown
-# Alice 的开发工程化系统
+# Alice 的开发工作框架
 
-## 哲学
-- 倾向迭代细化：构建最小版本，然后改进
-- 假设错误是学习，不是失败
+## 理念
+- 优先迭代改进：先构建最小版本，再逐步完善
+- 将错误视为学习机会，而非失败
 - 代码可读性 > 聪明的优化
 
 ## 代码质量
-- 函数少于 50 行
-- 变量名应该解释意图
+- 函数不超过 50 行
+- 变量名应清楚表达意图
 - 避免宽泛的 try/catch 块
-- 关键路径的测试优先
+- 关键路径采用测试驱动开发
 
 ## 项目上下文
-- 技术：React + Node.js
+- 技术栈：React + Node.js
 - 测试命令：`npm test`
-- 提示：ESLint + Prettier
+- 代码规范工具：ESLint + Prettier
 - 必须在 5 秒内可运行
 
 ## 价值观
-- 安全：代码中无 API 密钥
-- 隐私：永不推送个人数据
-- 可重现性：所有工作在 git 中
+- 安全：代码中不含 API 密钥
+- 隐私：不推送个人数据
+- 可复现性：所有工作纳入 git 管理
 ```
 
-这 **不是** Claude 必须遵循的检查清单。这是 Claude 用来做更好决定的上下文。
+这**不是** Claude 必须逐条遵守的清单，而是 Claude 用来做出更好判断的上下文。
 
-### 第 2 层：钩子 — 反应式自动化
+### 第二层：Hooks — 响应式自动化
 
-钩子是 shell 脚本、HTTP 请求或 AI 提示，当 Claude 采取特定操作时自动运行。它们强制质量门而不中断你的工作流。
+Hooks 是在 Claude 执行特定操作时自动触发的 Shell 脚本、HTTP 请求或 AI 提示。它们在不打断工作流的情况下强制执行质量门禁。
 
-**常见钩子模式：**
+**常见 Hook 模式：**
 
-| 触发器 | 示例 | 目的 |
+| 触发时机 | 示例 | 用途 |
 |---------|---------|---------|
-| 提交前 | 在更改文件上运行提示 | 防止风格违规 |
-| 文件编辑后 | 验证 YAML 语法 | 立即捕获配置错误 |
-| 在 shell 命令前 | 检查命令是否在允许列表中 | 防止意外破坏 |
-| 智能体生成后 | 记录哪个智能体被创建 | 追踪决策模式 |
+| 提交前 | 对修改的文件运行 Linter | 防止风格违规 |
+| 文件编辑后 | 验证 YAML 语法 | 即时发现配置错误 |
+| Shell 命令执行前 | 检查命令是否在白名单中 | 防止意外破坏 |
+| Agent 启动后 | 记录创建了哪个 Agent | 追踪决策模式 |
 
-**示例钩子（虚构 acme-app 项目）：**
+**示例 Hook（虚构 acme-app 项目）：**
 
 ```json
 {
@@ -109,64 +109,64 @@ Claude 在每个会话启动时读取 CLAUDE.md 并将其视为"系统上下文"
 }
 ```
 
-当 Claude 尝试提交（Stop 触发器）时，这个钩子运行验证脚本。如果脚本返回退出代码 0，提交继续。如果返回 2，提交被阻止并出现错误消息。
+当 Claude 尝试提交（Stop 触发器）时，此 Hook 运行验证脚本。脚本返回退出码 0 则提交继续，返回 2 则提交被阻止并显示错误信息。
 
-钩子是强制层。当 CLAUDE.md *建议*时，钩子 *需要*。
+Hooks 是强制执行层。CLAUDE.md *建议*，Hooks *要求*。
 
-### 第 3 层：技能 — 可复用能力
+### 第三层：Skills — 可复用能力
 
-技能是教 Claude 如何可靠地执行特定任务的 markdown 文件。与其在每个项目上重新发明轮子，你构建一个 Claude 可以自动调用的技能库。
+Skills 是教 Claude 如何可靠执行特定任务的 Markdown 文件。你不必在每个项目中重复造轮子，而是构建一个 Claude 可以按需或自动调用的 Skills 库。
 
-**技能解剖：**
+**Skills 的结构：**
 
-每个技能有：
-- 声明技能名称、描述和元数据的 YAML 前言
-- Claude 在调用技能时遵循的 markdown 指令
-- 支持文件的可选部分（模板、示例、脚本）作为参考
+每个 Skill 包含：
+- 声明名称、描述和元数据的 YAML 前置信息
+- Claude 被调用时遵循的 Markdown 指令
+- 可选的辅助文件（模板、示例、脚本）供参考
 
-**示例技能（虚构 acme-app 项目）：**
+**示例 Skill（虚构 acme-app 项目）：**
 
 ```yaml
 ---
 name: test-push
-description: 推送前运行完整测试套件。确保没有破坏的提交上游。
+description: Run full test suite before pushing to origin. Ensures no broken commits go upstream.
 allowed-tools: Bash(npm test, git push *)
 ---
 
-## 推送前：
+## Before pushing:
 
-1. **运行测试套件：** `npm test`
-2. **检查 git 状态：** `git status`
-3. **审查未提交的更改：** 有任何意外的文件吗？
-4. **报告结果：** 告诉用户测试是否通过以及 git 是否干净
-5. **仅在测试通过后：** 用 `git push origin main` 推送
+1. **Run the test suite:** `npm test`
+2. **Check git status:** `git status`
+3. **Review uncommitted changes:** Are there any unexpected files?
+4. **Report results:** Tell the user if tests passed and git is clean
+5. **Only after tests pass:** Push with `git push origin main`
 
-如果任何测试失败，停止并要求用户先修复它。
+If any test fails, stop and ask the user to fix it first.
 ```
 
-当你输入 `/test-push` 时，Claude 完全遵循这些指令。当 Claude 即将自己推送代码时，它看到这个技能在上下文中并在相关时自动调用。
+当你输入 `/test-push` 时，Claude 严格按照这些指令执行。当 Claude 准备自行推送代码时，它会在上下文中看到这个 Skill，并在相关情况下自动调用。
 
-### 第 4 层：智能体 — 专注的工作者
+### 第四层：Agents — 专职工作者
 
-智能体是专注的 Claude 子实例，工作隔离，有其自己的系统提示和工具访问。当你想将大任务拆分成较小的独立可验证的片段时，你使用智能体。
+Agents 是专注的 Claude 子实例，在独立环境中运行，拥有各自的系统提示和工具访问权限。当你希望将大型任务拆分成更小的、可独立验证的部分时，就可以使用 Agents。
 
-**常见智能体模式：**
+**常见 Agent 模式：**
 
-| 智能体 | 专业化 | 工具访问 | 示例 |
+| Agent | 专业方向 | 工具访问 | 示例 |
 |-------|---|---|---|
-| 探索 | 快速代码搜索与分析 | 仅读 | 在计划前理解新代码库 |
-| 计划 | 代码库研究以获得规范 | 仅读 | 在实现前收集需求 |
-| 审查 | 代码质量与安全评估 | 仅读 | 合并前的同行审查 |
-| 验证器 | 模式与 API 合同检查 | 读、Bash | 验证数据格式和集成 |
+| Explore | 快速代码搜索与分析 | 只读 | 在规划前了解新代码库 |
+| Plan | 代码库研究与规格制定 | 只读 | 在实现前收集需求 |
+| Review | 代码质量与安全评估 | 只读 | 合并前的同行评审 |
+| Validator | Schema 与 API 合约检查 | Read、Bash | 验证数据格式和集成 |
 
-**何时使用智能体：**
+**何时使用 Agents：**
 
-- **上下文隔离：** 你在处理复杂的 10 文件功能，不想要探索搜索噪音在你的主上下文中
-- **专门判断：** 你想要一个专注的"代码审查员"，不受实现细节分散
-- **平行工作：** 你想在另一个智能体开始实现时研究需求
-- **令牌预算：** 你需要在严格的令牌限制内工作，想要隔离昂贵的操作
+- **上下文隔离：** 正在处理复杂的 10 文件功能，不想让探索性搜索的噪音污染主上下文
+- **专项判断：** 需要一个专注的"代码评审员"，不受实现细节干扰
+- **并行工作：** 希望在另一个 Agent 开始实现的同时调研需求
+- **Token 预算：** 需要在严格的 Token 限制内工作，希望将高消耗操作隔离出去
 
-**示例智能体配置（虚构）：**
+**示例 Agent 配置（虚构）：**
 
 ```yaml
 ---
@@ -175,36 +175,36 @@ context: fork
 model: claude-opus
 tools: Read
 system_prompt: |
-  你是一位专家代码审查员。检查拉取请求以查找：
-  - 安全问题（输入验证、注入风险）
-  - 性能瓶颈
-  - 违反项目风格的不清楚代码
-  不建议小的重构。专注于错误和清晰。
+  You are an expert code reviewer. Examine pull requests for:
+  - Security issues (input validation, injection risks)
+  - Performance bottlenecks
+  - Unclear code that violates project style
+  Do not suggest minor refactorings. Focus on bugs and clarity.
 ---
 
-审查代码时，遵循这个检查清单：
+When reviewing code, follow this checklist:
 
-1. 首先读取 PR 描述
-2. 列出所有更改的文件
-3. 对于每个关键更改，询问：
-   - 这可能在规模上失败吗？
-   - 这可能被利用吗？
-   - 这违反项目风格吗？
-4. 仅报告关键问题
+1. Read the PR description first
+2. List all changed files
+3. For each critical change, ask:
+   - Could this fail at scale?
+   - Could this be exploited?
+   - Does this violate project style?
+4. Report only critical issues
 ```
 
-### 第 5 层：设置与权限 — 安全栏
+### 第五层：Settings 与权限 — 安全边界
 
-设置是限制 Claude 可以使用哪些工具以及在什么条件下的配置文件（通常是 `.claude/` 中的 `settings.json`）。
+Settings 是配置文件（通常是 `.claude/` 中的 `settings.json`），用于限制 Claude 可以使用哪些工具以及在什么条件下使用。
 
-**关键设置类型：**
+**关键配置类型：**
 
-- **allowed-tools：** Claude 可以运行哪些 bash 命令（及其参数）
-- **blocked-commands：** Claude 必须永不运行的 shell 命令
-- **edit-restrictions：** Claude 可以修改哪些文件（例如，阻止编辑 `.env`）
-- **permission-mode：** 读、执行、编辑或全堆栈
-- **force-branch：** 需要所有 git 工作在特定分支上
-- **require-approval：** 危险操作前的人类批准
+- **allowed-tools：** Claude 可以运行哪些 Bash 命令（及其参数）
+- **blocked-commands：** Claude 绝对不能运行的 Shell 命令
+- **edit-restrictions：** Claude 可以修改哪些文件（例如禁止编辑 `.env`）
+- **permission-mode：** 读取、执行、编辑或全栈模式
+- **force-branch：** 要求所有 git 操作在特定分支上进行
+- **require-approval：** 危险操作前需要人工确认
 
 **示例 settings.json（虚构 acme-app 项目）：**
 
@@ -230,113 +230,113 @@ system_prompt: |
 }
 ```
 
-有了这个配置，Claude 无法在任何情况下运行 `rm -rf`，无法编辑 `.env`，并且在推送到 git 前必须等待你的批准。
+有了这套配置，Claude 在任何情况下都不能运行 `rm -rf`，不能编辑 `.env`，且在推送 git 前必须等待你的确认。
 
 ---
 
 ## 设计原则
 
-有效的工程化系统遵循五个原则：
+有效的工作框架遵循五条原则：
 
-### 原则 1：声明性而不是命令性
+### 原则一：声明式而非命令式
 
-陈述*什么*对你很重要，不是*Claude 在每个场景中应该如何工作*。
+陈述*什么*对你重要，而不是*Claude 在每个场景中应该怎么做*。
 
-坏（命令性）："当用户要求你重构时，你必须运行提示、运行测试，然后要求批准。"
+差（命令式）："当用户要求重构时，你必须先运行 Linter，再运行测试，然后请求批准。"
 
-好（声明性）："我们优先考虑正确性。提示和测试是不可协商的。我们使用测试优先开发。"
+好（声明式）："我们优先保证正确性。Lint 和测试是不可商量的底线。我们采用测试驱动开发。"
 
-Claude 从声明推断正确的行为。你不微管理每一步。
+Claude 会从声明中推断正确的行为。你不需要微管理每一个步骤。
 
-### 原则 2：故障安全默认值
+### 原则二：故障安全的默认值
 
-设置保守的默认值。需要 *选择加入* 危险操作，不是选择退出。
+设置保守的默认值。危险操作需要*明确选择开启*，而不是选择关闭。
 
-坏："Claude 可以删除文件，除非被告知否则。"
+差："Claude 可以删除文件，除非被明确禁止。"
 
-好："Claude 无法删除文件。要允许删除，你必须显式批准或将操作添加到 allowed-tools。"
+好："Claude 不能删除文件。如需允许删除，必须显式批准或将该操作添加到 allowed-tools。"
 
-### 原则 3：可观察行为（日志与日志）
+### 原则三：可观察的行为（日志与日志记录）
 
-工程化系统应该是透明的。你必须能够回答：
-- Claude 做了哪些决定？
-- 哪些钩子运行及为什么？
-- 哪些智能体被生成？
-- 哪些规则被应用？
+工作框架应当透明。你必须能够回答：
+- Claude 做出了哪些决策？
+- 哪些 Hooks 运行了，为什么？
+- 启动了哪些 Agents？
+- 应用了哪些规则？
 
-使用钩子记录决定到文件或外部系统。使用日志创建对话的永久记录。这不是关于监视 — 这是关于理解你的工程化系统在做什么。
+使用 Hooks 将决策记录到文件或外部系统。使用日志记录创建对话的永久记录。这不是监控，而是理解你的工作框架在做什么。
 
-### 原则 4：分层强制
+### 原则四：分层强制
 
-不同的层强制不同的严格级别：
+不同层次的强制力度不同：
 
-1. **CLAUDE.md** — 软指导（Claude 应该遵循，但不被阻止忽视）
-2. **钩子** — 中等强制（钩子可以阻止操作，但是脚本化的，不是不可能的）
-3. **设置** — 硬强制（设置防止工具完全使用）
+1. **CLAUDE.md** — 软引导（Claude 应当遵循，但不被阻止忽略）
+2. **Hooks** — 中等强制（Hooks 可以阻止操作，但通过脚本实现，非绝对）
+3. **Settings** — 硬性强制（Settings 从根本上阻止工具被使用）
 
-设计良好的工程化系统使用所有三个层。CLAUDE.md 对于品味、钩子对于质量、设置对于安全。
+设计良好的工作框架同时使用这三个层次：CLAUDE.md 管口味，Hooks 保质量，Settings 守安全。
 
-### 原则 5：组合性
+### 原则五：可组合性
 
-技能和智能体应该是可组合的构建块，不是整体脚本。每个技能应该做一件事做得好。每个智能体应该有清晰的责任。它们应该一起工作而不创建依赖关系。
+Skills 和 Agents 应该是可组合的构建块，而非单体脚本。每个 Skill 应该把一件事做好。每个 Agent 应该有清晰的职责范围。它们应该协同工作，而不产生相互依赖。
 
-坏：一个包括测试、提示、发布和通知的单一"部署"技能。
+差：一个涵盖测试、Lint、发布和通知的单一"deploy" Skill。
 
-好：分离的"测试"、"提示"、"发布"和"通知"技能。在工作流中组合它们。
+好：独立的"test"、"lint"、"release"和"notify" Skills，在工作流中组合使用。
 
 ---
 
 ## 计划→工作→审查模式
 
-最成熟的工程化系统遵循三个阶段的循环：
+最成熟的工作框架遵循三阶段循环：
 
-### 阶段 1：计划
+### 阶段一：计划
 
-在写任何代码前，建立一个合同。计划者智能体（或用户）文档：
-- 将构建什么？
-- 我们如何知道它完成了？
-- 哪些风险存在？
+在写任何代码之前，先建立一份契约。计划者 Agent（或用户）记录：
+- 要构建什么？
+- 怎么判断它完成了？
+- 存在哪些风险？
 - 实现顺序是什么？
 
-输出：`Plans.md`，清晰的接受标准。
+输出：`Plans.md`，包含清晰的验收标准。
 
-### 阶段 2：工作
+### 阶段二：工作
 
-工作智能体（或你的主 Claude 会话）实现计划。当工作发生时：
-- 钩子强制质量门（提示、测试）
-- 自审查技能验证工作与计划匹配
-- 子智能体处理专门任务（安全审查、性能分析）
+工作 Agent（或你的主 Claude 会话）按计划实现。工作进行时：
+- Hooks 强制质量门禁（Lint、测试）
+- 自我审查 Skills 验证工作是否符合计划
+- 子 Agents 处理专项任务（安全审查、性能分析）
 
-输出：完成、测试、审查的代码。
+输出：已完成、已测试、已审查的代码。
 
-### 阶段 3：审查
+### 阶段三：审查
 
-在合并前，审查智能体从多个角度检查工作：
-- 它与计划匹配吗？
-- 有安全问题吗？
-- 有性能瓶颈吗？
-- 它遵循代码风格吗？
-- 有边缘案例吗？
+合并前，审查 Agent 从多个角度检查工作：
+- 是否符合计划？
+- 是否存在安全问题？
+- 是否存在性能瓶颈？
+- 是否遵循代码风格？
+- 是否存在边界情况？
 
-输出：批准、文档化、合并准备就绪的代码。
+输出：已批准、已记录、可合并的代码。
 
-只有在审查通过后代码才合并。这个循环确保到达时间，代码已被多个角度检查并通过多个质量门。
+只有审查通过后，代码才会合并。这个循环确保代码到达 main 分支时，已经经过多个视角的检查并通过了多道质量门禁。
 
 ---
 
-## 模式目录：常见工程化系统模式
+## 模式目录：常见工作框架模式
 
-### 模式 1：自动质量
+### 模式一：自动质量
 
-**目标：** 在每个文件编辑上自动运行提示和测试。
+**目标：** 在每次文件编辑时自动运行 Lint 和测试。
 
-**实现：**
+**实现方式：**
 
-1. 创建在每个文件编辑上激活的钩子
-2. 钩子运行 eslint 和任何格式化器
-3. 如果提示失败，钩子用错误消息阻止编辑
+1. 创建一个在每次文件编辑时触发的 Hook
+2. Hook 运行 ESLint 和格式化工具
+3. 如果 Lint 失败，Hook 阻止编辑并显示错误信息
 
-**示例钩子：**
+**示例 Hook：**
 
 ```json
 {
@@ -351,45 +351,45 @@ Claude 从声明推断正确的行为。你不微管理每一步。
 }
 ```
 
-**好处：** Claude 永不提交未提示的代码。你永不需要问"你提示了吗？"
+**好处：** Claude 永远不会提交未经 Lint 的代码。你再也不需要问"你 Lint 了吗？"
 
-### 模式 2：日志
+### 模式二：日志记录
 
-**目标：** 创建所有 Claude 决定和工作的不可改变日志。
+**目标：** 为所有 Claude 的决策和工作创建不可变的日志。
 
-**实现：**
+**实现方式：**
 
-1. 创建在每个主要事件上激活的钩子（智能体生成、提交、工具使用）
-2. 钩子写到 `.claude/journal/<date>.md`
-3. 每个条目包括时间戳、操作和上下文
+1. 创建一个在每个主要事件（Agent 启动、提交、工具使用）时触发的 Hook
+2. Hook 将内容写入 `.claude/journal/<date>.md`
+3. 每条记录包含时间戳、操作和上下文
 
 **示例日志条目：**
 
 ```markdown
 ## 2025-03-26
 
-### 09:15 — 智能体生成：探索
-- 原因：理解新代码库部分
-- 持续时间：3m 42s
-- 结果：找到 7 个相关文件
+### 09:15 — Agent spawned: Explore
+- Reason: Understanding new codebase section
+- Duration: 3m 42s
+- Result: Found 7 relevant files
 
-### 09:20 — 提交：feat: add user authentication
-- 文件：3 个修改、2 个添加
-- 测试：12 个新、全部通过
-- 钩子：提示 ✓，测试 ✓，安全 ✓
+### 09:20 — Commit: feat: add user authentication
+- Files: 3 modified, 2 added
+- Tests: 12 new, all passing
+- Hooks: lint ✓, test ✓, security ✓
 ```
 
-**好处：** 你有完整的记录。调试变得更容易。你可以追踪 Claude 行为中的模式。
+**好处：** 拥有完整记录。调试变得更容易。你可以追踪 Claude 行为中的规律。
 
-### 模式 3：安全门
+### 模式三：安全门禁
 
-**目标：** 防止破坏性操作，除非明确批准。
+**目标：** 防止破坏性操作在未明确批准的情况下执行。
 
-**实现：**
+**实现方式：**
 
-1. 使用 settings.json 阻止危险命令
-2. 创建安全实现"危险"操作的技能（有确认）
-3. 用户调用技能而不是原始命令
+1. 使用 settings.json 屏蔽危险命令
+2. 创建一个安全实现"危险"操作的 Skill（带确认步骤）
+3. 用户通过调用该 Skill 代替原始命令
 
 **示例：**
 
@@ -399,118 +399,118 @@ Claude 从声明推断正确的行为。你不微管理每一步。
 }
 ```
 
-与其，创建一个 `/safe-delete` 技能：
+转而创建 `/safe-delete` Skill：
 
 ```yaml
 ---
 name: safe-delete
-description: 安全删除带确认的文件
+description: Safely delete files with confirmation
 ---
 
-1. 询问用户："删除 {{file}}？这无法撤销。"
-2. 仅如果用户确认，运行：rm {{file}}
-3. 报告："文件已删除。"
+1. Ask user: "Delete {{file}}? This cannot be undone."
+2. Only if user confirms, run: rm {{file}}
+3. Report: "File deleted."
 ```
 
-**好处：** 防止意外破坏。教授安全模式。
+**好处：** 防止意外破坏。传授安全操作模式。
 
-### 模式 4：专业知识
+### 模式四：领域专长
 
-**目标：** 用默认情况下没有的域特定知识为 Claude 提供。
+**目标：** 向 Claude 提供它默认不具备的领域特定知识。
 
-**实现：**
+**实现方式：**
 
-1. 为每个域创建技能（AWS 部署、GraphQL 模式设计等）
-2. 技能包括最佳实践、常见陷阱、示例
-3. Claude 在相关时自动调用
+1. 为每个领域创建 Skill（AWS 部署、GraphQL Schema 设计等）
+2. Skill 包含最佳实践、常见陷阱和示例
+3. Claude 在相关情况下自动调用
 
-**示例技能（虚构）：**
+**示例 Skill（虚构）：**
 
 ```yaml
 ---
 name: deploy-aws-lambda
-description: 用冷启动、IAM 和监视最佳实践将 Node.js 代码部署到 AWS Lambda。
+description: Deploy Node.js code to AWS Lambda with best practices for cold starts, IAM, and monitoring.
 ---
 
-部署到 AWS Lambda 时：
+When deploying to AWS Lambda:
 
-1. **选择正确的内存：** 128 MB 太小；从 1024 MB 开始
-2. **捆绑依赖：** 确保 node_modules 包含在 zip 中
-3. **环境变量用于秘密，永不硬编码**
-4. **设置适当的超时：** 60 秒常见，但取决于用例
-5. **监视 CloudWatch 日志：** 部署后总是检查日志
+1. **Choose the right memory:** 128 MB is too small; start with 1024 MB
+2. **Bundle dependencies:** Ensure node_modules is included in the zip
+3. **Use environment variables** for secrets, never hardcode
+4. **Set appropriate timeout:** 60 seconds is common, but depends on use case
+5. **Monitor CloudWatch Logs:** Always check logs after deployment
 ```
 
-**好处：** Claude 拥有即时专家指导而不需要每次解释。
+**好处：** Claude 随时获得专家指导，无需你每次解释。
 
-### 模式 5：记忆
+### 模式五：记忆
 
-**目标：** 跨会话共享知识。
+**目标：** 在会话之间共享知识。
 
-**实现：**
+**实现方式：**
 
 1. 在 `.claude/CLAUDE.md` 中存储项目上下文
-2. 当新模式出现时使用钩子来更新 CLAUDE.md
-3. 使用日志创建可搜索的项目历史
-4. 在 `DECISIONS.md` 文件中存储常见决定
+2. 使用 Hooks 在新模式出现时更新 CLAUDE.md
+3. 使用日志记录创建可搜索的项目历史
+4. 在 `DECISIONS.md` 文件中存储常见决策
 
 **示例 DECISIONS.md（虚构）：**
 
 ```markdown
-# 架构决定
+# Architecture Decisions
 
-## 2025-03-20 — 用 React 钩子而不是类组件
-- 已决定：所有新代码必须使用钩子
-- 原因：更简单、可组合、更容易测试
-- 异常：现有类组件按原样留下
+## 2025-03-20 — Use React hooks instead of class components
+- Decided: All new code must use hooks
+- Rationale: Simpler, composable, easier to test
+- Exception: Existing class components are left as-is
 
-## 2025-03-15 — API 响应使用 camelCase
-- 已决定：API 总是返回 `firstName`，不是 `first_name`
-- 原因：与 JavaScript 约定一致
-- 强制方式：OpenAPI 模式验证
+## 2025-03-15 — API responses use camelCase
+- Decided: API always returns `firstName`, not `first_name`
+- Rationale: Consistency with JavaScript conventions
+- Enforced by: OpenAPI schema validation
 ```
 
-**好处：** Claude 记住过去的决定和原因。你不需要每个会话重新解释架构。
+**好处：** Claude 记住过去的决策和原因。你不需要每次会话都重新解释架构。
 
 ---
 
-## 构建你的第一个工程化系统：分步骤
+## 构建你的第一个工作框架：分步指南
 
-这是如何为虚构项目 `acme-app` 构建工作工程化系统：
+以下是为虚构项目 `acme-app` 构建可运行工作框架的步骤：
 
-### 步骤 1：创建 CLAUDE.md
+### 第一步：创建 CLAUDE.md
 
 ```bash
 mkdir -p acme-app/.claude
 cat > acme-app/.claude/CLAUDE.md << 'EOF'
-# ACME App 开发工程化系统
+# ACME App Development Harness
 
-## 哲学
-- 优先考虑正确性和用户安全
-- 代码清晰度击败聪明的优化
-- 所有更改通过测试和审查
-- 团队友好：文档化决定
+## Philosophy
+- Prioritize correctness and user safety
+- Code clarity beats clever optimizations
+- All changes go through tests and review
+- Team-friendly: document decisions
 
-## 代码质量
-- TypeScript 严格模式启用
-- 函数少于 50 行
-- 所有异步操作必须有错误处理
-- 无宽泛 try/catch 块
+## Code Quality
+- TypeScript strict mode enabled
+- Functions under 50 lines
+- All async operations must have error handling
+- No broad try/catch blocks
 
-## 测试
-- Jest 单位测试（`npm test`）
-- Playwright e2e 测试（`npm run test:e2e`）
-- 覆盖必须超过 70%
-- 推送前：所有测试必须通过
+## Testing
+- Jest for unit tests (`npm test`)
+- Playwright for e2e tests (`npm run test:e2e`)
+- Coverage must stay above 70%
+- Before pushing: all tests must pass
 
-## 部署
-- 仅从 main 分支部署
-- 部署需要手动批准
-- 总是运行前部署检查清单
+## Deployment
+- Only deploy from main branch
+- Deployment requires manual approval
+- Always run pre-deployment checklist
 EOF
 ```
 
-### 步骤 2：创建钩子配置
+### 第二步：创建 Hook 配置
 
 ```bash
 cat > acme-app/.claude/hooks.json << 'EOF'
@@ -534,14 +534,14 @@ cat > acme-app/.claude/hooks.json << 'EOF'
 EOF
 ```
 
-### 步骤 3：创建钩子脚本
+### 第三步：创建 Hook 脚本
 
 ```bash
 mkdir -p acme-app/.claude/hooks
 
 cat > acme-app/.claude/hooks/lint.sh << 'EOF'
 #!/bin/bash
-# 提示 TypeScript 文件
+# Lint TypeScript files
 
 FILE=$1
 npx eslint "$FILE" --fix 2>&1
@@ -558,7 +558,7 @@ chmod +x acme-app/.claude/hooks/lint.sh
 
 cat > acme-app/.claude/hooks/pre-commit.sh << 'EOF'
 #!/bin/bash
-# 提交前运行测试
+# Run tests before committing
 
 npm test --coverage 2>&1
 
@@ -573,7 +573,7 @@ EOF
 chmod +x acme-app/.claude/hooks/pre-commit.sh
 ```
 
-### 步骤 4：创建技能
+### 第四步：创建 Skill
 
 ```bash
 mkdir -p acme-app/.claude/skills/test-and-push
@@ -581,22 +581,22 @@ mkdir -p acme-app/.claude/skills/test-and-push
 cat > acme-app/.claude/skills/test-and-push/SKILL.md << 'EOF'
 ---
 name: test-and-push
-description: 运行完整测试套件并仅在测试通过时推送到原点
+description: Run full test suite and push to origin only if tests pass
 ---
 
-## 推送到原点前：
+## Before pushing to origin:
 
-1. 运行测试套件：`npm test`
-2. 检查覆盖：覆盖必须 > 70%
-3. 检查 git 状态：有任何未提交的更改吗？
-4. 如果所有检查通过：`git push origin main`
-5. 如果任何检查失败：停止并报告错误
+1. Run the test suite: `npm test`
+2. Check coverage: Coverage must be > 70%
+3. Check git status: Are there uncommitted changes?
+4. If all checks pass: `git push origin main`
+5. If any check fails: Stop and report the error
 
-仅在所有测试通过时推送。
+Only push if all tests pass.
 EOF
 ```
 
-### 步骤 5：创建设置
+### 第五步：创建 Settings
 
 ```bash
 cat > acme-app/.claude/settings.json << 'EOF'
@@ -620,83 +620,81 @@ cat > acme-app/.claude/settings.json << 'EOF'
 EOF
 ```
 
-### 步骤 6：测试工程化系统
+### 第六步：测试工作框架
 
-1. 在 `acme-app` 目录启动 Claude Code 会话
-2. 要求 Claude："What do you know about this project?"
-3. Claude 应该读取 `.claude/CLAUDE.md` 并描述工程化系统
-4. 要求 Claude 做一个测试编辑（例如，"Add a console.log to src/main.ts"）
-5. 钩子应该运行并强制提示
-6. 验证 Claude 无法编辑 `.env`（被设置阻止）
+1. 在 `acme-app` 目录中启动 Claude Code 会话
+2. 问 Claude："What do you know about this project?"
+3. Claude 应读取 `.claude/CLAUDE.md` 并描述工作框架
+4. 要求 Claude 做一次测试编辑（例如"Add a console.log to src/main.ts"）
+5. Hook 应该运行并强制执行 Lint
+6. 验证 Claude 无法编辑 `.env`（被 Settings 阻止）
 
 ---
 
-## 反模式：不要做什么
+## 反模式：不应该做什么
 
-### 反模式 1：过度配置
+### 反模式一：过度配置
 
-**问题：** 你为小项目创建 50 个钩子、30 个技能和 5 个智能体。
+**问题：** 为一个小项目创建了 50 个 Hooks、30 个 Skills 和 5 个 Agents。
 
-**为什么失败：** 工程化系统变成维护负担。钩子冲突。技能重复。Claude 花时间读配置而不是做工作。
+**为何失败：** 工作框架变成维护负担。Hooks 相互冲突，Skills 重复，Claude 花大量时间读配置而不是做工作。
 
-**修复：** 从最小开始。仅添加工程化系统层当 Claude 在没有它们时失败。单个 CLAUDE.md + 两个钩子通常足够。
+**解决方法：** 从最小化开始。只有在 Claude 没有某个层次就会出问题时，才添加那一层。单个 CLAUDE.md + 两个 Hooks 通常就够用了。
 
-### 反模式 2：冲突的层
+### 反模式二：层次冲突
 
-**问题：** CLAUDE.md 说"总是测试优先"，但设置允许跳过测试。钩子强制 TypeScript 严格模式，但技能禁用它。
+**问题：** CLAUDE.md 说"始终先测试"，但 Settings 允许跳过测试。Hooks 强制 TypeScript 严格模式，但某个 Skill 禁用了它。
 
-**为什么失败：** Claude 获得矛盾的指令并变得瘫痪。工程化系统信誉被打破。
+**为何失败：** Claude 收到相互矛盾的指令，陷入瘫痪。工作框架的可信度崩溃。
 
-**修复：** 层应该加强，不冲突。如果某些东西关键，在设置层强制。如果灵活，保留在 CLAUDE.md 中。
+**解决方法：** 各层次应该相互强化，而非相互矛盾。关键事项在 Settings 层强制，灵活事项保留在 CLAUDE.md。
 
-### 反模式 3：经常阻止的钩子
+### 反模式三：频繁阻断的 Hooks
 
-**问题：** 钩子 80% 的时间阻止 Claude 工作，因为规则太严格。
+**问题：** 某个 Hook 因规则过于严苛，80% 的情况下都会阻断 Claude 的工作。
 
-**为什么失败：** Claude 学会绕过钩子而不是尊重它。你花时间解释异常。
+**为何失败：** Claude 学会绕过 Hook 而非尊重它。你不得不花时间解释各种例外情况。
 
-**修复：** 做出规则现实。如果规则阻止太频繁，这是一个坏规则。修改或删除它。
+**解决方法：** 让规则切实可行。如果规则阻断得太频繁，说明规则本身有问题，应修改或删除。
 
-### 反模式 4：放弃的日志与决定
+### 反模式四：被弃置的日志和决策记录
 
-**问题：** 你设置日志，但永不读它。你创建 DECISIONS.md，但不更新它。
+**问题：** 设置了日志系统，却从不阅读。创建了 DECISIONS.md，却不更新。
 
-**为什么失败：** 工程化系统记录决定，但你不受益。Claude 忘记过去的决定，因为它们不在记忆中。
+**为何失败：** 工作框架记录了决策，但你没有从中获益。Claude 忘记了过去的决策，因为它们不在记忆中。
 
-**修复：** 每周审查日志。当新模式出现时更新 DECISIONS.md。使用 `/memory` 重新加载过去的决定。
+**解决方法：** 每周回顾日志。出现新模式时更新 DECISIONS.md。使用 `/memory` 重新加载过去的决策。
 
-### 反模式 5：在 CLAUDE.md 中硬编码特定
+### 反模式五：在 CLAUDE.md 中硬编码具体细节
 
-**问题：** CLAUDE.md 包含："处理仪表板时，总是使用 react-grid-layout 库。"
+**问题：** CLAUDE.md 中写着："处理 dashboard 时，始终使用 react-grid-layout 库。"
 
-**为什么失败：** CLAUDE.md 变成维护噩梦。你无法改变决定而不编辑 CLAUDE.md。它变得太特定于可复用。
+**为何失败：** CLAUDE.md 变成维护噩梦。你无法在不修改 CLAUDE.md 的情况下更改决策，而且它因过于具体而失去可复用性。
 
-**修复：** 保持 CLAUDE.md 一般和无时间限制。用技能处理具体模式。用决定文件处理项目特定的选择。
+**解决方法：** 保持 CLAUDE.md 通用和永恒。用 Skills 处理具体模式，用决策文件记录项目特定的选择。
 
 ---
 
 ## 参考资料
 
-1. **Anthropic 工程博客** — "有效的长期运行智能体工程化系统" ([anthropic.com/engineering](https://www.anthropic.com/engineering))
-2. **Anthropic 工程博客** — "长期运行应用开发的工程化系统设计" ([anthropic.com/engineering](https://www.anthropic.com/engineering))
-3. **HumanLayer 博客** — "技能问题：编码智能体工程化系统" ([humanlayer.dev/blog](https://www.humanlayer.dev/blog/skill-issue-harness-engineering-for-coding-agents))
-4. **GitHub — Chachamaru127/claude-code-harness** — 计划-工作-审查循环实现 ([github.com](https://github.com/Chachamaru127/claude-code-harness))
-5. **GitHub — ChrisWiles/claude-code-showcase** — 真实工程化系统配置 ([github.com](https://github.com/ChrisWiles/claude-code-showcase))
-6. **Claude Code 官方文档** — 自定义技能与智能体 ([claude.ai](https://claude.ai))
+1. **Anthropic Engineering Blog** — "Effective Harnesses for Long-Running Agents" ([anthropic.com/engineering](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents))
+2. **Anthropic Engineering Blog** — "Harness Design for Long-Running Application Development" ([anthropic.com/engineering](https://www.anthropic.com/engineering/harness-design-long-running-apps))
+3. **HumanLayer Blog** — "Skill Issue: Harness Engineering for Coding Agents" ([humanlayer.dev/blog](https://www.humanlayer.dev/blog/skill-issue-harness-engineering-for-coding-agents))
+4. **GitHub — Chachamaru127/claude-code-harness** — Plan-Work-Review cycle implementation ([github.com](https://github.com/Chachamaru127/claude-code-harness))
+5. **GitHub — ChrisWiles/claude-code-showcase** — Real-world harness configurations ([github.com](https://github.com/ChrisWiles/claude-code-showcase))
+6. **Claude Code Official Docs** — Custom Skills & Agents ([claude.ai](https://claude.ai))
 
 ---
 
 ## 关键要点
 
-- 工程化系统不是配置。这是一个*工程化系统*，使 Claude Code 行为可靠和可预测。
-- 五层 — CLAUDE.md、钩子、技能、智能体、设置 — 每个服务于不同的目的。
-- 有效的工程化系统遵循五个原则：声明性、故障安全、可观察、分层、可组合。
-- 计划-工作-审查循环确保每个阶段的质量。
-- 从最小开始。仅当 Claude 在没有它们时失败时添加复杂性。
-- 你的工程化系统是活的系统。季度审查它。随着模式出现进行细化。
+- 工作框架不是配置文件，而是一套*工程化系统*，使 Claude Code 的行为可靠且可预测。
+- 五个层次——CLAUDE.md、Hooks、Skills、Agents、Settings——各自承担不同职责。
+- 有效的工作框架遵循五条原则：声明式、故障安全、可观察、分层、可组合。
+- 计划→工作→审查循环确保每个阶段的质量。
+- 从最小化开始，只有在 Claude 没有某个层次就会出问题时才添加复杂性。
+- 你的工作框架是一个活的系统，每季度回顾一次，随着模式涌现不断精炼。
 
 ---
 
-## 下一章
-
-一旦你理解工程化系统作为系统，第 2 章涵盖**信息架构** — 如何结构化 CLAUDE.md、技能和智能体使它们从单独项目扩展到大型团队。
+**接下来：** [第 2 章 — Agent 团队](./02-agent-teams.md) — 编排多个 Claude Code 会话协同工作。
