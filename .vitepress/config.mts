@@ -392,13 +392,6 @@ export default defineConfig({
           { text: 'Book 1: 入门', link: '/zh/book1-getting-started/' },
           { text: 'Book 2: 进阶', link: '/zh/book2-advanced/' },
           { text: 'Book 3: 架构师', link: '/zh/book3-architect/' },
-          {
-            text: '语言',
-            items: [
-              { text: 'English', link: '/' },
-              { text: '中文', link: '/zh/' },
-            ]
-          }
         ],
         sidebar: {
           '/zh/book1-getting-started/': book1Zh,
@@ -433,13 +426,6 @@ export default defineConfig({
       { text: 'Book 1: Getting Started', link: '/en/book1-getting-started/' },
       { text: 'Book 2: Advanced', link: '/en/book2-advanced/' },
       { text: 'Book 3: Architect', link: '/en/book3-architect/' },
-      {
-        text: 'Language',
-        items: [
-          { text: 'English', link: '/' },
-          { text: '中文', link: '/zh/' },
-        ]
-      }
     ],
 
     sidebar: {
