@@ -22,57 +22,50 @@ hero:
 features:
   - icon: 📖
     title: Book 1 — Getting Started
-    details: From installation to your first AI-powered workflow. No coding experience required. Covers setup, daily workflows, and your first real project.
+    details: From installation to your first AI-powered workflow. No coding experience required. 16 chapters covering setup, daily workflows, and your first real project.
     link: /en/book1-getting-started/
-    linkText: Start Book 1
+    linkText: Start Book 1 →
   - icon: ⚡
-    title: Book 2 — Advanced Patterns
-    details: Skills, sub-agents, hooks, MCP servers, token optimization, and team workflows. Unlock Claude Code's full power.
+    title: Book 2 — Power User
+    details: Skills, sub-agents, hooks, MCP protocol, token optimization, desktop app, plugins. 22 chapters to unlock full power.
     link: /en/book2-advanced/
-    linkText: Explore Book 2
-  - icon: 🌐
-    title: Bilingual
-    details: Every chapter available in both English and Chinese (中文). Switch languages anytime from the navigation bar.
-    link: /zh/
-    linkText: 中文版
-  - icon: 🔍
-    title: Full-text Search
-    details: Instantly find any concept, command, or pattern across all chapters. Press Ctrl+K (or Cmd+K on Mac) to search.
-  - icon: 🎯
-    title: Practical & Hands-on
-    details: Every chapter includes real examples, terminal commands you can copy-paste, and annotated screenshots.
-  - icon: 🔄
-    title: Living Document
-    details: Updated continuously as Claude Code evolves. New chapters added regularly. Star on GitHub to follow updates.
+    linkText: Explore Book 2 →
+  - icon: 🏗️
+    title: Book 3 — Architect
+    details: Harness engineering, agent teams, scheduled tasks, cloud deployment, team workflows, security & cost. 9 chapters on system-level design.
+    link: /en/book3-architect/
+    linkText: Explore Book 3 →
 ---
 
 <div style="max-width: 800px; margin: 3rem auto; padding: 0 1.5rem;">
 
-## Two Books, One Complete Journey
+## Three Books, One Complete Journey
 
-This handbook is organized as two standalone books. Read in order, or jump to what you need.
+This handbook is organized as three standalone books. Read in order, or jump to what you need.
 
-### Book 1: Getting Started
+### Book 1: Getting Started · 16 chapters
 
 > *For everyone — no programming experience required.*
 
-Takes you from "what is a terminal?" all the way to building your first real project with Claude Code. Every step explained clearly, nothing assumed.
-
-**16 chapters available now:** What is Claude Code · Why Claude Code · How It Works · Installation · Your First Conversation · Permission Modes · Reading Code · Editing Files · Running Commands · Git Workflows · Building a Website · Debugging · Working with APIs · CLAUDE.md · Memory · IDE Integration
+Takes you from "what is a terminal?" to building your first real project with Claude Code.
 
 [Start reading Book 1 →](/en/book1-getting-started/01-what-is-claude-code)
 
----
-
-### Book 2: Advanced Patterns
+### Book 2: Power User · 22 chapters
 
 > *For developers ready to unlock the full power.*
 
-Deep dives into the skill system, sub-agent orchestration, hooks, MCP protocol, token optimization, and battle-tested patterns from real projects.
-
-**22 chapters available now:** Slash Commands · Custom Skills · Skill Composition · Sub-agents · Parallel Agents · Hooks · MCP · Token Optimization · Team Workflows · Security and more.
+Skills, sub-agents, hooks, MCP, token optimization, desktop app, plugins, worktree.
 
 [Start reading Book 2 →](/en/book2-advanced/)
+
+### Book 3: Architect · 9 chapters
+
+> *For those building system-level AI workflows.*
+
+Harness engineering, agent teams, scheduled tasks, cloud deployment, team workflows, security & cost.
+
+[Start reading Book 3 →](/en/book3-architect/)
 
 ---
 

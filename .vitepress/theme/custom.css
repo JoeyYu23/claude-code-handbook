@@ -247,6 +247,11 @@
   padding-bottom: 2rem !important;
 }
 
+.VPHero .VPImage {
+  max-width: 200px !important;
+  max-height: 200px !important;
+}
+
 .VPHero .name {
   font-family: 'Lora', Georgia, serif !important;
   font-size: clamp(2rem, 5vw, 3.5rem) !important;
