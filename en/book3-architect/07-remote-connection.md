@@ -237,4 +237,4 @@ The session continues running even when you disconnect from the terminal.
 
 ---
 
-**Next up:** [Chapter 22 — Security & Privacy](./22-security.md) — Keeping your code and credentials safe while using Claude Code.
+**Next up:** [Chapter 8 — Security & Privacy](./08-security.md) — Keeping your code and credentials safe while using Claude Code.

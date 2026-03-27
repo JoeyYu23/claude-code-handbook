@@ -373,4 +373,4 @@ This pattern transforms Claude from a per-session tool into a genuine project co
 
 ---
 
-**Next up:** [Chapter 19 — CLAUDE.md Best Practices](./19-claude-md-patterns.md) — Battle-tested configurations for every project type.
+**Next up:** [Chapter 19 — Desktop App & Computer Use](./19-desktop-app.md) — Chat, Cowork, Code modes and autonomous UI control.

@@ -166,7 +166,7 @@ Select which servers to import interactively. Works on macOS and WSL.
 
 ## Building Your Own
 
-When no existing server meets your needs, build a custom MCP server. See [Chapter 14 — Building Custom MCP Servers](./14-custom-mcp.md).
+When no existing server meets your needs, build a custom MCP server. See [Chapter 14 — Building Custom MCP Servers](/en/book2-advanced/14-custom-mcp) in Book 2.
 
 **Quick-start template:**
 

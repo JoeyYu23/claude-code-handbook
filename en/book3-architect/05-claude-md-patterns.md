@@ -267,4 +267,4 @@ A well-calibrated CLAUDE.md produces noticeably different — and better — beh
 
 ---
 
-**Next up:** [Chapter 20 — Team Workflows](./20-team-workflows.md) — Collaboration patterns, shared configuration, and knowledge management for engineering teams.
+**Next up:** [Chapter 6 — Team Workflows](./06-team-workflows.md) — Collaboration patterns, shared configuration, and knowledge management for engineering teams.

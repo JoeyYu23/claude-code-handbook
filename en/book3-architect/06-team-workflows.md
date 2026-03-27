@@ -310,4 +310,4 @@ For monitoring usage at the team level, Claude Code exposes OpenTelemetry metric
 
 ---
 
-**Next up:** [Chapter 21 — Remote Connection](./21-remote-connection.md) — Working across machines, devices, and locations.
+**Next up:** [Chapter 7 — Remote Connection](./07-remote-connection.md) — Working across machines, devices, and locations.

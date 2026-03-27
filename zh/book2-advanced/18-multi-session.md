@@ -254,4 +254,4 @@ Select a session to resume, or press Enter for new session:
 
 ---
 
-**下一章：** [CLAUDE.md 最佳实践](./19-claude-md-patterns.md)
+**下一章：** [桌面应用与 Computer Use](./19-desktop-app.md)

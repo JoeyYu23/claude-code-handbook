@@ -32,15 +32,8 @@
 17. [Memory 架构](./17-memory-architecture.md) — 高级 memory 模式
 18. [多 Session 工作流](./18-multi-session.md) — 长期项目管理
 
-### Part VI: 实战 Patterns
-19. [CLAUDE.md 最佳实践](./19-claude-md-patterns.md) — 久经考验的配置模板
-20. [团队协作](./20-team-workflows.md) — 多人协作模式
-21. [远程连接](./21-remote-connection.md) — 跨机器工作
-22. [安全与隐私](./22-security.md) — 保护你的代码和数据
-23. [费用真相](./23-cost-reality.md) — Claude Code 到底要花多少钱（真实数据）
-
-### 附录
-- [Agent 类型速查表](./agent-reference.md)
-- [MCP Server 清单](./mcp-registry.md)
-- [性能基准测试](./benchmarks.md)
-- [迁移指南](./migration-guide.md)
+### Part VI: 强力新特性
+19. [桌面应用与 Computer Use](./19-desktop-app.md) — Chat、Cowork、Code 三种模式与自主 UI 控制
+20. [插件与市场](./20-plugins.md) — 用第三方工具扩展 Claude Code
+21. [Worktree 与隔离](./21-worktree.md) — 同时运行多个分支
+22. [语音、快速模式与 Effort](./22-voice-fast-effort.md) — 速度、详细程度与模型算力控制

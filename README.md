@@ -18,9 +18,13 @@ I've used Claude Code on a Max Plan for 7 weeks, consuming $3,400+ in API-equiva
 
 For everyone, no coding experience required. Covers installation, your first conversation, permission modes, reading and editing code, Git workflows, debugging, APIs, CLAUDE.md, and IDE integration.
 
-**Book 2: Advanced Patterns** — 22 chapters
+**Book 2: Claude Code Power User** — 22 chapters
 
-For developers ready to unlock the full power. Covers the Skill system, sub-agent orchestration, parallel agents, hooks and automation, the MCP protocol (Browser, Database, custom servers), context window management, token optimization, memory architecture, and team workflows.
+For developers ready to unlock the full power. Covers the Skill system, sub-agent orchestration, parallel agents, hooks and automation, the MCP protocol (Browser, Database, custom servers), context window management, token optimization, memory architecture, and advanced power features.
+
+**Book 3: The Claude Code Architect** — 9 chapters + appendices
+
+For engineers designing systems at scale. Covers harness engineering, multi-agent teams, scheduled automation loops, cloud providers (Bedrock, Vertex, Foundry), CLAUDE.md best practices, team and enterprise workflows, security, and real cost data.
 
 Every chapter available in **English** and **中文**.
 

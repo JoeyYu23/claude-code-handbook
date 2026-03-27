@@ -112,23 +112,66 @@ const book2En = [
     ]
   },
   {
-    text: 'Part VI: Real-World Patterns',
+    text: 'Part VI: Power Features',
     items: [
-      { text: '19. CLAUDE.md Best Practices', link: '/en/book2-advanced/19-claude-md-patterns' },
-      { text: '20. Team Workflows', link: '/en/book2-advanced/20-team-workflows' },
-      { text: '21. Remote Connection', link: '/en/book2-advanced/21-remote-connection' },
-      { text: '22. Security & Privacy', link: '/en/book2-advanced/22-security' },
-      { text: '23. Cost Reality', link: '/en/book2-advanced/23-cost-reality' },
+      { text: '19. Desktop App & Computer Use', link: '/en/book2-advanced/19-desktop-app' },
+      { text: '20. Plugins & Marketplaces', link: '/en/book2-advanced/20-plugins' },
+      { text: '21. Worktree & Isolation', link: '/en/book2-advanced/21-worktree' },
+      { text: '22. Voice, Fast Mode & Effort', link: '/en/book2-advanced/22-voice-fast-effort' },
+    ]
+  },
+]
+
+// Book 3 EN sidebar
+const book3En = [
+  {
+    text: 'Book 3: The Claude Code Architect',
+    items: [
+      { text: 'Overview', link: '/en/book3-architect/' },
+    ]
+  },
+  {
+    text: 'Part I: Harness Engineering',
+    items: [
+      { text: '1. Harness Engineering', link: '/en/book3-architect/01-harness-engineering' },
+    ]
+  },
+  {
+    text: 'Part II: Agent Teams & Automation',
+    items: [
+      { text: '2. Agent Teams', link: '/en/book3-architect/02-agent-teams' },
+      { text: '3. Scheduled Tasks', link: '/en/book3-architect/03-scheduled-tasks' },
+    ]
+  },
+  {
+    text: 'Part III: Cloud & Remote',
+    items: [
+      { text: '4. Cloud Remote', link: '/en/book3-architect/04-cloud-remote' },
+    ]
+  },
+  {
+    text: 'Part IV: Team Patterns',
+    items: [
+      { text: '5. CLAUDE.md Patterns', link: '/en/book3-architect/05-claude-md-patterns' },
+      { text: '6. Team Workflows', link: '/en/book3-architect/06-team-workflows' },
+      { text: '7. Remote Connection', link: '/en/book3-architect/07-remote-connection' },
+    ]
+  },
+  {
+    text: 'Part V: Operations',
+    items: [
+      { text: '8. Security', link: '/en/book3-architect/08-security' },
+      { text: '9. Cost Reality', link: '/en/book3-architect/09-cost-reality' },
     ]
   },
   {
     text: 'Appendix',
     collapsed: true,
     items: [
-      { text: 'Agent Type Reference', link: '/en/book2-advanced/agent-reference' },
-      { text: 'MCP Server Registry', link: '/en/book2-advanced/mcp-registry' },
-      { text: 'Performance Benchmarks', link: '/en/book2-advanced/benchmarks' },
-      { text: 'Migration Guide', link: '/en/book2-advanced/migration-guide' },
+      { text: 'Agent Type Reference', link: '/en/book3-architect/agent-reference' },
+      { text: 'MCP Server Registry', link: '/en/book3-architect/mcp-registry' },
+      { text: 'Performance Benchmarks', link: '/en/book3-architect/benchmarks' },
+      { text: 'Migration Guide', link: '/en/book3-architect/migration-guide' },
     ]
   },
 ]
@@ -245,23 +288,66 @@ const book2Zh = [
     ]
   },
   {
-    text: 'Part VI: 实战 Patterns',
+    text: 'Part VI: 强力新特性',
     items: [
-      { text: '19. CLAUDE.md 最佳实践', link: '/zh/book2-advanced/19-claude-md-patterns' },
-      { text: '20. 团队协作', link: '/zh/book2-advanced/20-team-workflows' },
-      { text: '21. 远程连接', link: '/zh/book2-advanced/21-remote-connection' },
-      { text: '22. 安全与隐私', link: '/zh/book2-advanced/22-security' },
-      { text: '23. 费用真相', link: '/zh/book2-advanced/23-cost-reality' },
+      { text: '19. 桌面应用与 Computer Use', link: '/zh/book2-advanced/19-desktop-app' },
+      { text: '20. 插件与市场', link: '/zh/book2-advanced/20-plugins' },
+      { text: '21. Worktree 与隔离', link: '/zh/book2-advanced/21-worktree' },
+      { text: '22. 语音、快速模式与 Effort', link: '/zh/book2-advanced/22-voice-fast-effort' },
+    ]
+  },
+]
+
+// Book 3 ZH sidebar
+const book3Zh = [
+  {
+    text: 'Book 3: Claude Code 架构师',
+    items: [
+      { text: '目录', link: '/zh/book3-architect/' },
+    ]
+  },
+  {
+    text: 'Part I: Harness 工程',
+    items: [
+      { text: '1. Harness 工程', link: '/zh/book3-architect/01-harness-engineering' },
+    ]
+  },
+  {
+    text: 'Part II: Agent 团队与自动化',
+    items: [
+      { text: '2. Agent 团队', link: '/zh/book3-architect/02-agent-teams' },
+      { text: '3. 定时任务', link: '/zh/book3-architect/03-scheduled-tasks' },
+    ]
+  },
+  {
+    text: 'Part III: 云端与远程',
+    items: [
+      { text: '4. 云端远程', link: '/zh/book3-architect/04-cloud-remote' },
+    ]
+  },
+  {
+    text: 'Part IV: 团队协作模式',
+    items: [
+      { text: '5. CLAUDE.md 模式', link: '/zh/book3-architect/05-claude-md-patterns' },
+      { text: '6. 团队工作流', link: '/zh/book3-architect/06-team-workflows' },
+      { text: '7. 远程连接', link: '/zh/book3-architect/07-remote-connection' },
+    ]
+  },
+  {
+    text: 'Part V: 运维与成本',
+    items: [
+      { text: '8. 安全与隐私', link: '/zh/book3-architect/08-security' },
+      { text: '9. 费用真相', link: '/zh/book3-architect/09-cost-reality' },
     ]
   },
   {
     text: '附录',
     collapsed: true,
     items: [
-      { text: 'Agent 类型速查表', link: '/zh/book2-advanced/agent-reference' },
-      { text: 'MCP Server 清单', link: '/zh/book2-advanced/mcp-registry' },
-      { text: '性能基准测试', link: '/zh/book2-advanced/benchmarks' },
-      { text: '迁移指南', link: '/zh/book2-advanced/migration-guide' },
+      { text: 'Agent 类型速查表', link: '/zh/book3-architect/agent-reference' },
+      { text: 'MCP Server 清单', link: '/zh/book3-architect/mcp-registry' },
+      { text: '性能基准测试', link: '/zh/book3-architect/benchmarks' },
+      { text: '迁移指南', link: '/zh/book3-architect/migration-guide' },
     ]
   },
 ]
@@ -305,6 +391,7 @@ export default defineConfig({
           { text: '首页', link: '/zh/' },
           { text: 'Book 1: 入门', link: '/zh/book1-getting-started/' },
           { text: 'Book 2: 进阶', link: '/zh/book2-advanced/' },
+          { text: 'Book 3: 架构师', link: '/zh/book3-architect/' },
           {
             text: '语言',
             items: [
@@ -316,6 +403,7 @@ export default defineConfig({
         sidebar: {
           '/zh/book1-getting-started/': book1Zh,
           '/zh/book2-advanced/': book2Zh,
+          '/zh/book3-architect/': book3Zh,
         },
         outline: {
           label: '本页目录',
@@ -344,6 +432,7 @@ export default defineConfig({
       { text: 'Home', link: '/' },
       { text: 'Book 1: Getting Started', link: '/en/book1-getting-started/' },
       { text: 'Book 2: Advanced', link: '/en/book2-advanced/' },
+      { text: 'Book 3: Architect', link: '/en/book3-architect/' },
       {
         text: 'Language',
         items: [
@@ -356,6 +445,7 @@ export default defineConfig({
     sidebar: {
       '/en/book1-getting-started/': book1En,
       '/en/book2-advanced/': book2En,
+      '/en/book3-architect/': book3En,
     },
 
     socialLinks: [

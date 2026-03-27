@@ -185,4 +185,4 @@ The SDK handles context management, tool execution, and result streaming. See th
 
 ---
 
-*See [Chapter 4 — Sub-agents Explained](./04-subagents.md) and [Chapter 6 — Parallel Agent Orchestration](./06-parallel-agents.md) for detailed coverage of multi-agent patterns.*
+*See [Chapter 4 — Sub-agents Explained](/en/book2-advanced/04-subagents) and [Chapter 6 — Parallel Agent Orchestration](/en/book2-advanced/06-parallel-agents) in Book 2 for detailed coverage of multi-agent patterns.*

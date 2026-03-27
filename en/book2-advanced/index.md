@@ -1,4 +1,4 @@
-# Book 2: Advanced Claude Code Patterns
+# Book 2: Claude Code Power User
 
 > Unlock the full power of Claude Code — skills, agents, hooks, MCP, and beyond.
 
@@ -16,7 +16,7 @@
 7. [Large Project Patterns](./07-large-projects.md) — Architect → coders → review workflow
 
 ### Part III: Hooks & Automation
-8. [Hook System Deep Dive](./08-hooks.md) — Pre/post tool execution hooks
+8. [Hook System Deep Dive](./08-hooks.md) — All 24 hook events explained
 9. [Automated Workflows](./09-automated-workflows.md) — CI/CD integration
 10. [Custom Tool Creation](./10-custom-tools.md) — Extending Claude's capabilities
 
@@ -32,15 +32,8 @@
 17. [Memory Architecture](./17-memory-architecture.md) — Advanced memory patterns
 18. [Multi-session Workflows](./18-multi-session.md) — Long-running projects
 
-### Part VI: Real-World Patterns
-19. [CLAUDE.md Best Practices](./19-claude-md-patterns.md) — Battle-tested configurations
-20. [Team Workflows](./20-team-workflows.md) — Collaboration patterns
-21. [Remote Connection](./21-remote-connection.md) — Working across machines
-22. [Security & Privacy](./22-security.md) — Keeping your code safe
-23. [Cost Reality](./23-cost-reality.md) — What Claude Code actually costs (real data)
-
-### Appendix
-- [Agent Type Reference](./agent-reference.md)
-- [MCP Server Registry](./mcp-registry.md)
-- [Performance Benchmarks](./benchmarks.md)
-- [Migration Guide](./migration-guide.md)
+### Part VI: Power Features
+19. [Desktop App & Computer Use](./19-desktop-app.md) — Chat, Cowork, Code modes and autonomous UI control
+20. [Plugins & Marketplaces](./20-plugins.md) — Extending Claude Code with third-party tools
+21. [Worktree & Isolation](./21-worktree.md) — Running multiple branches simultaneously
+22. [Voice, Fast Mode & Effort](./22-voice-fast-effort.md) — Speed, verbosity, and model effort controls

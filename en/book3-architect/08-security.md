@@ -307,4 +307,4 @@ You have completed the Claude Code Handbook. Every chapter is continuously updat
 
 - [Star this repo](https://github.com/JoeyYu23/claude-code-handbook) to follow updates
 - [Open an issue](https://github.com/JoeyYu23/claude-code-handbook/issues) if you found an error or have a suggestion
-- [Browse the appendices](/en/book2-advanced/agent-reference) for quick-reference material
+- [Browse the appendices](/en/book3-architect/agent-reference) for quick-reference material
