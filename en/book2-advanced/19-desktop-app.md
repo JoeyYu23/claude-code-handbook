@@ -175,6 +175,8 @@ If the preview fails to load:
 
 ## Computer Use: Autonomous Mouse, Keyboard, Screenshot
 
+> **Released:** March 24, 2026 (research preview). Available on macOS only, requires a Pro or Max subscription. To enable, open Settings, navigate to General, and toggle "Computer use" on. macOS will prompt you to grant Accessibility and Screen Recording permissions the first time. Your computer must be awake and the Claude Desktop app must be open for computer use to work.
+
 Computer use is unique to Cowork and Code on macOS. When enabled, Claude can:
 - **Take screenshots** of your screen to see the current state.
 - **Move the mouse cursor** and click on elements.

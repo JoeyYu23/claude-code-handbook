@@ -158,8 +158,14 @@ SessionEnd
 |------|------|-----------|
 | `~/.claude/settings.json` | 所有项目 | 否（个人） |
 | `.claude/settings.json` | 当前项目 | 是（团队共享）|
-| `.claude/settings.local.json` | 当前项目 | 否（本地专属）|
+| `.claude/settings.local.json` | 当前项目 | 否（自动 gitignore）|
 | 插件 `hooks/hooks.json` | 插件启用时 | 是 |
+
+### `settings.local.json` — 不提交的本地设置
+
+`.claude/settings.local.json` 是项目级的**个人本地设置**，自动被 gitignore，不会提交到版本控制。格式与 `settings.json` 完全相同。适合存放不应共享的个人偏好，例如 `bypassPermissions` 或 `claudeMdExcludes`。
+
+优先级规则：`settings.local.json` 中的配置会覆盖 `settings.json` 的同名 key。但安全相关的限制是累加的——项目级 `settings.json` 中的 `deny` 规则不能被 local 设置撤销。
 
 ---
 

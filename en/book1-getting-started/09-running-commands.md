@@ -225,6 +225,12 @@ Notice how Claude executes multiple commands in sequence, reports what each one 
 
 Commands fail. This is normal. A dependency might not be available, a port might already be in use, a configuration file might be missing.
 
+### A Note for Windows Users: PowerShell Tool
+
+As of v2.1.84, Claude Code supports an opt-in PowerShell tool on Windows. Instead of routing all commands through Git Bash, you can set `CLAUDE_CODE_USE_POWERSHELL_TOOL=1` in your environment (or in `settings.json`) to have Claude run PowerShell commands natively. Claude Code auto-detects `pwsh.exe` (PowerShell 7+) and falls back to `powershell.exe` (5.1). This is useful when working with Windows-native tooling, `.ps1` scripts, or modules that do not work well under Git Bash.
+
+---
+
 When a command fails, Claude reads the error output and usually knows what to do:
 
 ```

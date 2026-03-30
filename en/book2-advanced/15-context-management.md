@@ -171,14 +171,16 @@ Read the authentication module and understand how sessions work.
 Read src/auth/session.ts and specifically explain how token refresh is handled.
 ```
 
-**Use `/btw` for quick questions.**
-The `/btw` command opens a side overlay for quick questions that do not need to enter the main conversation history:
+**Use `/btw` for quick side questions.**
+Introduced in v2.1.72 (March 10, 2026), the `/btw` command opens a side conversation that does not accumulate in the main context. It reuses the parent conversation's prompt cache, so there is no additional context cost:
 
 ```text
 /btw what's the syntax for a TypeScript conditional type?
 ```
 
-The answer appears in a dismissible overlay and never consumes context in your main session.
+The answer appears in a dismissible overlay and never enters your conversation history. You can run `/btw` even while Claude is actively processing a response — it runs independently without interrupting the main turn. Think of it as the inverse of a subagent: a subagent gets full tool access but starts with no context, while `/btw` gets your full context but has zero tool access. It cannot read files, run commands, or search — it answers only from what is already in context.
+
+This makes `/btw` perfect for quick lookups ("what was the name of that function?", "what's the syntax for X?") without polluting your working session.
 
 **Clear context between unrelated tasks.**
 The `/clear` command resets context completely. Use it when switching to a genuinely unrelated task:

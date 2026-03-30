@@ -88,6 +88,28 @@ This is useful in large projects where different parts of the codebase have diff
 
 ---
 
+## The Rules Directory: `.claude/rules/`
+
+For larger projects, a single CLAUDE.md file can become unwieldy. The `.claude/rules/` directory provides a modular alternative: place individual `.md` files inside it, each covering one topic (e.g., `testing.md`, `api-design.md`).
+
+Rules files support optional `paths:` frontmatter for path-scoped activation. A rule with `paths:` only loads into context when Claude is working with files matching those glob patterns, reducing noise and saving context space:
+
+```markdown
+---
+paths:
+  - src/api/**/*.ts
+  - src/handlers/**/*.ts
+---
+All API handlers must validate input with Zod schemas.
+Return 400 with a structured error object for validation failures.
+```
+
+This rule loads only when Claude reads or edits files under `src/api/` or `src/handlers/`. Rules without `paths:` frontmatter are loaded globally, just like CLAUDE.md content.
+
+Rules files are loaded alongside CLAUDE.md, not instead of it. The directory also supports symlinks, so you can maintain shared rules across multiple projects.
+
+---
+
 ## Writing Your First CLAUDE.md
 
 Create a file named `CLAUDE.md` in your project root. Here is a solid template to start from:
