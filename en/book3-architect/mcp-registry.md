@@ -73,7 +73,7 @@ A curated reference of popular MCP servers for Claude Code. For the full live re
 | **Google Drive** | Read/write Google Docs, Sheets, Slides, Drive files. | `claude mcp add --transport stdio gdrive -- npx -y @modelcontextprotocol/server-gdrive` | Document and spec access |
 | **Obsidian** | Read/write Obsidian vault notes. | `claude mcp add --transport stdio obsidian -- npx -y mcp-obsidian --vault /path/to/vault` | Personal knowledge base access |
 | **Confluence** | Read/write Confluence pages and spaces. | `claude mcp add --transport http confluence https://mcp.atlassian.com/rest/mcp/sse` | Atlassian documentation |
-| **Figma** | Access Figma designs, components, comments. | `claude mcp add --transport http figma https://mcp.figma.com/sse` | Design-to-code workflows |
+| **Figma** | Access Figma designs, components, comments. | `claude mcp add --transport http figma https://mcp.figma.com/mcp` (verify the current endpoint in [official Figma MCP docs](https://help.figma.com/hc/en-us/articles/32132810816535-Use-Figma-MCP) — it may change) | Design-to-code workflows |
 
 ---
 

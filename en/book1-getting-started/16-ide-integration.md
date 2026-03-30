@@ -47,7 +47,7 @@ Beyond what the terminal CLI does, the extension provides:
 
 **Plan mode integration:** When Claude creates a plan (in plan mode — see Chapter 6), VS Code opens it as a full Markdown document where you can add inline comments before Claude proceeds.
 
-**Built-in MCP server:** VS Code 1.98.0+ includes a built-in MCP (Model Context Protocol) server. This means Claude Code can access open files, the current selection, diagnostics, and other editor state without any additional configuration — it connects automatically when you use the extension.
+**Built-in MCP server:** VS Code 1.98.0+ includes a built-in MCP (Model Context Protocol) server that exposes two tools to the model: `getDiagnostics` (TypeScript/JavaScript diagnostics) and `executeCode` (run selected code). Other editor interactions like file access and selection reading are handled by internal RPC between the CLI and VS Code — these are not MCP tools visible to Claude. The MCP server connects automatically when you use the extension; no additional configuration is needed.
 
 ### Keyboard Shortcuts in VS Code
 

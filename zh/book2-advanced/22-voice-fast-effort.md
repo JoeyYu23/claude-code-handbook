@@ -16,7 +16,7 @@ Claude Code 提供了多种方式来调整你与 Claude 推理问题的方式。
 
 这打开语音配置屏幕，其中你可以：
 - 启用或禁用语音输入
-- 选择输入语言（支持 50+ 种语言和方言）
+- 选择输入语言（支持 20 种语言，截至 2026 年 3 月。支持的语言数量在持续增加，请查阅官方文档获取最新列表。）
 - 调整麦克风灵敏度
 - 设置语音反馈（Claude 应该用音频回应吗）
 - 测试麦克风
@@ -188,12 +188,12 @@ Claude 将这些连接成单个消息。
 
 ### 使用键盘的尽力
 
-在支持的平台上，使用 `Option+T` (macOS) 或 `Alt+T` (Windows/Linux) 来切换尽力级别而不用输入。这比 `/effort` 更快用于频繁调整。
+在支持的平台上，使用 `Cmd+T` (macOS) 或 `Meta+T` (Windows/Linux) 来切换尽力级别而不用输入。这比 `/effort` 更快用于频繁调整。
 
 **键盘循环：**
 
 ```
-Option+T: auto → low → medium → high → max → auto
+Cmd+T: auto → low → medium → high → max → auto
 ```
 
 你当前的级别显示在状态栏中。
@@ -366,7 +366,7 @@ Option+T: auto → low → medium → high → max → auto
 | 设置语言 | `/voice [lang]` | 多语言支持 |
 | 切换快速 | `/fast on/off` | 降低延迟 |
 | 设置尽力 | `/effort [level]` | 控制推理深度 |
-| 循环尽力 | `Option+T` / `Alt+T` | 快速调整 |
+| 循环尽力 | `Cmd+T` / `Meta+T` | 快速调整 |
 | 尽力 + 模型 | `/model sonnet`, `/effort high` | 成本最优配置 |
 
 ---
@@ -380,7 +380,7 @@ Option+T: auto → low → medium → high → max → auto
 2. 对于探索和迭代，使用 /fast on
 3. 对于质量关键工作，使用 /effort high 或 max
 4. 对高级描述使用语音；对代码输入
-5. 在交互工作时使用 Option+T 来切换尽力
+5. 在交互工作时使用 Cmd+T 来切换尽力
 ```
 
 **示例任务：添加功能请求验证 API**

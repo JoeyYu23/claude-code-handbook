@@ -289,7 +289,7 @@ claude -w feature-oauth
 claude --worktree feature-auth
 ```
 
-Claude Code creates a new git worktree at `../<repo>-<name>/` and starts a session there. Each worktree is a separate working directory pointing to the same repository — changes in one do not affect another until explicitly merged.
+Claude Code creates a new git worktree at `.claude/worktrees/<name>/` and starts a session there. Each worktree is a separate working directory pointing to the same repository — changes in one do not affect another until explicitly merged.
 
 For sparse checkouts on large repositories, configure which paths to include:
 

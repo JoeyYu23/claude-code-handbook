@@ -289,7 +289,7 @@ claude -w feature-oauth
 claude --worktree feature-auth
 ```
 
-Claude Code 在 `../<repo>-<name>/` 创建新的 git worktree 并在那里启动 session。每个 worktree 是指向同一仓库的独立工作目录——一个 worktree 中的更改不会影响另一个，直到显式合并。
+Claude Code 在 `.claude/worktrees/<name>` 创建新的 git worktree 并在那里启动 session。每个 worktree 是指向同一仓库的独立工作目录——一个 worktree 中的更改不会影响另一个，直到显式合并。
 
 对于大型仓库的稀疏检出，配置要包含的路径：
 

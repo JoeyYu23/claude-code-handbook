@@ -16,7 +16,7 @@ Voice dictation transforms Claude Code into a tool you can use without typing. E
 
 This opens the voice configuration screen where you can:
 - Enable or disable voice input
-- Select input language (supports 50+ languages and dialects)
+- Select input language (supports 20 languages as of March 2026 — the number of supported languages is growing, so check the official docs for the latest list)
 - Adjust microphone sensitivity
 - Set voice feedback (should Claude respond with audio)
 - Test the microphone
@@ -188,12 +188,12 @@ The default is `auto`, which adjusts based on task complexity. Higher effort use
 
 ### Using Effort with the Keyboard
 
-On supported platforms, use `Option+T` (macOS) or `Alt+T` (Windows/Linux) to toggle through effort levels without typing. This is faster than `/effort` for frequent adjustments.
+On supported platforms, use `Cmd+T` (macOS) or `Meta+T` (Windows/Linux) to toggle through effort levels without typing. This is faster than `/effort` for frequent adjustments.
 
 **Keyboard cycling:**
 
 ```
-Option+T: auto → low → medium → high → max → auto
+Cmd+T: auto → low → medium → high → max → auto
 ```
 
 Your current level displays in the status bar.
@@ -366,7 +366,7 @@ Use /model sonnet and /effort high before reaching for Opus.
 | Set language | `/voice [lang]` | Multi-language support |
 | Toggle fast | `/fast on/off` | Reduce latency |
 | Set effort | `/effort [level]` | Control reasoning depth |
-| Cycle effort | `Option+T` / `Alt+T` | Quick adjustment |
+| Cycle effort | `Cmd+T` / `Meta+T` | Quick adjustment |
 | Effort + model | `/model sonnet`, `/effort high` | Cost-optimal configuration |
 
 ---
@@ -380,7 +380,7 @@ Use /model sonnet and /effort high before reaching for Opus.
 2. For exploration and iteration, use /fast on
 3. For quality-critical work, use /effort high or max
 4. Use voice for high-level descriptions; type for code
-5. Use Option+T to toggle effort if working interactively
+5. Use Cmd+T to toggle effort if working interactively
 ```
 
 **Example task: Add feature request validation API**

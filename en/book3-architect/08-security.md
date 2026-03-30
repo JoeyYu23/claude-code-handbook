@@ -91,6 +91,8 @@ credentials/
 
 Files listed in `.claudeignore` are invisible to Claude's file reads and codebase exploration — even if you ask Claude to "explore the project," it will not read `.claudeignore`-listed files. This is distinct from `.gitignore` (which only affects git) and provides an additional safety layer for locally sensitive files.
 
+> **Known limitation:** `.claudeignore` has known bypass issues ([GitHub Issue #579](https://github.com/anthropics/claude-code/issues/579)). For security-sensitive files, use `permissions.deny` rules in `settings.json` as a more reliable alternative.
+
 If you work with a `.env` file that contains sensitive values and Claude is exploring your codebase, be explicit:
 ```text
 Do not read .env or any environment files in this project.

@@ -91,6 +91,8 @@ credentials/
 
 `.claudeignore` 中列出的文件对 Claude 的文件读取和代码库探索是不可见的——即使你让 Claude "探索项目"，它也不会读取 `.claudeignore` 中的文件。这与 `.gitignore`（只影响 git）不同，为本地敏感文件提供了额外的安全层。
 
+> **已知限制：** `.claudeignore` 存在已知的绕过问题（[GitHub Issue #579](https://github.com/anthropics/claude-code/issues/579)）。对于安全敏感文件，建议使用 `settings.json` 中的 `permissions.deny` 规则作为更可靠的替代方案。
+
 如果你有一个包含敏感值的 `.env` 文件，且 Claude 正在探索代码库，请明确说明：
 ```text
 不要读取 .env 或本项目中的任何环境文件。

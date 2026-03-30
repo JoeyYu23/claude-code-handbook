@@ -75,9 +75,11 @@ claude --permission-mode plan
 
 ---
 
-### 4. Auto 模式：自主运行（Team 和 Enterprise）
+### 4. Auto 模式：自主运行（Team 计划）
 
-Auto 模式在 Claude 的 Team 和 Enterprise 计划上可用。在这个模式下，Claude 以显著更大的自主性运作——它可以读取文件、进行编辑、运行命令，以及处理多步骤任务，而不必在每一步停下来询问权限。
+Auto 模式在 Claude 的 Team 计划上可用（Enterprise 和 API 支持正在逐步推出）。它需要 Claude Sonnet 4.6 或 Opus 4.6 模型，并且需要通过 `--enable-auto-mode` 启动参数或在 settings 中配置后，才会出现在 Shift+Tab 循环中。
+
+在这个模式下，Claude 以显著更大的自主性运作——它可以读取文件、进行编辑、运行命令，以及处理多步骤任务，而不必在每一步停下来询问权限。
 
 尽管 Auto 模式有其自主性，但让它安全的是 Anthropic 的内置安全分类器。这个分类器在后台持续运行，筛查 Claude 计划采取的任何有害或不可逆操作。如果分类器标记了某个操作，Claude 会暂停并询问——即使在 Auto 模式下。
 
@@ -116,6 +118,8 @@ DontAsk 模式把权限模型倒过来。它不是询问所有事情然后让你
 
 激活 DontAsk 模式后，Claude 只能做那些特定的事情。不在列表上的任何事情都会被直接拒绝——不提示、不询问、没有变通方法。
 
+**注意：** 在 DontAsk 模式下，有 `ask` 规则的工具会被拒绝而不是弹出提示。这意味着任何未在允许列表中明确授权的操作都会静默失败。
+
 ---
 
 ### 6. 绕过模式：无护栏
@@ -138,15 +142,16 @@ claude --dangerously-skip-permissions
 
 你不必在整个会话中都坚持一种模式。你可以随着需求的变化来切换。
 
-最快的方式是 `Shift+Tab`，它按顺序循环切换主要的交互模式：
-1. 默认模式（正常提示）
-2. 自动接受模式（`⏵⏵ accept edits on`）
-3. 计划模式（`⏸ plan mode on`）
-4. 回到默认
+最快的方式是 `Shift+Tab`，它按顺序循环切换模式。循环包含哪些模式取决于你的配置：
+
+- **默认循环（3 种模式）：** default → acceptEdits → plan → default
+- **启用 auto 模式后（4 种模式）：** default → acceptEdits → plan → auto → default
+  - 启用方式：使用 `--enable-auto-mode` 启动参数，或在 settings 中配置
+- **启用 bypass 权限后：** default → acceptEdits → plan → bypassPermissions → default
 
 所以如果你在会话中途决定想让 Claude 直接完成 20 个文件改动，按一次 `Shift+Tab` 来启用自动接受。完成后，再按一次回到正常状态。
 
-对于 Auto 模式、DontAsk 模式和绕过模式，你在启动时或通过设置来配置它们——它们不在 `Shift+Tab` 的循环里。
+DontAsk 模式通过设置文件配置，不在 `Shift+Tab` 的循环里。
 
 ---
 

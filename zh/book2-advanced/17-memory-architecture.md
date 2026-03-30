@@ -18,7 +18,7 @@ Memory 系统
 │
 ├── Auto Memory           # Claude 自动积累的学习（被动积累）
 │   └── ~/.claude/projects/<project>/memory/
-│       ├── MEMORY.md     # 索引文件（每次 session 加载前 200 行）
+│       ├── MEMORY.md     # 索引文件（每次 session 加载前 200 行或 25KB）
 │       ├── debugging.md  # 调试相关的知识
 │       ├── patterns.md   # 代码模式发现
 │       └── ...           # 其他主题文件
@@ -103,7 +103,7 @@ Memory 系统
 **特点**：
 - 由 Claude 自动写入，无需你手动管理
 - 按主题分散在多个文件
-- `MEMORY.md` 是索引，每次 session 自动加载前 200 行
+- `MEMORY.md` 是索引，每次 session 自动加载前 200 行或 25KB（以先到者为准）
 - 其他主题文件按需读取
 
 **MEMORY.md 示例**：
@@ -187,7 +187,7 @@ paths:
 
 ```
 每次 session 启动：
-├── 加载 MEMORY.md 前 200 行（自动）
+├── 加载 MEMORY.md 前 200 行或 25KB（自动，以先到者为准）
 └── 其他主题文件只在需要时读取
 
 好处：

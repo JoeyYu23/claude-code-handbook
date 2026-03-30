@@ -28,9 +28,19 @@ Whatever you put in CLAUDE.md, Claude treats as context for the current session.
 
 ---
 
-## The Hierarchy: Global, Project, Directory
+## The Hierarchy: Managed Policy, Global, Project, Directory
 
-CLAUDE.md files can exist in three different locations, each with different scope. More specific locations take precedence over broader ones.
+CLAUDE.md files can exist in four different locations, each with different scope.
+
+### Managed Policy CLAUDE.md — Deployed by Administrators (Highest Priority)
+
+Located at:
+- macOS: `/Library/Application Support/ClaudeCode/CLAUDE.md`
+- Linux: `/etc/claude-code/CLAUDE.md`
+
+This is a machine-wide instruction file deployed by IT or DevOps administrators. It has the highest priority — its rules override all other CLAUDE.md files. Individual users cannot modify it without elevated permissions.
+
+Use this for enforcing organization-wide policies: security requirements, approved tooling, compliance rules, or any instructions that must apply to every Claude Code session on a managed machine.
 
 ### Global CLAUDE.md — Applies to All Your Projects
 

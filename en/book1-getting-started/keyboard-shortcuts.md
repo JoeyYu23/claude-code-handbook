@@ -15,7 +15,7 @@ Many shortcuts differ between Mac and Windows/Linux. This guide uses:
 - **Terminal.app:** Settings → Profiles → Keyboard → check "Use Option as Meta Key"
 - **VS Code integrated terminal:** Settings → Profiles → Keys → set Option key to "Esc+"
 
-Once configured, `Option+B`, `Option+F`, `Option+T`, etc. will work as expected.
+Once configured, `Option+B`, `Option+F`, etc. will work as expected.
 
 Press `?` inside a Claude Code session to see shortcuts available in your specific environment.
 
@@ -55,14 +55,14 @@ Press `?` inside a Claude Code session to see shortcuts available in your specif
 | Shortcut | Action |
 |---|---|
 | `Ctrl+B` | Background the currently running command (tmux users: press twice) |
-| `Ctrl+F` | Kill all background agents (press twice within 3 seconds to confirm) |
+| `Ctrl+X Ctrl+K` | Kill all background agents (chord sequence: press `Ctrl+X`, then `Ctrl+K`) |
 
 ### Model and Thinking
 
 | Shortcut | Action |
 |---|---|
-| `Option+P` (Mac) / `Alt+P` (Win/Linux) | Switch model without clearing your prompt |
-| `Option+T` (Mac) / `Alt+T` (Win/Linux) | Toggle extended thinking on/off (run `/terminal-setup` first) |
+| `Cmd+P` (Mac) / `Meta+P` (Win/Linux) | Switch model without clearing your prompt |
+| `Cmd+T` (Mac) / `Meta+T` (Win/Linux) | Toggle extended thinking on/off (run `/terminal-setup` first) |
 
 ### Paste
 

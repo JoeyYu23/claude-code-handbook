@@ -44,7 +44,7 @@ Inside this folder:
 - `MEMORY.md` — the main index file, loaded at the start of every session
 - Additional topic files like `debugging.md`, `api-conventions.md`, `build-commands.md` — detailed notes that Claude reads on demand
 
-The `MEMORY.md` file's first 200 lines are loaded into every session automatically. For longer notes, Claude creates separate topic files and loads them when relevant.
+The `MEMORY.md` file's first 200 lines or 25KB (whichever comes first) are loaded into every session automatically. For longer notes, Claude creates separate topic files and loads them when relevant.
 
 All of these are plain Markdown files. You can open, read, edit, and delete them like any text file.
 

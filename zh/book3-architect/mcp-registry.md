@@ -75,6 +75,8 @@ Claude Code 常用 MCP 服务器的精选参考列表。如需查看完整的实
 | **Confluence** | 读写 Confluence 页面和空间。 | `claude mcp add --transport http confluence https://mcp.atlassian.com/rest/mcp/sse` | Atlassian 文档 |
 | **Figma** | 访问 Figma 设计、组件、评论。 | `claude mcp add --transport http figma https://mcp.figma.com/sse` | 设计转代码工作流 |
 
+> **注意：** Figma MCP 的 URL 可能为 `https://mcp.figma.com/mcp`——请查阅 [Figma 官方 MCP 文档](https://help.figma.com/hc/en-us/articles/32132100833559-Guide-to-the-Figma-MCP-Server) 获取最新端点。
+
 ---
 
 ## 支付与商业

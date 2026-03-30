@@ -75,9 +75,9 @@ claude --permission-mode plan
 
 ---
 
-### 4. Auto Mode: Autonomous Operation (Team and Enterprise)
+### 4. Auto Mode: Autonomous Operation (Team Plans)
 
-Auto mode is available on Claude's Team and Enterprise plans. In this mode, Claude operates with significantly greater autonomy — it can read files, make edits, run commands, and handle multi-step tasks without stopping to ask for permission at each step.
+Auto mode is available on Claude's Team plans (Enterprise and API support is rolling out). It requires Claude Sonnet 4.6 or Opus 4.6 as the active model. In this mode, Claude operates with significantly greater autonomy — it can read files, make edits, run commands, and handle multi-step tasks without stopping to ask for permission at each step.
 
 What makes Auto mode safe despite its autonomy is Anthropic's built-in safety classifier. This classifier runs continuously in the background, screening Claude's planned actions for anything that would be harmful or irreversible. If the classifier flags an action, Claude pauses and asks — even in Auto mode.
 
@@ -116,6 +116,8 @@ You configure the allowlist in your settings file or through your organization's
 
 With DontAsk mode active, Claude can only do those specific things. Anything not on the list is simply declined — no prompting, no asking, no workarounds.
 
+**Note on `ask` rules:** If a tool has an explicit `ask` rule in the permission configuration, DontAsk mode treats it as a denial rather than prompting the user. The "don't ask" principle applies universally — if Claude would normally need to ask, the action is denied instead.
+
 ---
 
 ### 6. Bypass Mode: No Guardrails
@@ -138,15 +140,23 @@ claude --dangerously-skip-permissions
 
 You do not have to commit to a mode for an entire session. You can switch as your needs change.
 
-The quickest way is `Shift+Tab`, which cycles through the main interactive modes in order:
+The quickest way is `Shift+Tab`, which cycles through modes. The exact cycle depends on your configuration:
+
+**Default cycle (3 modes):**
 1. Default mode (normal prompts)
 2. Auto-accept mode (`⏵⏵ accept edits on`)
 3. Plan mode (`⏸ plan mode on`)
 4. Back to default
 
-So if you are in the middle of a session and decide you want to just let Claude rip through 20 file changes, hit `Shift+Tab` once to enable auto-accept. When it is done, hit it again to go back to normal.
+**With auto mode enabled** (requires `--enable-auto-mode` flag or enabled in settings):
+1. Default → Auto-accept → Plan → Auto → Default
 
-For Auto mode, DontAsk mode, and Bypass mode, you configure them at startup or through your settings — they are not part of the `Shift+Tab` cycle.
+**With bypass permissions:**
+1. Default → Auto-accept → Plan → Bypass Permissions → Default
+
+So if you are in the middle of a session and decide you want to just let Claude rip through 20 file changes, hit `Shift+Tab` once to enable auto-accept. When it is done, hit it again to cycle forward.
+
+DontAsk mode is configured at startup or through your settings — it is not part of the `Shift+Tab` cycle.
 
 ---
 
