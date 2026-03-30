@@ -76,7 +76,7 @@ Supported units:
 - `h` for hours
 - `d` for days
 
-Intervals that do not divide evenly (like `7m` or `90m`) are rounded to the nearest clean interval, and Claude Code tells you what it chose.
+Most reasonable intervals work as specified. Claude Code confirms the chosen interval when the loop is created.
 
 ### Looping Commands
 
@@ -382,7 +382,7 @@ Gentle nudges toward better PR discipline without being heavy-handed.
 
 ### Build Failure Notifications
 
-**Cloud task, every 30 minutes:**
+**Cloud task, every hour:**
 
 ```
 Check the CI/CD pipeline status.

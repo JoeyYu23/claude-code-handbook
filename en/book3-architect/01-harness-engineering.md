@@ -176,20 +176,17 @@ Agents are focused sub-instances of Claude that work in isolation, with their ow
 - **Parallel work:** You want to research requirements while another agent starts implementation
 - **Token budgets:** You need to work within strict token limits and want to isolate expensive operations
 
-**Example agent configuration (fictional):**
+**Example agent configuration:**
 
-```yaml
+Agent configuration uses YAML frontmatter in `.claude/agents/<name>.md` files. See the [official docs](https://code.claude.com/docs/en/sub-agents) for the current schema.
+
+Here is an illustrative example (verify field names against official documentation):
+
+```markdown
 ---
 name: Code Reviewer
-context: fork
-model: claude-opus
-tools: Read
-system_prompt: |
-  You are an expert code reviewer. Examine pull requests for:
-  - Security issues (input validation, injection risks)
-  - Performance bottlenecks
-  - Unclear code that violates project style
-  Do not suggest minor refactorings. Focus on bugs and clarity.
+description: Reviews pull requests for security, performance, and style issues
+allowed-tools: Read, Glob, Grep
 ---
 
 When reviewing code, follow this checklist:
@@ -211,7 +208,7 @@ Settings are configuration files (typically `settings.json` in `.claude/`) that 
 
 - **permissions.allow:** Tool patterns Claude can use without prompting (e.g., `Bash(npm test:*)`, `Read`, `Edit`)
 - **permissions.deny:** Tool patterns Claude must never use (e.g., `Bash(rm -rf:*)`, `Bash(sudo:*)`)
-- **permissions.defaultMode:** The default permission mode — `default`, `acceptEdits`, `bypassPermissions`, `plan`, or `dontAsk`
+- **permissions.defaultMode:** The default permission mode — `default`, `acceptEdits`, `bypassPermissions`, or `plan`
 
 **Example settings.json (fictional acme-app project):**
 

@@ -195,96 +195,61 @@ export ANTHROPIC_BASE_URL="http://localhost:8000"
 
 ---
 
-## 远程控制
+## 远程连接
 
-有时你不在机器旁边——可能相隔 3000 英里，或者正在帮助同事调试他们的系统。远程控制让你从本地终端控制远程的 Claude Code 实例。
+有时你不在机器旁边——可能相隔 3000 英里，或者正在帮助同事调试他们的系统。Claude Code 支持通过 SSH 连接远程机器，在远端环境中直接运行。
 
-### 基本命令
+### 通过 SSH 使用 Claude Code
 
-```bash
-claude remote-control --name production-server
-```
-
-这会发起与名为 `production-server` 的 Claude Code 实例的连接。远程机器必须具备：
-
-1. 已安装 Claude Code
-2. 守护进程正在运行：`claude daemon start`
-3. 相同的身份验证令牌（或共享的凭证来源）
-
-你的终端此时充当代理。你输入命令，它们在远程执行，结果实时流回。这是透明的——你感觉不到自己不在本地。
-
-### 连接多台设备
-
-注册多台机器：
+最直接的远程使用方式是在远程机器上安装 Claude Code，然后通过 SSH 连接使用：
 
 ```bash
-# 你的开发机器
-claude remote-control register --name dev-laptop --host 192.168.1.100 --port 7843
+# 在远程机器上安装 Claude Code
+ssh user@remote-server
+npm install -g @anthropic-ai/claude-code
 
-# 团队服务器
-claude remote-control register --name team-gpu --host gpu-server.internal --port 7843
-
-# 预发布环境
-claude remote-control register --name staging-canary --host staging-01.prod.internal --port 7843
+# 之后每次使用时，SSH 连接后直接运行
+ssh user@remote-server
+cd /path/to/project
+claude
 ```
 
-列出已注册的机器：
+Claude Code 在远程机器上运行，所有文件操作和命令执行都在远端完成。你的本地终端只是 SSH 会话的显示窗口。
+
+### VS Code Remote 集成
+
+如果你使用 VS Code Remote SSH 或 Remote Containers，Claude Code 可以在远程环境中运行，同时利用 VS Code 的远程开发能力：
+
+1. 通过 VS Code 连接到远程机器
+2. 在远程终端中运行 `claude`
+3. Claude Code 会在远程文件系统上操作
+
+### 多机器工作流
+
+对于需要在多台机器间切换的场景，推荐使用 SSH 配置文件管理连接：
 
 ```bash
-claude remote-control list
+# ~/.ssh/config
+Host dev-gpu
+    HostName gpu-server.internal
+    User developer
+    IdentityFile ~/.ssh/id_rsa
+
+Host staging
+    HostName staging-01.prod.internal
+    User deploy
+    IdentityFile ~/.ssh/id_rsa
 ```
 
-输出：
-```
-Name                  Host                        Port  Last Seen
-dev-laptop            192.168.1.100               7843  2 minutes ago
-team-gpu              gpu-server.internal         7843  1 hour ago
-staging-canary        staging-01.prod.internal    7843  offline
-```
-
-连接到任意一台：
+然后通过 SSH 连接到任意机器并使用 Claude Code：
 
 ```bash
-claude remote-control --name team-gpu
+ssh dev-gpu
+cd /home/ml/project
+claude
 ```
-
-### 跨设备操作
-
-你可以在一台机器上打开文件，在另一台上编辑：
-
-```bash
-# 在你的笔记本上，控制远程服务器
-claude remote-control --name team-gpu
-> Read /home/ml/models/llm-config.yaml
-> Modify the batch size from 32 to 64
-> Test the config by running /home/ml/test_config.sh
-```
-
-操作流程：
-
-1. `Read` 在远程机器上执行
-2. Claude Code 接收文件内容
-3. 你在本地终端看到它
-4. `Modify` 将修改写回远程机器
-5. `Test` 在远程机器上运行
-6. 输出流式传输到你的本地终端
 
 所有凭证、SSH 密钥和 API 密钥都留在远程机器上，你的笔记本始终看不到它们。
-
-### 从 claude.ai 发起连接
-
-你也可以从 claude.ai Web 界面启动远程控制会话：
-
-1. 访问 https://claude.ai/code
-2. 点击 "Connect to Remote"
-3. 输入机器名称或主机名
-4. 授权连接（远程机器上会收到提示）
-5. 在 Web 界面中开始输入命令
-
-以下情况特别适用：
-- 你正在使用平板电脑或 Chromebook（没有终端）
-- 你想与团队成员共享视图（他们能在 Web UI 中看到你的光标）
-- 你需要跨浏览器会话保持状态
 
 ---
 
@@ -318,30 +283,23 @@ Share link: https://claude.ai/code/tp_7f3a8c4b5d2e9a1f
 6. **回到终端**：切换回终端（你的机器持续运行）
 7. **完成工作**：在本地执行最终命令
 
-### `--remote` 标志
+### 与远程机器结合
 
-`--remote` 标志将此功能扩展到真实的远程机器：
+在远程机器上通过 SSH 启动带 `--teleport` 的会话，然后将分享链接发给同事：
 
 ```bash
-claude --remote staging-env-01 --teleport
+ssh user@staging-env-01
+cd /path/to/project
+claude --teleport
 ```
 
-这会：
-1. 连接到远程机器 `staging-env-01`
-2. 开启 Teleport 会话
-3. 显示分享链接
-
-现在任何人都可以通过 Web 链接访问你的会话，实时观看你调试预发布环境。这在以下情况极为有用：
+这在以下情况极为有用：
 
 - **事故响应**："所有人，看我的终端，我来追踪这个生产 Bug"
 - **结对调试**：无需屏幕共享，直接发送链接
 - **异步协作**：团队成员可以稍后查看你做了什么并添加评论
 
-随时撤销访问权限：
-
-```bash
-claude teleport revoke tp_7f3a8c4b5d2e9a1f
-```
+会话链接在会话结束后自动失效。
 
 ---
 
@@ -353,20 +311,20 @@ claude.ai/code 的 Web 界面提供了不同的控制模式：通过浏览器而
 
 如果你的代码运行在云端虚拟机上（EC2、GCE、Azure VM），可以从 Web 界面指向 Claude Code：
 
-1. 确保虚拟机已安装 Claude Code 且守护进程正在运行：
+1. 确保虚拟机已安装 Claude Code：
 
 ```bash
-# 在虚拟机上
-curl https://install.anthropic.com/claude-code | bash
-claude daemon start
+# 在虚拟机上安装 Claude Code（二选一）
+npm install -g @anthropic-ai/claude-code
+# 或
+curl -fsSL https://claude.ai/install.sh | bash
 ```
 
-2. 在 claude.ai/code 中点击 "Connect to Environment"
-3. 选择 "Cloud VM" 并选择你的服务商（AWS、GCP、Azure）
+2. 在 claude.ai/code 中连接到你的云端环境
+3. 选择你的服务商（AWS、GCP、Azure）
 4. 使用你的云凭证进行身份验证
-5. Claude Code 自动发现你正在运行的实例
-6. 选择你想控制的实例
-7. 开始工作
+5. 选择你想控制的实例
+6. 开始工作
 
 浏览器充当 CLI 的 GUI 层。你仍然可以运行任何命令，同时还获得：
 

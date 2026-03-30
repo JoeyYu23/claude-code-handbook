@@ -112,7 +112,7 @@ Claude Code translates this into a `bq load` command, using your GCP credentials
 
 ## Microsoft Foundry
 
-Microsoft's AI platform integrates with Azure ML and Copilot Studio. If your organization standardizes on Azure, Foundry gives you:
+Azure AI Foundry (formerly Azure AI Studio) provides the hosting environment for Claude models on Azure. If your organization standardizes on Azure, Foundry gives you:
 
 - Managed inference with GPU pools
 - Enterprise compliance (ISO 27001, SOC2)
@@ -145,17 +145,17 @@ LiteLLM is a third-party open-source proxy (not a native Claude Code provider) t
 model_list:
   - model_name: claude-default
     litellm_params:
-      model: bedrock/claude-3-5-sonnet
+      model: bedrock/claude-sonnet-4-6
       region: us-east-1
 
   - model_name: claude-fallback
     litellm_params:
-      model: vertex-ai/claude-3-opus
+      model: vertex-ai/claude-opus-4-6
       project: my-gcp-project
 
   - model_name: claude-budget
     litellm_params:
-      model: bedrock/claude-3-haiku
+      model: bedrock/claude-haiku-4-5
       region: us-west-2
 
 fallbacks:
@@ -199,92 +199,34 @@ export ANTHROPIC_DEFAULT_SONNET_MODEL="us.anthropic.claude-sonnet-4-6-20260320-v
 
 Sometimes you are not sitting at the machine. You are 3000 miles away, or you are helping a colleague debug their system. Remote control lets you control a distant Claude Code instance from your local terminal.
 
-### Basic Command
+### How Remote Control Works
+
+Remote control allows you to operate a Claude Code session from another device or share your session with teammates. There are two primary ways to access it:
+
+1. **From the CLI:** Use `claude --remote` to start a cloud-hosted session that you can access from any device.
+2. **Within a session:** Use the `/remote-control` (or `/rc`) slash command to enable remote control of your current session. This generates a QR code or share link that another device can use to connect.
+3. **From the Desktop App:** The Claude Desktop App can generate a QR code for sharing your session with a mobile device or another computer.
+
+The remote machine must have Claude Code installed. Install it with:
 
 ```bash
-claude remote-control --name production-server
+npm install -g @anthropic-ai/claude-code
 ```
 
-This initiates a connection to a Claude Code instance named `production-server`. The remote machine must have:
+### Sharing a Session
 
-1. Claude Code installed
-2. A daemon running: `claude daemon start`
-3. The same authentication token (or shared credential source)
+When you run `/remote-control` or `/rc` inside a Claude Code session, you get a shareable link or QR code. Another person (or your other device) can open that link to view and interact with your session in real time.
 
-Your terminal now acts as a proxy. You type commands, they execute remotely, and results stream back in real time. It is transparent — you cannot tell you are not local.
+This is useful when:
+- You are pair debugging with a colleague and want them to see your terminal
+- You want to control a session from a tablet or phone
+- You need to hand off an in-progress session to a teammate
 
-### Connecting Multiple Devices
-
-Register multiple machines:
-
-```bash
-# On your development machine
-claude remote-control register --name dev-laptop --host 192.168.1.100 --port 7843
-
-# On a team server
-claude remote-control register --name team-gpu --host gpu-server.internal --port 7843
-
-# On a staging environment
-claude remote-control register --name staging-canary --host staging-01.prod.internal --port 7843
-```
-
-List registered machines:
-
-```bash
-claude remote-control list
-```
-
-Output:
-```
-Name                  Host                        Port  Last Seen
-dev-laptop            192.168.1.100               7843  2 minutes ago
-team-gpu              gpu-server.internal         7843  1 hour ago
-staging-canary        staging-01.prod.internal    7843  offline
-```
-
-Connect to any:
-
-```bash
-claude remote-control --name team-gpu
-```
-
-### Cross-Device Operation
-
-You can open files on one machine and edit them on another:
-
-```bash
-# On your laptop, controlling a remote server
-claude remote-control --name team-gpu
-> Read /home/ml/models/llm-config.yaml
-> Modify the batch size from 32 to 64
-> Test the config by running /home/ml/test_config.sh
-```
-
-The flow:
-
-1. `Read` executes on the remote machine
-2. Claude Code receives the file contents
-3. You see it in your local terminal
-4. `Modify` writes the changes back to the remote machine
-5. `Test` runs on the remote machine
-6. Output streams to your local terminal
-
-All credentials, SSH keys, and API keys stay on the remote machine. Your laptop never sees them.
+All credentials and API keys stay on the host machine. The remote viewer interacts through the Claude Code interface, not through direct shell access.
 
 ### Connecting from claude.ai
 
-You can also start a remote control session from claude.ai web interface:
-
-1. Visit https://claude.ai/code
-2. Click "Connect to Remote"
-3. Enter the machine name or hostname
-4. Authorize the connection (you will be prompted on the remote machine)
-5. Start typing commands in the web interface
-
-This is useful when:
-- You are using a tablet or Chromebook (no terminal available)
-- You want to share a view with a team member (they see your cursor in the web UI)
-- You need persistence across browser sessions
+You can also work with remote sessions through the claude.ai/code web interface, which provides a browser-based view of your Claude Code session with file tree navigation, syntax highlighting, and visual diffs.
 
 ---
 
@@ -357,8 +299,7 @@ If your code runs on a cloud VM (EC2, GCE, Azure VM), you can point Claude Code 
 
 ```bash
 # On the VM
-curl https://install.anthropic.com/claude-code | bash
-claude daemon start
+npm install -g @anthropic-ai/claude-code
 ```
 
 2. From claude.ai/code, click "Connect to Environment"
@@ -375,55 +316,13 @@ The browser acts as a GUI layer over the CLI. You can still run any command, but
 - Terminal output with clickable links
 - Visual diff viewer for changes
 
-### Connectors
+### Shared Environments
 
-For teams, use connectors to register shared environments:
-
-```bash
-# Admin sets up the connector (one time)
-# (experimental, may not be available in all versions)
-claude connector create --name prod-cluster \
-  --type kubernetes \
-  --context prod-us-east \
-  --credentials /path/to/kubeconfig
-```
-
-Team members then access it:
-
-```bash
-# On claude.ai/code
-Select "Production Cluster" from the Environment dropdown
-```
-
-Connectors abstract away SSH, port forwarding, and credential management. Everyone on the team can connect to shared infrastructure without needing individual credentials.
+For teams, cloud-based sessions on claude.ai/code can be configured to connect to shared infrastructure. Integration with services like GitHub, Slack, and Linear is managed through the claude.ai web interface when creating cloud tasks or sessions. The specific connector setup depends on your organization's deployment; refer to the [Claude Code official documentation](https://code.claude.com/docs) for current integration options.
 
 ### Network Policy
 
-By default, Claude Code connections are encrypted and authenticated. But you can enforce stricter policies:
-
-> **Note:** Network policies are an enterprise feature. Check with your Anthropic account team for availability.
-
-```yaml
-# ~/.claude/network-policy.yaml
-allowed_origins:
-  - claude.ai
-  - internal-claude.mycompany.com
-
-network_restrictions:
-  outbound:
-    - deny: external-apis
-      allow: approved-list.txt
-  inbound:
-    - require_mfa: true
-    - require_vpn: true
-
-audit:
-  log_all_commands: true
-  log_file_access: true
-  retention_days: 90
-```
-
-This is essential for regulated industries (finance, healthcare) where you must prove that code execution was authorized and audited.
+By default, Claude Code connections are encrypted and authenticated. For enterprise network policy configuration (restricting origins, enforcing VPN/MFA, audit logging), contact your Anthropic account team or refer to the [enterprise deployment documentation](https://docs.anthropic.com/en/docs/claude-code/enterprise). Network policies are especially important for regulated industries (finance, healthcare) where you must prove that code execution was authorized and audited.
 
 ---
 
@@ -468,8 +367,7 @@ This architecture separates concerns: local experimentation, team resources, and
 - Google Vertex AI Documentation: https://cloud.google.com/vertex-ai/docs
 - Microsoft Azure ML: https://learn.microsoft.com/en-us/azure/machine-learning/
 - LiteLLM GitHub: https://github.com/BerriAI/litellm
-- Claude Code Remote Control Guide: run `claude docs remote-control` in your terminal for details
-- Network Policy Specification: run `claude docs network-policy` in your terminal for details
+- Claude Code Documentation: https://code.claude.com/docs
 
 ---
 
