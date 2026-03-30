@@ -148,7 +148,7 @@ claude "帮我理解 payments 模块的架构，给我一个结构总结"
 claude "根据 @notes.md 中的架构，在 payments 模块添加退款功能"
 ```
 
-### 技巧五：用 `/btw` 提问而不污染 context
+### 技巧四：用 `/btw` 提问而不污染 context
 
 `/btw <问题>` 打开一个**旁路对话**（side conversation），不会将问答内容累积到主 context 中。v2.1.72（2026 年 3 月）引入。
 
@@ -159,7 +159,7 @@ claude "根据 @notes.md 中的架构，在 payments 模块添加退款功能"
 
 与 subagent 相反：subagent 有完整工具但空 context，`/btw` 有完整 context 但无工具。需要查新信息用 subagent，需要问已有 context 里的事用 `/btw`。
 
-### 技巧四：善用 .claudeignore
+### 技巧五：善用 .claudeignore
 
 在项目根目录创建 `.claudeignore`，排除 Claude 不需要看的文件：
 

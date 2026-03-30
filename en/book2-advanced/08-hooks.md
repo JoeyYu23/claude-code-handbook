@@ -267,7 +267,7 @@ The three-level nesting is:
 
 Project-level hooks (`.claude/settings.json`) should be committed to version control so your whole team benefits.
 
-**A note on `settings.local.json`:** The `.claude/settings.local.json` file is for project-local settings that should not be committed to version control. It uses the same format as `settings.json` but is intended for personal preferences — such as `bypassPermissions` overrides, machine-specific paths, or experimental hook configurations you do not want to push to the team. When both files exist, keys in `settings.local.json` take precedence over `settings.json`. Add `.claude/settings.local.json` to your `.gitignore` to prevent accidental commits of personal or sensitive configuration.
+**A note on `settings.local.json`:** The `.claude/settings.local.json` file is for project-local settings that should not be committed to version control. Claude Code automatically gitignores this file. It uses the same format as `settings.json` but is intended for personal preferences — such as `bypassPermissions` overrides, machine-specific paths, or experimental hook configurations you do not want to push to the team. When both files exist, keys in `settings.local.json` take precedence over `settings.json`. However, security restrictions are additive — `deny` rules in the project-level `settings.json` cannot be overridden by local settings.
 
 ---
 
