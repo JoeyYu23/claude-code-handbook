@@ -12,6 +12,21 @@ This chapter covers installation on Mac, Windows, and Linux. Jump to your operat
 
 **An account.** Claude Code requires a Claude subscription (Pro, Max, Teams, or Enterprise) or an Anthropic Console account (API access with pre-paid credits). If you do not have one yet, go to [claude.com](https://claude.com) and sign up before starting. The free Claude.ai plan does not include Claude Code access.
 
+**Which plan should I pick?** Here is a quick comparison to help you decide before installing. You can always change your plan later.
+
+| Plan | Price | Best For | Context Window |
+|------|-------|----------|----------------|
+| Pro | $20/month | Occasional use, a few hours per week | 200K tokens |
+| Max 5 | $100/month | Daily development, regular usage | 1M tokens |
+| Max 20 | $200/month | Primary dev tool, parallel agents, heavy usage | 1M tokens |
+| API Direct | Pay per token | CI/CD pipelines, automation, bursty usage | Depends on model |
+| Team | $25+/user/month | Team collaboration with admin controls | 1M tokens |
+| Enterprise | Custom pricing | Large organizations, compliance needs | 1M tokens |
+
+> **Important note on Team plans:** The $25/user/month Team Standard tier does **not** include Claude Code access. Claude Code requires Team Premium seats at a higher price point. Check [claude.ai/pricing](https://claude.ai/pricing) for the latest details.
+
+**Quick decision:** Try the water → Pro ($20). Serious daily use → Max 5 ($100). All-in → Max 20 ($200). For a deep dive into real usage costs and leverage calculations, see [Chapter 23: Cost Reality](../book3-architect/09-cost-reality.md).
+
 **A terminal.** This is the text-based interface you type commands into. Every computer has one built in:
 - Mac: Terminal (search "Terminal" in Spotlight, or find it in Applications > Utilities)
 - Windows: PowerShell or Command Prompt (search "PowerShell" in the Start menu)

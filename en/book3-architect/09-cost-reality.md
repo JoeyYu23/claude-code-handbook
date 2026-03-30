@@ -23,7 +23,7 @@ The highest subscription tier. Designed for developers using Claude Code as thei
 No subscription fee, pure pay-as-you-go. Every token costs money. This is the right choice for CI/CD pipelines, automated workflows, or usage patterns that are bursty and infrequent enough that a subscription would be wasteful. Budget carefully — uncapped usage can get expensive fast.
 
 **Team/Enterprise (per-seat pricing)**
-Team plans start at $25/user/month (billed annually). Enterprise pricing is negotiated. Both include admin controls, audit logs, and additional security features. Worth it once a team has standardized on Claude Code.
+Team Standard starts at $25/user/month (billed annually), but **Claude Code is not included on Standard seats** — it requires Team Premium seats at a higher price point. Enterprise pricing is negotiated. Both tiers include admin controls, audit logs, and additional security features. Check [claude.ai/pricing](https://claude.ai/pricing) for the latest Team Premium pricing. Worth it once a team has standardized on Claude Code and needs governance features.
 
 ---
 
@@ -187,7 +187,7 @@ Claude Code is your primary development tool. 20+ hours per week, multiple activ
 You are building a product that calls Claude Code programmatically. You have a CI/CD pipeline. You have bursty, predictable usage that does not warrant a subscription. Or you want cost visibility and control over every token. Budget carefully — set hard limits in your Anthropic console.
 
 **Team/Enterprise (per-seat)**
-More than one person on your team uses Claude Code regularly. You need admin controls, usage visibility, or compliance features. Team plans ($25/user/month, billed annually) become economical once each seat is being used at even moderate intensity.
+More than one person on your team uses Claude Code regularly. You need admin controls, usage visibility, or compliance features. Note that Claude Code requires Team Premium seats — the $25/user/month Standard tier does not include Claude Code access. Check [claude.ai/pricing](https://claude.ai/pricing) for the current Team Premium pricing.
 
 ---
 
@@ -232,6 +232,33 @@ Claude Code is expensive if you pay per token and use it heavily. The real cost 
 The Max 20 subscription plan is, by the numbers, an unusually good deal for heavy users — at least as of early 2026. Eight-plus times leverage on a $200/month fixed fee means you can use Claude Code aggressively without throttling yourself out of concern for costs. That changes the psychology of how you work: you reach for the more capable model when the task warrants it, you run parallel agents when they would help, you let sessions run as long as they need to.
 
 Whether that leverage persists as Anthropic adjusts pricing is unknown. Use it while it holds.
+
+---
+
+## Additional Pricing Details
+
+Beyond the core subscription plans, several features have their own pricing mechanics that affect total cost:
+
+**Long-Context Pricing**
+Claude Opus 4.6 and Sonnet 4.6 include the full 1M token context window at standard rates — no premium. Older models (Sonnet 4.5/4) charge a 2x rate for context beyond 200K tokens.
+
+**Fast Mode (Beta)**
+Opus 4.6 offers a Fast Mode that delivers approximately 6x faster output at 6x the standard token price. Useful when speed matters more than cost — rapid prototyping, time-sensitive debugging.
+
+**Prompt Caching**
+Claude Code automatically caches frequently reused content (CLAUDE.md, system prompts). Cache economics:
+- 5-minute cache: writing costs 1.25x base input price; reading costs 10% of base
+- 1-hour cache: writing costs 2x base input price; reading costs 10% of base
+
+For subscription users, caching happens transparently and reduces effective token consumption. For API users, it meaningfully reduces costs on repetitive workflows.
+
+**Code Execution (Sandbox)**
+When Claude runs code in a sandboxed environment: free when used alongside web search or web fetch. Otherwise, 1,550 free container-hours per month, then $0.05/hour per container.
+
+**Web Search (API only)**
+$10 per 1,000 searches on the API. Web fetch is free. Subscription users are not charged separately for web search.
+
+> **Note:** Pricing details are current as of early 2026. Check [platform.claude.com/docs/en/about-claude/pricing](https://platform.claude.com/docs/en/about-claude/pricing) for the latest rates.
 
 ---
 

@@ -12,6 +12,21 @@
 
 **一个账号。** Claude Code 需要 Claude 订阅（Pro、Max、Teams 或 Enterprise），或者一个 Anthropic Console 账号（API 访问，需预充值信用额度）。如果你还没有，在开始之前先去 [claude.com](https://claude.com) 注册。免费的 Claude.ai 套餐不包含 Claude Code 访问权限。
 
+**该选哪个套餐？** 以下是一个快速对比，帮你在安装之前做出决定。你随时可以更换套餐。
+
+| 套餐 | 价格 | 适合人群 | 上下文窗口 |
+|------|------|---------|-----------|
+| Pro | $20/月（≈ ¥145/月） | 偶尔使用，每周几小时 | 200K tokens |
+| Max 5 | $100/月（≈ ¥725/月） | 日常开发，常规使用 | 1M tokens |
+| Max 20 | $200/月（≈ ¥1,450/月） | 主力开发工具，并行 agent，重度使用 | 1M tokens |
+| API 直接计费 | 按 token 付费 | CI/CD 流水线、自动化、偶发性使用 | 取决于模型 |
+| Team | $25+/用户/月 | 团队协作，需要管理功能 | 1M tokens |
+| Enterprise | 定制价格 | 大型组织，合规需求 | 1M tokens |
+
+> **Team 套餐重要提示：** $25/用户/月 的 Team Standard 席位**不包含** Claude Code 访问权限。使用 Claude Code 需要 Team Premium 席位，价格更高。详情请查看 [claude.ai/pricing](https://claude.ai/pricing)。
+
+**快速决策：** 试水 → Pro（$20）。认真日常使用 → Max 5（$100）。全力投入 → Max 20（$200）。关于真实使用成本和杠杆率的深入分析，请参阅[第二十三章：成本实况](../book3-architect/09-cost-reality.md)。
+
 **一个终端。** 这是你用来输入命令的文字界面。每台电脑都内置了一个：
 - Mac：终端（在 Spotlight 里搜索"Terminal"，或者在"应用程序 > 实用工具"里找）
 - Windows：PowerShell 或命令提示符（在开始菜单里搜索"PowerShell"）
