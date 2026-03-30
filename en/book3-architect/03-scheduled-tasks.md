@@ -148,22 +148,31 @@ For automation that needs to run reliably without your session active, configure
 
 ### Setting Up Desktop Tasks
 
-On macOS, tasks are managed through `.claude/desktop-tasks.json`:
+Desktop scheduled tasks are stored as individual SKILL.md files under `~/.claude/scheduled-tasks/`. Each task gets its own directory with a `SKILL.md` file that uses standard YAML frontmatter:
 
-```json
-{
-  "tasks": [
-    {
-      "id": "daily-dependency-check",
-      "schedule": "0 9 * * *",
-      "prompt": "check for outdated dependencies in all repos and report critical ones",
-      "enabled": true
-    }
-  ]
-}
+```
+~/.claude/scheduled-tasks/
+  daily-dependency-check/
+    SKILL.md
+  weekly-pr-review/
+    SKILL.md
 ```
 
-Create or edit this file in your home directory's `.claude` folder. Claude Code watches this configuration and loads tasks at startup.
+Example task file (`~/.claude/scheduled-tasks/daily-dependency-check/SKILL.md`):
+
+```yaml
+---
+name: daily-dependency-check
+description: Check for outdated dependencies in all repos and report critical ones
+schedule: "0 9 * * *"
+---
+
+Check all dependencies in the current project.
+Identify any packages with newer major versions available.
+Report critical security advisories.
+```
+
+The Claude Desktop App must remain open for desktop tasks to run. Tasks are discovered automatically from the `~/.claude/scheduled-tasks/` directory.
 
 ### Cron Expression Reference
 
@@ -195,23 +204,24 @@ Day-of-week uses `0` or `7` for Sunday through `6` for Saturday. Extended cron s
 
 ### MCP Servers and Permissions
 
-Desktop tasks inherit MCP servers configured in your `.claude/mcp.json` file. You can also specify per-task connectors for GitHub, Slack, Linear, and other integrations.
+Desktop tasks inherit MCP servers configured in your `.claude/mcp.json` file.
 
-```json
-{
-  "tasks": [
-    {
-      "id": "pr-review",
-      "schedule": "0 10 * * 1-5",
-      "prompt": "review open PRs and summarize blockers",
-      "connectors": ["github"],
-      "enabled": true
-    }
-  ]
-}
+Example task with connectors (`~/.claude/scheduled-tasks/pr-review/SKILL.md`):
+
+```yaml
+---
+name: pr-review
+description: Review open PRs and summarize blockers
+schedule: "0 10 * * 1-5"
+connectors:
+  - github
+---
+
+Review all open PRs and summarize blockers.
+For each PR waiting more than 24 hours, flag it as urgent.
 ```
 
-Tasks run autonomously by default — they do not prompt for permission. If you want prompts for sensitive operations, set `requiresApproval: true` for that task.
+Tasks run autonomously by default — they do not prompt for permission.
 
 ---
 

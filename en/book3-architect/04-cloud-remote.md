@@ -39,27 +39,15 @@ export AWS_SECRET_ACCESS_KEY="..."
 export AWS_REGION="us-east-1"
 ```
 
-Bedrock requires you to request model access in the AWS Console. Navigate to **Bedrock > Model Access**, then check which Claude models are available in your region. Once enabled, configure Claude Code:
+Bedrock requires you to request model access in the AWS Console. Navigate to **Bedrock > Model Access**, then check which Claude models are available in your region. Once enabled, configure Claude Code using environment variables:
 
 ```bash
-claude config set provider bedrock
-claude config set bedrock-region us-east-1
-claude config set bedrock-model claude-3-5-sonnet  # or opus, haiku
+export CLAUDE_CODE_USE_BEDROCK=1
+export ANTHROPIC_DEFAULT_SONNET_MODEL="us.anthropic.claude-sonnet-4-6-20260320-v1:0"
+export AWS_REGION="us-east-1"
 ```
 
-Verify the connection:
-
-```bash
-claude status --provider bedrock
-```
-
-Output:
-```
-Provider: Amazon Bedrock
-Region: us-east-1
-Model: claude-3-5-sonnet
-Status: Connected
-```
+You can add these to your shell profile (`~/.zshrc`, `~/.bashrc`) for persistence, or set them in your CI/CD environment.
 
 ### Model IDs and Region Availability
 
@@ -71,11 +59,7 @@ Bedrock model identifiers follow a specific format. The most common are:
 | Claude Opus 4.6 | `claude-opus-4-6` | us-east-1, us-west-2 | Complex reasoning, large contexts |
 | Claude Haiku 4.5 | `claude-haiku-4-5` | us-east-1, us-west-2, ap-southeast-1 | Cost optimization |
 
-Bedrock routes requests to the nearest regional endpoint, reducing latency. If your primary region is unavailable, you can configure a failover:
-
-```bash
-claude config set bedrock-failover-region us-west-2
-```
+Bedrock routes requests to the nearest regional endpoint, reducing latency. If your primary region is unavailable, you can configure a failover by setting `AWS_REGION` to your backup region.
 
 When accessing Bedrock, Claude Code checks:
 1. Credentials in `~/.aws/credentials` or env vars
@@ -96,12 +80,12 @@ Common issues and fixes:
 
 Vertex AI is Google Cloud's unified ML platform. It integrates with BigQuery, Dataflow, and Pub/Sub, making it ideal if your data pipeline already lives in GCP.
 
-Configuration is similar to Bedrock:
+Configuration uses environment variables, similar to Bedrock:
 
 ```bash
-claude config set provider vertex-ai
-claude config set gcp-project "my-gcp-project-123"
-claude config set gcp-location us-central1
+export CLAUDE_CODE_USE_VERTEX=1
+export CLOUD_ML_REGION="us-east5"
+export ANTHROPIC_VERTEX_PROJECT_ID="my-gcp-project-123"
 ```
 
 Claude Code uses Application Default Credentials. Set them up once:
@@ -114,7 +98,6 @@ This creates `~/.config/gcloud/application_default_credentials.json`. You can al
 
 ```bash
 export GOOGLE_APPLICATION_CREDENTIALS="/path/to/service-account-key.json"
-claude status --provider vertex-ai
 ```
 
 Vertex AI uses the same Claude models as Bedrock, but with GCP-native integrations. For example, you can directly read from BigQuery datasets:
@@ -136,12 +119,10 @@ Microsoft's AI platform integrates with Azure ML and Copilot Studio. If your org
 - Integration with Azure DevOps, GitHub, and Codespaces
 - Cost governance through Azure Cost Management
 
-Setup:
+Setup uses environment variables:
 
 ```bash
-claude config set provider foundry
-claude config set azure-subscription-id "12345678-..."
-claude config set azure-resource-group "my-rg"
+export CLAUDE_CODE_USE_FOUNDRY=1
 ```
 
 Authenticate using Azure CLI:
@@ -149,22 +130,15 @@ Authenticate using Azure CLI:
 ```bash
 az login
 az account set --subscription "12345678-..."
-claude status --provider foundry
 ```
 
-One powerful pattern: if your code deployment runs in Azure Container Instances or App Service, you can point Claude Code at it:
-
-```bash
-claude config set foundry-deployment-endpoint "https://my-app.azurewebsites.net"
-```
-
-Now Claude Code can execute in that environment, with full access to Azure Key Vault, Managed Identity, and networking policies.
+Once authenticated, Claude Code uses your Azure credentials to access Foundry endpoints.
 
 ---
 
-## LiteLLM Gateway (Model Routing)
+## LiteLLM Gateway (Third-Party Proxy)
 
-LiteLLM is an open-source proxy that unifies multiple AI providers behind a single API. Instead of switching between Bedrock, Vertex AI, and OpenAI, you define routes:
+LiteLLM is a third-party open-source proxy (not a native Claude Code provider) that unifies multiple AI providers behind a single API. Instead of switching between Bedrock, Vertex AI, and OpenAI, you define routes:
 
 ```yaml
 # ~/.litellm/config.yaml
@@ -196,12 +170,10 @@ Then run the LiteLLM server locally:
 litellm --config ~/.litellm/config.yaml --port 8000
 ```
 
-Point Claude Code at it:
+Point Claude Code at it by setting `ANTHROPIC_BASE_URL` to your LiteLLM proxy:
 
 ```bash
-claude config set provider litellm
-claude config set litellm-base-url "http://localhost:8000"
-claude config set litellm-model "claude-default"
+export ANTHROPIC_BASE_URL="http://localhost:8000"
 ```
 
 Advantages:
@@ -213,11 +185,12 @@ Advantages:
 Common scenario: you are developing locally with Haiku (cheap), but production uses Opus (accurate). LiteLLM routes based on the context:
 
 ```bash
-# Dev environment
-claude config set litellm-model "claude-budget"
+# Dev environment — route through LiteLLM to cheaper models
+export ANTHROPIC_BASE_URL="http://localhost:8000"
 
-# Production environment
-claude config set litellm-model "claude-default"
+# Production environment — use direct Bedrock connection
+export CLAUDE_CODE_USE_BEDROCK=1
+export ANTHROPIC_DEFAULT_SONNET_MODEL="us.anthropic.claude-sonnet-4-6-20260320-v1:0"
 ```
 
 ---
@@ -408,6 +381,7 @@ For teams, use connectors to register shared environments:
 
 ```bash
 # Admin sets up the connector (one time)
+# (experimental, may not be available in all versions)
 claude connector create --name prod-cluster \
   --type kubernetes \
   --context prod-us-east \
@@ -426,6 +400,8 @@ Connectors abstract away SSH, port forwarding, and credential management. Everyo
 ### Network Policy
 
 By default, Claude Code connections are encrypted and authenticated. But you can enforce stricter policies:
+
+> **Note:** Network policies are an enterprise feature. Check with your Anthropic account team for availability.
 
 ```yaml
 # ~/.claude/network-policy.yaml
@@ -447,55 +423,42 @@ audit:
   retention_days: 90
 ```
 
-Load it:
-
-```bash
-claude config load-policy ~/.claude/network-policy.yaml
-```
-
 This is essential for regulated industries (finance, healthcare) where you must prove that code execution was authorized and audited.
 
 ---
 
 ## Practical Architecture
 
-Here is a real-world example: a data science team using Claude Code across three environments.
+Here is a real-world example: a data science team using Claude Code across three environments. Each environment uses different environment variables — you can manage these with shell profiles, direnv, or wrapper scripts.
 
-**Setup:**
+**Environment setup (conceptual):**
 
-```yaml
-# ~/.claude/multi-env.yaml
-environments:
-  local-dev:
-    provider: local
-    name: development-laptop
+```bash
+# Development (default — uses Anthropic API directly)
+# No special env vars needed
 
-  shared-gpu:
-    provider: bedrock
-    region: us-east-1
-    name: team-gpu-cluster
+# Shared GPU cluster (uses Bedrock)
+export CLAUDE_CODE_USE_BEDROCK=1
+export AWS_REGION="us-east-1"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="us.anthropic.claude-sonnet-4-6-20260320-v1:0"
 
-  production:
-    provider: vertex-ai
-    gcp_project: company-prod-123
-    name: prod-serving
+# Production (uses Vertex AI)
+export CLAUDE_CODE_USE_VERTEX=1
+export CLOUD_ML_REGION="us-east5"
+export ANTHROPIC_VERTEX_PROJECT_ID="company-prod-123"
 
-  web-control:
-    provider: litellm
-    base_url: http://localhost:8000
-    fallbacks:
-      - team-gpu-cluster
-      - local-dev
+# Cost-optimized dev (uses LiteLLM proxy)
+export ANTHROPIC_BASE_URL="http://localhost:8000"
 ```
 
 **Workflow:**
 
-1. **Develop locally**: `claude` (uses local-dev)
-2. **Test on shared GPU**: `claude --env shared-gpu` (uses Bedrock)
-3. **Deploy to production**: `claude --env production` (uses Vertex AI, with MFA required)
+1. **Develop locally**: `claude` (uses default Anthropic API)
+2. **Test on shared GPU**: Source Bedrock env vars, then `claude` (uses Bedrock)
+3. **Deploy to production**: Source Vertex AI env vars, then `claude` (uses Vertex AI)
 4. **Pair debug with teammate**: `claude --teleport` (opens web session)
 
-This architecture separates concerns: local experimentation, team resources, and production systems, but keeps the interface consistent.
+This architecture separates concerns: local experimentation, team resources, and production systems. You switch between them by changing environment variables, not CLI flags.
 
 ---
 

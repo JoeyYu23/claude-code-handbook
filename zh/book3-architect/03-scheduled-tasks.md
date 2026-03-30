@@ -148,22 +148,23 @@ cancel the deploy check job
 
 ### 设置桌面任务
 
-在 macOS 上，任务通过 `.claude/desktop-tasks.json` 管理：
+桌面定时任务存储为 SKILL.md 文件，路径为 `~/.claude/scheduled-tasks/<task-name>/SKILL.md`。每个任务使用标准 SKILL.md 格式（YAML frontmatter + Markdown body）：
 
-```json
-{
-  "tasks": [
-    {
-      "id": "daily-dependency-check",
-      "schedule": "0 9 * * *",
-      "prompt": "check for outdated dependencies in all repos and report critical ones",
-      "enabled": true
-    }
-  ]
-}
+```yaml
+---
+name: daily-dependency-check
+description: Check for outdated dependencies in all repos and report critical ones
+schedule: "0 9 * * *"
+---
+
+## Instructions
+
+Check for outdated dependencies in all repos.
+Report any critical security advisories.
+Post findings to the team channel.
 ```
 
-在你的主目录下的 `.claude` 文件夹中创建或编辑此文件。Claude Code 会监视该配置并在启动时加载任务。
+将每个任务放在 `~/.claude/scheduled-tasks/` 下的独立目录中。Claude Desktop App 必须保持打开状态，任务才会按计划执行。
 
 ### Cron 表达式参考
 
@@ -195,23 +196,23 @@ minute hour day-of-month month day-of-week
 
 ### MCP 服务器与权限
 
-桌面任务继承你的 `.claude/mcp.json` 中配置的 MCP 服务器。你也可以为单个任务指定连接器，用于 GitHub、Slack、Linear 等集成。
+桌面任务继承你的 `.claude/mcp.json` 中配置的 MCP 服务器。你也可以在 SKILL.md 的 frontmatter 中指定连接器，用于 GitHub、Slack、Linear 等集成：
 
-```json
-{
-  "tasks": [
-    {
-      "id": "pr-review",
-      "schedule": "0 10 * * 1-5",
-      "prompt": "review open PRs and summarize blockers",
-      "connectors": ["github"],
-      "enabled": true
-    }
-  ]
-}
+```yaml
+---
+name: pr-review
+description: Review open PRs and summarize blockers
+schedule: "0 10 * * 1-5"
+connectors:
+  - github
+---
+
+## Instructions
+
+Review all open PRs and summarize blockers.
 ```
 
-任务默认自主运行——不会弹出权限提示。如果你希望对敏感操作进行提示，可以为该任务设置 `requiresApproval: true`。
+任务默认自主运行——不会弹出权限提示。
 
 ---
 
@@ -531,7 +532,7 @@ CLAUDE_CODE_DISABLE_DESKTOP_TASKS=1
 
 - 需要机器开机并运行 launchd 或同等软件。
 - 不跨多台机器同步（每台机器各自运行自己的任务）。
-- 需要在 `.claude/` 文件中手动配置。
+- 需要在 `~/.claude/scheduled-tasks/` 中手动创建 SKILL.md 文件。
 
 ---
 

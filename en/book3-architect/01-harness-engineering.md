@@ -87,29 +87,39 @@ Hooks are shell scripts, HTTP requests, or AI prompts that run automatically whe
 | Before shell command | Check if command is in allowlist | Prevent accidental destruction |
 | After agent spawns | Log which agent was created | Track decision patterns |
 
-**Example hook (fictional acme-app project):**
+**Example hook configuration (in `.claude/settings.json`, fictional acme-app project):**
 
 ```json
 {
-  "Stop": [
-    {
-      "type": "command",
-      "command": ".claude/hooks/verify-before-commit.sh",
-      "timeout": 30
-    }
-  ],
-  "Edit": [
-    {
-      "glob": "src/**/*.ts",
-      "type": "command",
-      "command": ".claude/hooks/lint-typescript.sh",
-      "async": true
-    }
-  ]
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/verify-before-commit.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "tool == \"Edit\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/lint-typescript.sh"
+          }
+        ]
+      }
+    ]
+  }
 }
 ```
 
-When Claude tries to commit (Stop trigger), this hook runs a verification script. If the script returns exit code 0, the commit proceeds. If it returns 2, the commit is blocked with an error message.
+Hooks live inside `settings.json` under the `"hooks"` key — not in a separate file. Each event (like `Stop` or `PostToolUse`) maps to an array of objects containing a `matcher` expression and a `hooks` array. When Claude finishes a response (Stop trigger), this hook runs a verification script. If the script returns exit code 0, the action proceeds. If it returns 2, the action is blocked with an error message.
 
 Hooks are the enforcement layer. While CLAUDE.md *suggests*, hooks *require*.
 
@@ -199,38 +209,34 @@ Settings are configuration files (typically `settings.json` in `.claude/`) that 
 
 **Key setting types:**
 
-- **allowed-tools:** Which bash commands Claude can run (and with what arguments)
-- **blocked-commands:** Shell commands Claude must never run
-- **edit-restrictions:** Which files Claude can modify (e.g., block edits to `.env`)
-- **permission-mode:** Read, Execute, Edit, or Fullstack
-- **force-branch:** Require all git work on specific branches
-- **require-approval:** Human sign-off before dangerous operations
+- **permissions.allow:** Tool patterns Claude can use without prompting (e.g., `Bash(npm test:*)`, `Read`, `Edit`)
+- **permissions.deny:** Tool patterns Claude must never use (e.g., `Bash(rm -rf:*)`, `Bash(sudo:*)`)
+- **permissions.defaultMode:** The default permission mode — `default`, `acceptEdits`, `bypassPermissions`, `plan`, or `dontAsk`
 
 **Example settings.json (fictional acme-app project):**
 
 ```json
 {
-  "force-branch": "main",
-  "blocked-commands": [
-    "rm -rf",
-    "sudo",
-    "kill -9"
-  ],
-  "allowed-tools": {
-    "Bash": ["npm test", "npm build", "git *"],
-    "Write": {
-      "glob": ["src/**/*.ts", "src/**/*.tsx"],
-      "blocked": [".env", ".env.local", "secrets.json"]
-    }
-  },
-  "require-approval": {
-    "triggers": ["git push", "npm publish"],
-    "prompt": "Do you approve this action?"
+  "permissions": {
+    "defaultMode": "default",
+    "allow": [
+      "Bash(npm test:*)",
+      "Bash(npm run build:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Read",
+      "Edit"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(sudo:*)",
+      "Bash(kill -9:*)"
+    ]
   }
 }
 ```
 
-With this configuration, Claude cannot run `rm -rf` under any circumstances, cannot edit `.env`, and must wait for your approval before pushing to git.
+With this configuration, Claude can freely run tests, builds, and git status checks, but cannot run `rm -rf` or `sudo` under any circumstances. Any tool not in the `allow` list requires your approval before use.
 
 ---
 
@@ -336,18 +342,24 @@ Only after review passes does the code merge. This cycle ensures that by the tim
 2. Hook runs eslint and any formatters
 3. If linting fails, hook blocks the edit with an error message
 
-**Example hook:**
+**Example hook (in `settings.json`):**
 
 ```json
 {
-  "Edit": [
-    {
-      "glob": "src/**/*.{ts,tsx}",
-      "type": "command",
-      "command": ".claude/hooks/lint-ts.sh",
-      "timeout": 20
-    }
-  ]
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "tool == \"Edit\" || tool == \"Write\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/lint-ts.sh",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  }
 }
 ```
 
@@ -391,11 +403,16 @@ Only after review passes does the code merge. This cycle ensures that by the tim
 2. Create a skill that implements the "dangerous" operation safely (with confirmations)
 3. Users invoke the skill instead of raw commands
 
-**Example:**
+**Example (in `settings.json`):**
 
 ```json
 {
-  "blocked-commands": ["rm -rf", "git reset --hard"]
+  "permissions": {
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(git reset --hard:*)"
+    ]
+  }
 }
 ```
 
@@ -510,26 +527,50 @@ cat > acme-app/.claude/CLAUDE.md << 'EOF'
 EOF
 ```
 
-### Step 2: Create a Hook Configuration
+### Step 2: Create Settings with Hooks
+
+Hooks are configured inside `settings.json`, not in a separate file:
 
 ```bash
-cat > acme-app/.claude/hooks.json << 'EOF'
+cat > acme-app/.claude/settings.json << 'EOF'
 {
-  "Edit": [
-    {
-      "glob": "src/**/*.ts",
-      "type": "command",
-      "command": ".claude/hooks/lint.sh",
-      "async": true
-    }
-  ],
-  "Stop": [
-    {
-      "type": "command",
-      "command": ".claude/hooks/pre-commit.sh",
-      "timeout": 30
-    }
-  ]
+  "permissions": {
+    "allow": [
+      "Bash(npm test:*)",
+      "Bash(npm run build:*)",
+      "Read",
+      "Edit"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(git reset --hard:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "tool == \"Edit\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/lint.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/pre-commit.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
 }
 EOF
 ```
@@ -596,28 +637,33 @@ Only push if all tests pass.
 EOF
 ```
 
-### Step 5: Create Settings
+### Step 5: Verify the Settings
+
+The permissions and hooks were already configured in Step 2 inside `settings.json`. Review the file to make sure it covers your needs:
 
 ```bash
-cat > acme-app/.claude/settings.json << 'EOF'
+cat acme-app/.claude/settings.json
+```
+
+If you need to add more allowed or denied tools, edit the `permissions.allow` and `permissions.deny` arrays. For example, to allow git push but deny npm publish:
+
+```json
 {
-  "force-branch": "main",
-  "blocked-commands": [
-    "rm -rf",
-    "git reset --hard",
-    "npm publish"
-  ],
-  "allowed-tools": {
-    "Bash": ["npm test", "npm run build", "git *"],
-    "Edit": {
-      "blocked": [".env", ".env.local", ".aws"]
-    }
-  },
-  "require-approval": {
-    "triggers": ["git push"]
+  "permissions": {
+    "allow": [
+      "Bash(npm test:*)",
+      "Bash(npm run build:*)",
+      "Bash(git push:*)",
+      "Read",
+      "Edit"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(npm publish:*)"
+    ]
   }
 }
-EOF
 ```
 
 ### Step 6: Test the Harness
@@ -627,7 +673,7 @@ EOF
 3. Claude should read `.claude/CLAUDE.md` and describe the harness
 4. Ask Claude to make a test edit (e.g., "Add a console.log to src/main.ts")
 5. The hook should run and enforce linting
-6. Verify that Claude cannot edit `.env` (blocked by settings)
+6. Verify that Claude cannot run `rm -rf` (blocked by permissions deny list)
 
 ---
 
@@ -677,8 +723,8 @@ EOF
 
 ## References
 
-1. **Anthropic Engineering Blog** — "Effective Harnesses for Long-Running Agents" ([anthropic.com/engineering](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents))
-2. **Anthropic Engineering Blog** — "Harness Design for Long-Running Application Development" ([anthropic.com/engineering](https://www.anthropic.com/engineering/harness-design-long-running-apps))
+1. **Anthropic Engineering Blog** — "Effective Harnesses for Long-Running Agents" (anthropic.com/engineering)
+2. **Anthropic Engineering Blog** — "Harness Design for Long-Running Application Development" (anthropic.com/engineering)
 3. **HumanLayer Blog** — "Skill Issue: Harness Engineering for Coding Agents" ([humanlayer.dev/blog](https://www.humanlayer.dev/blog/skill-issue-harness-engineering-for-coding-agents))
 4. **GitHub — Chachamaru127/claude-code-harness** — Plan-Work-Review cycle implementation ([github.com](https://github.com/Chachamaru127/claude-code-harness))
 5. **GitHub — ChrisWiles/claude-code-showcase** — Real-world harness configurations ([github.com](https://github.com/ChrisWiles/claude-code-showcase))
