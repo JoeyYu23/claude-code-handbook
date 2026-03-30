@@ -74,8 +74,8 @@ The key insight: **usage is bursty, not linear.** Some weeks are light, some are
 It is worth being explicit about the math, because the numbers are striking.
 
 At API rates (approximate, as of early 2026):
-- Claude Sonnet: ~$3 per million input tokens, ~$15 per million output tokens
-- Claude Opus: ~$15 per million input tokens, ~$75 per million output tokens
+- Claude Sonnet 4.6: ~$3 per million input tokens, ~$15 per million output tokens
+- Claude Opus 4.6: ~$5 per million input tokens, ~$25 per million output tokens
 
 A heavy development week — large files read repeatedly, long code-generation sessions, extended thinking enabled, multiple parallel agents — can consume tens of millions of tokens. W5 at $1,065 API-equivalent is not unusual for that kind of usage.
 
@@ -100,7 +100,7 @@ Not all tasks are equal. These are the patterns that consume tokens at the highe
 Reading a 2,000-line file injects thousands of tokens into context every time it is accessed. If Claude reads the same large file multiple times during a session — which happens naturally when debugging across files — those tokens add up. Reading a 500-line file three times costs the same as reading it once at 1,500 lines.
 
 **2. Opus model usage**
-Opus is roughly 5x more expensive per token than Sonnet. A task that takes 100,000 tokens on Sonnet would cost 500,000 token-equivalents on Opus. The capability difference is real, but reflexive use of Opus for tasks that Sonnet handles fine is the single largest unnecessary cost driver.
+Opus is roughly 1.7x more expensive per token than Sonnet (input: $5 vs $3, output: $25 vs $15 per million tokens). The gap has narrowed significantly since older models (Opus 4.1 was 5x more expensive than Sonnet). But over many sessions, even a 1.7x multiplier adds up — and Opus sessions tend to run longer and use more tokens due to deeper reasoning. The capability difference is real, but reflexive use of Opus for tasks that Sonnet handles fine is still an unnecessary cost driver.
 
 **3. Long sessions without `/compact`**
 Claude Code's context grows with every exchange. Every new message includes the full conversation history. A session that started an hour ago and has gone through 50 exchanges is sending the entire previous 50 exchanges as context with every new message. This is expensive and often unnecessary — most of that early context is no longer relevant.

@@ -66,7 +66,7 @@ claude --model claude-haiku-4-5 -p "Add type annotations to all functions in $(c
 
 Model aliases also work: `opus`, `sonnet`, `haiku`, `sonnet[1m]`, `opus[1m]`, `opusplan`.
 
-**The highest-leverage model decision:** use Opus selectively for tasks that genuinely require it. The cost difference between Opus and Sonnet is significant (roughly 5x). A developer who reflexively uses Opus for everything pays five times more than one who uses Sonnet by default and switches to Opus only for genuinely complex reasoning tasks.
+**The highest-leverage model decision:** use Opus selectively for tasks that genuinely require it. With Opus 4.6, the per-token cost gap has narrowed to roughly 1.7x compared to Sonnet 4.6 ($5/$25 vs $3/$15 per million tokens). But Opus sessions tend to be longer and use more tokens due to deeper reasoning, so the effective cost difference is often 2-3x. A developer who reflexively uses Opus for everything still pays meaningfully more than one who uses Sonnet by default and switches to Opus only for genuinely complex reasoning tasks.
 
 A practical rule: if you could explain the desired output in a clear prompt without requiring deep inference, Sonnet handles it well. If the task requires synthesizing ambiguous information from many sources, requires reasoning about trade-offs with many variables, or involves debugging a subtle multi-system interaction, reach for Opus.
 

@@ -75,7 +75,7 @@ The following estimates use approximate Anthropic API pricing as of early 2025. 
 |-------|----------------------|------------------------|---------------------|
 | Claude Haiku 4.5 | ~$1 | ~$5 | ~$0.10 |
 | Claude Sonnet 4.6 | ~$3 | ~$15 | ~$0.30 |
-| Claude Opus 4.6 | ~$15 | ~$75 | ~$1.50 |
+| Claude Opus 4.6 | ~$5 | ~$25 | ~$0.50 |
 
 Prompt caching is automatic — Claude Code caches CLAUDE.md, system prompts, and other stable content. Cache reads cost approximately 10% of normal input price, which substantially reduces costs in long sessions where the same context is reused.
 
@@ -92,7 +92,7 @@ Prompt caching is automatic — Claude Code caches CLAUDE.md, system prompts, an
 | Architecture planning session | $1.00–$4.00 |
 
 **Model selection impact:**
-Running the same task on Opus 4.6 vs Sonnet 4.6 costs approximately 5x more. For tasks where Sonnet produces satisfactory results, the cost difference over a month of heavy use is substantial. A developer doing 20 medium features per month on Sonnet (~$10 in API costs) would pay ~$50 doing the same on Opus.
+Running the same task on Opus 4.6 vs Sonnet 4.6 costs approximately 1.7x more per token. However, Opus sessions tend to use more tokens due to deeper reasoning, so the effective cost difference is often 2-3x in practice. For tasks where Sonnet produces satisfactory results, the cost difference over a month of heavy use is still meaningful.
 
 ---
 
