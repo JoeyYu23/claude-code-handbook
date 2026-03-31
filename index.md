@@ -73,6 +73,6 @@ Harness engineering, agent teams, scheduled tasks, cloud deployment, team workfl
 
 **Joey Yu** — Developer and heavy Claude Code user. Built 50+ projects with Claude Code including AI tools, optimization systems, and quant trading platforms. This handbook is based on 7 weeks of intensive usage consuming $3,400+ in API-equivalent tokens.
 
-[GitHub](https://github.com/JoeyYu23)
+[GitHub](https://github.com/JoeyYu23) · [LinkedIn](https://www.linkedin.com/in/chenyangyu023) · 2235062003ycy@gmail.com
 
 </div>

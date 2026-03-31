@@ -65,6 +65,8 @@ PRs welcome. Whether it's fixing a typo, improving an explanation, or translatin
 
 ## Author
 
-**Joey Yu** — Developer and heavy Claude Code user. Built 50+ projects with Claude Code including AI tools, optimization systems, and quant trading platforms.
+**Joey Yu** — Developer and heavy Claude Code user. Built 50+ projects with Claude Code including AI tools, optimization systems, and quant trading platforms. This handbook is based on 7 weeks of intensive usage and $3,400+ in API-equivalent token consumption.
 
 - GitHub: [@JoeyYu23](https://github.com/JoeyYu23)
+- LinkedIn: [Joey Yu](https://www.linkedin.com/in/chenyangyu023)
+- Email: 2235062003ycy@gmail.com

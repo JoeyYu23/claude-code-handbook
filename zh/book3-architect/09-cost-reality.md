@@ -74,7 +74,7 @@ Team Standard 起价 $25/用户/月（按年计费），但 **Claude Code 不包
 这个数学值得明确展示，因为数字相当惊人。
 
 按 API 费率（2026年初的近似值）：
-- Claude Sonnet：约 $3/百万输入 token，约 $15/百万输出 token
+- Claude Sonnet 4.6：约 $3/百万输入 token，约 $15/百万输出 token
 - Claude Opus 4.6：约 $5/百万输入 token，约 $25/百万输出 token
 
 高强度开发周——大文件反复读取、长时间代码生成会话、开启深度思考、多个并行 agent——可以消耗数千万 token。W5 的 $1,065 API 等价成本对于这种用量来说并不夸张。
