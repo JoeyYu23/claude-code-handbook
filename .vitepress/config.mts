@@ -376,9 +376,10 @@ export default defineConfig({
   lastUpdated: true,
 
   locales: {
-    root: {
+    en: {
       label: 'English',
       lang: 'en',
+      link: '/en/',
     },
     zh: {
       label: '中文',
