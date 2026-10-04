@@ -1,5 +1,9 @@
 # 第二章：自定义 Skills
 
+::: info 中文版仍为第一版（2026 年 3 月）
+第二版（2026 年 10 月）目前只有英文：[阅读英文第二版 →](/en/book1-getting-started/)
+:::
+
 ## Skills 是什么？
 
 Skills 是 Claude Code 的扩展机制。简单说：一个 `SKILL.md` 文件 = 一个新的 `/` 命令。

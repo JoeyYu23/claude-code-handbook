@@ -352,6 +352,193 @@ const book3Zh = [
   },
 ]
 
+// Book 1 EN sidebar (2nd edition)
+const book1En2 = [
+  {
+    text: 'Book 1: Getting Started',
+    items: [
+      { text: 'Overview', link: '/en/book1-getting-started/' },
+      { text: 'What\'s New in the Second Edition', link: '/en/whats-new' },
+    ]
+  },
+  {
+    text: 'Part I: What & Why',
+    items: [
+      { text: '1. What Is Claude Code?', link: '/en/book1-getting-started/01-what-is-claude-code' },
+      { text: '2. Why Claude Code?', link: '/en/book1-getting-started/02-why-claude-code' },
+      { text: '3. How It Works', link: '/en/book1-getting-started/03-how-it-works' },
+    ]
+  },
+  {
+    text: 'Part II: Setup',
+    items: [
+      { text: '4. Installation', link: '/en/book1-getting-started/04-installation' },
+      { text: '5. Your First Conversation', link: '/en/book1-getting-started/05-first-conversation' },
+      { text: '6. Auto Mode and Permissions', link: '/en/book1-getting-started/06-auto-mode-and-permissions' },
+    ]
+  },
+  {
+    text: 'Part III: Daily Workflows',
+    items: [
+      { text: '7. Reading and Understanding Code', link: '/en/book1-getting-started/07-reading-code' },
+      { text: '8. Editing Files', link: '/en/book1-getting-started/08-editing-files' },
+      { text: '9. Running Commands', link: '/en/book1-getting-started/09-running-commands' },
+      { text: '10. Git Workflows', link: '/en/book1-getting-started/10-git-workflows' },
+    ]
+  },
+  {
+    text: 'Part IV: Your First Project',
+    items: [
+      { text: '11. Building a Simple Website', link: '/en/book1-getting-started/11-build-website' },
+      { text: '12. Check the Work', link: '/en/book1-getting-started/12-check-the-work' },
+      { text: '13. Working with APIs', link: '/en/book1-getting-started/13-working-with-apis' },
+    ]
+  },
+  {
+    text: 'Part V: Customization Basics',
+    items: [
+      { text: '14. CLAUDE.md and AGENTS.md', link: '/en/book1-getting-started/14-claude-md' },
+      { text: '15. Memory', link: '/en/book1-getting-started/15-memory' },
+      { text: '16. IDE Integration', link: '/en/book1-getting-started/16-ide-integration' },
+    ]
+  },
+  {
+    text: 'Appendix',
+    collapsed: false,
+    items: [
+      { text: 'Glossary', link: '/en/book1-getting-started/glossary' },
+      { text: 'Troubleshooting', link: '/en/book1-getting-started/troubleshooting' },
+      { text: 'Keyboard Shortcuts', link: '/en/book1-getting-started/keyboard-shortcuts' },
+      { text: 'Who to Follow', link: '/en/who-to-follow' },
+    ]
+  },
+]
+
+// Book 2 EN sidebar (2nd edition)
+const book2En2 = [
+  {
+    text: 'Book 2: Power User',
+    items: [
+      { text: 'Overview', link: '/en/book2-advanced/' },
+    ]
+  },
+  {
+    text: 'Part I: Commands, Skills, Plugins',
+    items: [
+      { text: '1. Slash Commands', link: '/en/book2-advanced/01-slash-commands' },
+      { text: '2. Custom Skills', link: '/en/book2-advanced/02-custom-skills' },
+      { text: '3. Skill Composition', link: '/en/book2-advanced/03-skill-composition' },
+      { text: '4. Plugins, Marketplace and Mods', link: '/en/book2-advanced/04-plugins-marketplace-mods' },
+    ]
+  },
+  {
+    text: 'Part II: Subagents and Sessions',
+    items: [
+      { text: '5. Subagents', link: '/en/book2-advanced/05-subagents' },
+      { text: '6. Agent Catalog', link: '/en/book2-advanced/06-agent-catalog' },
+      { text: '7. The Agent View and Sessions', link: '/en/book2-advanced/07-agent-view-and-sessions' },
+      { text: '8. Worktrees', link: '/en/book2-advanced/08-worktrees' },
+    ]
+  },
+  {
+    text: 'Part III: Tools and Automation',
+    items: [
+      { text: '9. Hooks', link: '/en/book2-advanced/09-hooks' },
+      { text: '10. Automated Workflows', link: '/en/book2-advanced/10-automated-workflows' },
+      { text: '11. MCP, CLI or Skill?', link: '/en/book2-advanced/11-mcp-cli-or-skill' },
+      { text: '12. MCP in Practice', link: '/en/book2-advanced/12-mcp-in-practice' },
+      { text: '13. Custom Tools', link: '/en/book2-advanced/13-custom-tools' },
+      { text: '14. Agents That See', link: '/en/book2-advanced/14-agents-that-see' },
+    ]
+  },
+  {
+    text: 'Part IV: Context, Memory, Cost',
+    items: [
+      { text: '15. Context Engineering', link: '/en/book2-advanced/15-context-engineering' },
+      { text: '16. Tokens, Limits and Caching', link: '/en/book2-advanced/16-tokens-limits-caching' },
+      { text: '17. Memory Architecture', link: '/en/book2-advanced/17-memory-architecture' },
+      { text: '18. Large Projects', link: '/en/book2-advanced/18-large-projects' },
+    ]
+  },
+  {
+    text: 'Part V: Surfaces',
+    items: [
+      { text: '19. Desktop and Web', link: '/en/book2-advanced/19-desktop-and-web' },
+      { text: '20. Voice, Fast Mode and Effort', link: '/en/book2-advanced/20-voice-fast-effort' },
+    ]
+  },
+]
+
+// Book 3 EN sidebar (2nd edition)
+const book3En2 = [
+  {
+    text: 'Book 3: Architect',
+    items: [
+      { text: 'Overview', link: '/en/book3-architect/' },
+    ]
+  },
+  {
+    text: 'Part I: The Harness',
+    items: [
+      { text: '1. Harness Engineering', link: '/en/book3-architect/01-harness-engineering' },
+      { text: '2. Verification and Evals at Scale', link: '/en/book3-architect/02-verification-and-evals' },
+      { text: '3. CLAUDE.md and Agent-File Patterns', link: '/en/book3-architect/03-claude-md-patterns' },
+    ]
+  },
+  {
+    text: 'Part II: Many Agents',
+    items: [
+      { text: '4. Orchestrating Many Agents', link: '/en/book3-architect/04-orchestrating-many-agents' },
+      { text: '5. Agents Checking Agents', link: '/en/book3-architect/05-agents-checking-agents' },
+      { text: '6. Scheduled Agents and Routines', link: '/en/book3-architect/06-scheduled-agents-routines' },
+      { text: '7. Cloud and Managed Agents', link: '/en/book3-architect/07-cloud-managed-agents' },
+      { text: '8. Remote Connection', link: '/en/book3-architect/08-remote-connection' },
+    ]
+  },
+  {
+    text: 'Part III: Safety, Cost, Portability',
+    items: [
+      { text: '9. Containment and Security', link: '/en/book3-architect/09-containment-and-security' },
+      { text: '10. Cost Reality, Measured', link: '/en/book3-architect/10-cost-reality-measured' },
+      { text: '11. Portability: Many Tools, Many Models', link: '/en/book3-architect/11-portability' },
+      { text: '12. Team Workflows', link: '/en/book3-architect/12-team-workflows' },
+    ]
+  },
+  {
+    text: 'Part IV: Field Notes',
+    items: [
+      { text: '13. The Builder\'s Job Now', link: '/en/book3-architect/13-builders-job-now' },
+    ]
+  },
+  {
+    text: 'Appendix',
+    collapsed: false,
+    items: [
+      { text: 'Agent Type Reference', link: '/en/book3-architect/agent-reference' },
+      { text: 'MCP Server Registry', link: '/en/book3-architect/mcp-registry' },
+      { text: 'Performance Benchmarks', link: '/en/book3-architect/benchmarks' },
+      { text: 'First to Second Edition: What Changed', link: '/en/book3-architect/migration-guide' },
+    ]
+  },
+]
+
+// First edition (March 2026), archived under /v1/. Sidebars are frozen copies of the
+// first-edition structure with links moved to /v1/.
+type Item = { text: string, link?: string, items?: Item[], collapsed?: boolean }
+const toV1 = (s: Item[]): Item[] => s.map(i => ({
+  ...i,
+  ...(i.link ? { link: '/v1' + i.link } : {}),
+  ...(i.items ? { items: toV1(i.items) } : {}),
+}))
+const v1Sidebar = {
+  '/v1/en/book1-getting-started/': toV1(book1En),
+  '/v1/en/book2-advanced/': toV1(book2En),
+  '/v1/en/book3-architect/': toV1(book3En),
+  '/v1/zh/book1-getting-started/': toV1(book1Zh),
+  '/v1/zh/book2-advanced/': toV1(book2Zh),
+  '/v1/zh/book3-architect/': toV1(book3Zh),
+}
+
 export default defineConfig({
   base: '/claude-code-handbook/',
 
@@ -393,11 +580,16 @@ export default defineConfig({
           { text: 'Book 1: 入门', link: '/zh/book1-getting-started/' },
           { text: 'Book 2: 进阶', link: '/zh/book2-advanced/' },
           { text: 'Book 3: 架构师', link: '/zh/book3-architect/' },
+          { text: '第二版 · 2026.10', items: [
+            { text: '第二版（当前）', link: '/zh/' },
+            { text: '第一版 · 2026.3（存档）', link: '/v1/zh/book1-getting-started/' },
+          ] },
         ],
         sidebar: {
           '/zh/book1-getting-started/': book1Zh,
           '/zh/book2-advanced/': book2Zh,
           '/zh/book3-architect/': book3Zh,
+          ...v1Sidebar,
         },
         outline: {
           label: '本页目录',
@@ -425,14 +617,21 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Book 1: Getting Started', link: '/en/book1-getting-started/' },
-      { text: 'Book 2: Advanced', link: '/en/book2-advanced/' },
+      { text: 'Book 2: Power User', link: '/en/book2-advanced/' },
       { text: 'Book 3: Architect', link: '/en/book3-architect/' },
+      { text: '2nd Edition · Oct 2026', items: [
+        { text: '2nd edition (current)', link: '/' },
+        { text: '1st edition · Mar 2026 (archived)', link: '/v1/' },
+      ] },
     ],
 
     sidebar: {
-      '/en/book1-getting-started/': book1En,
-      '/en/book2-advanced/': book2En,
-      '/en/book3-architect/': book3En,
+      '/en/book1-getting-started/': book1En2,
+      '/en/book2-advanced/': book2En2,
+      '/en/book3-architect/': book3En2,
+      '/en/whats-new': book1En2,
+      '/en/who-to-follow': book1En2,
+      ...v1Sidebar,
     },
 
     socialLinks: [

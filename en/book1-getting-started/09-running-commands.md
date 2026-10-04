@@ -1,254 +1,99 @@
-# Chapter 9: Running Commands
+# Running Commands
 
-## What the Terminal Can Do
+> Verified on 2026-10-04 with Claude Code 2.1.289.
 
-If you have not used a terminal much before, here is a quick orientation: the terminal is a text-based interface for controlling your computer. Instead of clicking icons, you type commands. Instead of menus, you type what you want to do.
+## What the terminal can do
 
-Developers use the terminal because many powerful tools live there — build systems, test runners, package managers, version control, deployment tools — and because complex operations that would take many menu clicks can be expressed in a single command.
+The terminal is a text interface for your computer: instead of clicking icons you type commands. Developers live there because build tools, test runners, package managers and version control all have command-line interfaces, and one command can replace a dozen clicks.
 
-Claude Code can run terminal commands on your behalf. This transforms it from a code editor into a genuine assistant that can take real action: install a library, run your tests, start a development server, check the status of your project. Not just suggest — actually do.
+Claude Code can run those commands for you. That turns it from an editor into an assistant that acts: it installs a library, runs your tests, starts a development server, checks the state of your project, and reads what came back.
 
-This chapter explains how that works, when it is useful, and how to stay in control.
+## How it works
 
----
+Claude runs commands with its Bash tool (on Windows it can use a PowerShell tool; see below). What happens before a command runs depends on your permission mode. In Manual mode, Claude asks before most commands, and reading-only commands such as `ls` or `git status` run without asking. In auto mode, a separate classifier model reviews actions in the background instead of you. In every mode, you can see the command and its output in your terminal. Nothing runs in a black box. [Auto Mode and Permissions](/en/book1-getting-started/06-auto-mode-and-permissions) explains the modes.
 
-## How Claude Uses the Terminal
+The important part is the loop: Claude runs a command, reads the output, and decides what to do next. If a command fails, it sees the error and can try something else.
 
-When Claude needs to run a command, it uses its Bash tool. Before running anything, it will show you exactly what it plans to execute and ask for your permission:
+## What to ask for
 
+```text
+Install the axios library
 ```
-I need to install the date-fns library.
+Claude picks the right command for your project (`npm install`, `pip install`, and so on).
 
-Running: npm install date-fns
-
-Allow this command? [y/n]
+```text
+Run the tests and tell me which ones fail
 ```
-
-You see the exact command before it runs. No surprises.
-
-After you approve, Claude runs the command and reads the output. It uses that output to understand what happened — whether the command succeeded, what it printed, whether there were errors — and then continues with the task or tells you what it found.
-
-This feedback loop is powerful. Claude can react to real results rather than guessing. If a command fails, Claude sees the error message and can try a different approach.
-
----
-
-## Common Use Cases
-
-### Installing packages
-
-```
-Install the axios library for making HTTP requests
-```
-
-Claude will run the appropriate install command for your project (`npm install axios`, `pip install requests`, `yarn add axios`, etc.) and confirm it succeeded.
-
-### Running tests
-
-```
-Run the tests and tell me if any are failing
-```
-
-Claude runs your test suite, reads the output, and tells you which tests passed and which failed. If tests fail, it can often identify why and propose a fix.
-
-```
+```text
 Run just the tests in the auth module
 ```
-
-Most test frameworks support running specific test files or directories. Claude will figure out the right command for your setup.
-
-### Starting a development server
-
+```text
+Build the project and tell me about any errors
 ```
+```text
 Start the development server so I can preview my changes
 ```
-
-Claude will run the appropriate start command (`npm run dev`, `python manage.py runserver`, `rails server`, etc.). Note that for long-running processes like development servers, Claude typically starts them and reports back, but the server runs in the background.
-
-### Building your project
-
-```
-Build the project and tell me if there are any errors
+```text
+What is the git status of this project?
 ```
 
-Claude runs the build command, reads the output, and reports on success or failure. If there are compilation errors, it reads them and can fix them.
+You do not need to know the command. Describe the goal and check the command Claude chose.
 
-### Checking project status
+## Reading output
 
-```
-What is the current git status of this project?
-```
+Claude reads command output and can explain it: "I ran the build and got a lot of warnings. Which ones matter?" Warnings are usually not the same as failures, and Claude can tell you which is which.
 
-```
-Show me which files have been modified recently
-```
+## Running commands yourself with `!`
 
-Claude can run informational commands (`git status`, `git log`, `ls -la`) to gather information and report back to you.
+Start a line in the prompt with `!` to run a command directly and add its output to the conversation:
 
-### Database operations
-
-```
-Run the database migrations
+```text
+! npm test
 ```
 
-```
-Seed the database with test data
-```
+Claude then responds to the output. In the weekly digest for the week of June 22, 2026, Anthropic noted that shell mode now responds to command output without a second prompt, so `! npm test` gets an explanation right away. That is handy when you know the command but want help interpreting the result.
 
-For projects with databases, Claude can run migration and seeding commands that set up or update your database schema.
+## Long-running commands and background tasks
 
----
+Tests may take 30 seconds and a build several minutes. While a command runs you can see its output. Press `Ctrl+C` to interrupt.
 
-## Understanding Command Output
+For processes that are meant to keep running, like a development server, Claude can run them in the background so you can keep talking. You can ask ("start the dev server in the background") or press `Ctrl+B` to move a running command to the background. If you use tmux, press `Ctrl+B` twice. A command that reaches its time limit is moved to the background rather than stopped (unless it starts with `sleep`).
 
-When Claude runs a command, it reads the output — the text the command prints to the screen — and incorporates that into its understanding. For you, this means:
+## Guardrails
 
-**You can ask Claude to explain output:**
+Claude Code is conservative by default:
 
-```
-I ran the build and got a bunch of warnings. What do they mean?
-```
+- **Reading** commands can run freely; **writing or executing** commands are what the permission system is for.
+- You can pre-approve commands you trust, for example test and lint commands, with `/permissions`, so you are not asked every time.
+- Auto mode also blocks risky classes of action, such as destructive git commands you did not ask for, and asks before `rm -rf` on an unresolved variable.
+- Deny rules always win, in every mode.
 
-**Claude uses output to diagnose problems:**
+If a command looks destructive (deleting folders, force-pushing, anything touching a database you care about), read it before you let it run, whichever mode you are in.
 
-If a command fails, Claude sees the error message and can usually tell you what went wrong:
+## A note for Windows users
 
-```
-The npm install failed with an error about peer dependencies. Let me look at that...
-```
+Claude Code can run commands through a native PowerShell tool instead of Git Bash. Per the tools reference, on Windows with Git Bash installed the tool is on by default for claude.ai and Console accounts, and setting `CLAUDE_CODE_USE_POWERSHELL_TOOL=1` turns it on for Amazon Bedrock, Google Cloud's Agent Platform and Microsoft Foundry sessions (`0` turns it off). Since the week of April 27, 2026, Git for Windows is no longer required, and Claude Code uses PowerShell when Bash is absent. Behavior differs by version and setup, so if something is off on Windows, ask Claude to explain which shell it is using.
 
-**You can see the output too:**
+## When a command fails
 
-Whatever Claude runs, you see the real terminal output. You are not in a black box — the full text of every command and every response is visible in your terminal.
+Commands fail all the time: a missing dependency, a port already in use, a file that is not there. Paste the new output back if Claude did not see it, and say what happened:
 
----
-
-## Long-Running Commands
-
-Some commands take a while. Tests might run for 30 seconds. A build might take several minutes. A database seed might be even longer.
-
-Claude Code handles these by running them and waiting for completion before proceeding. While waiting, you will typically see the live output streaming to your terminal.
-
-If you start a command and change your mind, press `Ctrl+C` to cancel it.
-
-For long-running processes that should keep running (like a development server), Claude may start them and note that they are running in the background, then proceed with other tasks while the server stays up.
-
-**Background commands:**
-
-If you want Claude to start something and not wait for it to finish, you can ask explicitly:
-
-```
-Start the development server in the background
+```text
+That did not work. Same error, new output: ...
 ```
 
-Claude will start the process and return control to you, with the server running separately. Press `Ctrl+B` in the terminal to manually background a running command.
+If you have corrected Claude two or three times on the same problem, stop. The Claude Code docs recommend running `/clear` and starting again with a better first prompt that includes what you learned.
 
----
+### Check that it worked
 
-## Safety: What Claude Will Not Run Without Permission
+- For an install: ask Claude to run a command that proves it, such as printing the library's version, or running the project.
+- For a build or tests: the output should end with a success line, and the exit status should be 0. Ask: "Show me the last lines of the output and the exit status."
+- For a server: open the address it prints (for example `http://localhost:3000`) in your browser.
 
-Claude Code is designed with a conservative approach to running commands. The general rule:
+## Sources
 
-- **Reading commands** (like `ls`, `cat`, `git status`) — Claude can run these more freely because they do not change anything
-- **Write or execute commands** (like installing packages, modifying files, running scripts) — Claude will ask permission before each one
-
-Beyond that, certain types of commands are treated with extra caution:
-
-**Sensitive operations:** Commands that could delete data, expose secrets, modify system settings, or make network requests to external services require explicit approval.
-
-**Irreversible operations:** Anything that cannot easily be undone — like deleting files or pushing to a remote server — will prompt for confirmation.
-
-**Commands involving sensitive files:** Claude will not read or pass the contents of `.env` files (which typically contain passwords and API keys) to commands without explicit permission.
-
-You can customize which commands are always allowed or always denied using the permissions system described in Chapter 6. For example, you might always allow `npm run test` so you do not have to confirm every test run.
-
----
-
-## Running Commands Yourself with `!`
-
-Sometimes you want to run a command yourself without going through Claude. You can do this directly from the Claude Code prompt by starting your input with `!`:
-
-```
-! git status
-! ls -la
-! npm run build
-```
-
-The `!` prefix tells Claude Code to run that command directly and add the output to the conversation context. This means Claude can see what happened and you can ask follow-up questions about it:
-
-```
-! npm run build
-[build output appears]
-There were 3 TypeScript errors in the output. Can you help me fix them?
-```
-
-This is useful when you know exactly what command you want to run but still want Claude to help you understand or act on the result.
-
----
-
-## Practical Example: Setting Up a New Project
-
-Here is how command execution flows in a real scenario. Suppose you have just started a new web project and want Claude to help you set it up:
-
-```
-Me: Create a new React app called my-portfolio and set it up for development
-
-Claude: I'll set up a React app for you. Let me run a few commands:
-
-Running: npx create-react-app my-portfolio
-[npm install output... completes]
-
-Running: cd my-portfolio && npm install --save-dev prettier eslint
-[install output... completes]
-
-I've created the React app and added Prettier and ESLint for code formatting.
-The project is ready in the my-portfolio directory.
-
-To start the development server:
-npm start
-
-Shall I start the development server now?
-
-Me: Yes, start it up
-
-Running: npm start
-[server starting output...]
-
-The development server is running at http://localhost:3000.
-Open that URL in your browser to see your app.
-```
-
-Notice how Claude executes multiple commands in sequence, reports what each one did, and checks in with you before proceeding. The whole setup took one message from you and a few seconds of Claude work.
-
----
-
-## When Commands Go Wrong
-
-Commands fail. This is normal. A dependency might not be available, a port might already be in use, a configuration file might be missing.
-
-### A Note for Windows Users: PowerShell Tool
-
-As of v2.1.84, Claude Code supports an opt-in PowerShell tool on Windows. Instead of routing all commands through Git Bash, you can set `CLAUDE_CODE_USE_POWERSHELL_TOOL=1` in your environment (or in `settings.json`) to have Claude run PowerShell commands natively. Claude Code auto-detects `pwsh.exe` (PowerShell 7+) and falls back to `powershell.exe` (5.1). This is useful when working with Windows-native tooling, `.ps1` scripts, or modules that do not work well under Git Bash.
-
----
-
-When a command fails, Claude reads the error output and usually knows what to do:
-
-```
-The npm install failed:
-> npm ERR! peer dep missing: react@>=16.8.0
-
-This means the package requires a newer version of React than you have installed.
-I can update React first. Would you like me to do that?
-```
-
-If Claude's suggested fix does not work, just tell it what happened:
-
-```
-That didn't work — I got the same error. Here is the new output: [paste output]
-```
-
-Claude will try a different approach. Debugging command failures is a back-and-forth process, and Claude is patient about trying multiple strategies.
-
----
-
-**Next up:** [Chapter 10 — Git Workflows](./10-git-workflows.md) — Using Claude to commit changes, manage branches, and create pull requests.
+- Anthropic, "Interactive mode" (shell mode, `Ctrl+B` backgrounding), Claude Code docs, accessed 2026-10-04. https://code.claude.com/docs/en/interactive-mode
+- Anthropic, "Tools reference" (Bash and PowerShell tools), Claude Code docs, accessed 2026-10-04. https://code.claude.com/docs/en/tools-reference
+- Anthropic, "Choose a permission mode", Claude Code docs, accessed 2026-10-04. https://code.claude.com/docs/en/permission-modes
+- Anthropic, "What's new" (Weeks 18, 26, 28), Claude Code docs, accessed 2026-10-04. https://code.claude.com/docs/en/whats-new
+- Anthropic, "Best practices for Claude Code", Claude Code docs, accessed 2026-10-04. https://code.claude.com/docs/en/best-practices

@@ -1,186 +1,70 @@
-# Appendix C: Performance Benchmarks
+# Performance Benchmarks
 
-This appendix provides reference data for typical token usage, cost estimates, and performance characteristics across common Claude Code task types. All figures are approximate and represent typical ranges observed across real development workflows.
+> Verified on 2026-10-04 with Claude Code 2.1.289.
 
----
+The first edition of this appendix printed token ranges per task type with no source. They were estimates, and the models they described are gone, so they have been removed. What replaces them is a short guide to public benchmarks and two independent studies of the harness itself, with what each one measures and where it misleads.
 
-## Token Usage by Task Type
+The rule for reading any number here: a benchmark score tells you about that model, that harness, that benchmark and that run. It does not tell you how the model behaves on your codebase. Run a small evaluation of your own before changing models; see [Verification and Evals at Scale](/en/book3-architect/02-verification-and-evals).
 
-Token counts represent total tokens (input + output) for a complete task, including context accumulation. Actual usage varies significantly based on codebase size, CLAUDE.md length, and conversation history.
+## Vendor-reported model scores
 
-### Exploration and Understanding Tasks
+On 2026-09-22 Anthropic published scores for Claude Opus 5.5 alongside Fable 5.1, Opus 5, GPT-6 Astra and GPT-5.6 Sol. These are the coding and agent rows from [that page](https://www.anthropic.com/claude-opus-5-5). The Claude figures are Anthropic's own measurements; its footnote says the GPT-6 Astra and GPT-5.6 Sol Terminal-Bench figures are as reported by OpenAI.
 
-| Task | Typical Token Range | Notes |
-|------|-------------------|-------|
-| Explain a single 100-200 line file | 3,000–6,000 | One file read + explanation |
-| Understand a module (5-10 files) | 10,000–25,000 | Multiple file reads, cross-reference |
-| Map a full subsystem (20+ files) | 30,000–80,000 | Deep exploration; use subagent to contain |
-| Answer a question about a function | 1,500–4,000 | Targeted read |
-| Explain unfamiliar codebase end-to-end | 50,000–150,000 | Very wide exploration; plan to compact |
-| Git log analysis (last 50 commits) | 5,000–15,000 | Varies with commit message length |
+| Benchmark | What it measures | Opus 5.5 | Fable 5.1 | Opus 5 | GPT-6 Astra | GPT-5.6 Sol |
+| --- | --- | --- | --- | --- | --- | --- |
+| Terminal-Bench 4.0 | Agentic work in a terminal; the public leaderboard Anthropic's footnote cites uses the Claude Code harness | 66.4% (xhigh effort) | 55.8% | 52.3% | 57.9% (high effort) | 37.3% |
+| FrontierCode v1.1 (Main) | Likelihood that agent-written code would be merged | 54.4% | 50.3% | 48.0% | 53.3% | 47.5% |
+| CursorBench 4.0 | Multi-file, ambiguous tasks drawn from real sessions | 57.8% | 51.8% | 46.6% | not listed | 41.7% |
+| OSWorld 2.1 | Computer use (partial-credit scoring) | 81.8% | 80.7% | 74.0% | not listed | not listed |
 
-### Code Writing Tasks
+Caveats, most important first:
 
-| Task | Typical Token Range | Notes |
-|------|-------------------|-------|
-| Write a unit test for one function | 2,000–5,000 | One read + generation |
-| Implement a simple utility function | 1,500–4,000 | Usually no file reads needed |
-| Implement a CRUD endpoint (standard pattern) | 5,000–15,000 | Reads schema + existing handlers |
-| Implement a medium feature (3-5 files) | 15,000–35,000 | Multiple reads, multiple writes |
-| Implement a complex feature (10+ files) | 40,000–100,000 | Consider subagents for parts |
-| Write a complete test suite for a module | 10,000–30,000 | Module read + test generation |
-| Migrate a file to a new API/library | 5,000–20,000 | Depends on file size and library complexity |
+1. **Vendor-run.** The same company built the model and chose the benchmarks, effort settings and harness. Terminal-Bench 4.0 carries a standard error of about 2.6 points for Opus 5.5 and 1.6 to 2 for the other Claude models, so adjacent rows are not clearly different.
+2. **Settings differ by row.** Unless noted, Opus 5.5's results use max effort; Terminal-Bench 4.0 is quoted at xhigh for Opus 5.5 and at high effort for GPT-6 Astra (each model's highest score, per the page). The same page reports that at its default (medium) effort Opus 5.5 scores 54.6% on FrontierCode and 52.5% on CursorBench, so a cell is not a like-for-like comparison unless the effort matches.
+3. **Anthropic says so itself.** The page states that "benchmark margins have become a less reliable guide to real-world differences" and that, in its own use, the gap between Opus 5.5 and Fable 5.1 is narrower than the scores suggest.
+4. **Footnotes matter.** The page attaches numbered footnotes to several rows; read them before quoting a number.
 
-### Bug Fixing Tasks
+## Long-horizon code quality: SlopCodeBench
 
-| Task | Typical Token Range | Notes |
-|------|-------------------|-------|
-| Fix a simple bug (error message provided) | 3,000–8,000 | Targeted file reads |
-| Debug a complex multi-file issue | 20,000–60,000 | Exploration-heavy; context fills fast |
-| Trace a performance issue | 15,000–50,000 | Depends on profiling depth |
-| Fix a failing test (cause not obvious) | 5,000–20,000 | Test file + relevant source files |
-| Fix a security vulnerability | 10,000–30,000 | Security analysis + multiple files |
+[SlopCodeBench](https://arxiv.org/html/2603.24755v1) (University of Wisconsin-Madison, March 2026) hands the model a task in checkpoints, revealing new requirements over time, so the agent must evolve its own code instead of solving a fully specified problem. It scores strict pass rate and also code-smell measures such as verbosity and complexity.
 
-### Code Review and Analysis Tasks
+HumanLayer ran a subset (3 problems, 17 checkpoints) on Opus 4.8, Sonnet 5 and Opus 5 in July 2026 and reported 24% strict pass for Opus 5, against 17% for Opus 4.6 and 11% for GPT-5.4 in the original paper. In that run, all models got more verbose and complex over each challenge, and Opus 5 wrote about five times as many functions as Opus 4.8. Caveat, stated by the author: the subset is small ("4 of 17" checkpoints for Opus 5), so it cannot support firm ranking. Its value is the shape of the result: passing tests and keeping the code maintainable are different things. This is the case for the checks in [Check the Work](/en/book1-getting-started/12-check-the-work).
 
-| Task | Typical Token Range | Notes |
-|------|-------------------|-------|
-| Review a small PR (1-3 files) | 5,000–12,000 | Diff + file context |
-| Review a medium PR (5-10 files) | 15,000–35,000 | Larger diff + cross-file analysis |
-| Review a large PR (20+ files) | 40,000–100,000 | Consider subagent reviewer |
-| Security audit of a module | 15,000–40,000 | All files in module + analysis |
-| Performance audit | 10,000–30,000 | Code + query analysis |
-| Dependency vulnerability scan | 5,000–15,000 | package.json + npm audit output |
+## What the harness adds: two 2026 studies
 
-### Automation and Scripting Tasks
+Benchmarks usually vary the model. These two vary the harness, which matters if you own one ([Harness Engineering](/en/book3-architect/01-harness-engineering)).
 
-| Task | Typical Token Range | Notes |
-|------|-------------------|-------|
-| Write a shell script | 2,000–6,000 | Usually no file reads |
-| Create a CI/CD workflow file | 3,000–8,000 | Reads existing config if present |
-| Set up a GitHub Actions workflow | 4,000–10,000 | |
-| Batch rename/refactor (10 files) | 10,000–25,000 | Parallel approach more efficient |
-| Add type annotations (single file) | 3,000–8,000 | Depends on file size |
-| Documentation generation (module) | 5,000–15,000 | Module read + doc generation |
+### HarnessTax (UC Berkeley, September 2026)
 
----
+By Melissa Z. Pan, Shuo Yang, Negar Arabzadeh, Wei-Lin Chiang, Ion Stoica and Matei Zaharia, at https://harnesstax.github.io/. Design: 21 model-harness pairs (seven models, three harnesses: Claude Code, Codex CLI and Pi), 30 randomly sampled tasks from each of SWE-bench Lite and Terminal-Bench 2.0, three runs per task, high effort, 100-turn cap, costs computed from one fixed direct-API price list dated 2026-09-01.
 
-## Cost Estimates
+Findings, as the authors report them:
 
-The following estimates use approximate Anthropic API pricing as of early 2025. Subscription plan costs (Pro, Max) are flat-rate and not reflected here — these figures apply to API (pay-per-use) usage.
+- Harness choice moved success rate little (within about 2 points on SWE-bench Lite and about 5 on Terminal-Bench 2.0 on average) but moved cost a lot. Claude Fable 5 solved 97.8% of attempts in Claude Code and 96.7% in Pi, at about $1.33 versus $0.67 per attempt.
+- Across shared models, Claude Code cost about 2.0 times Pi and 1.6 times Codex on SWE-bench Lite, and 1.5 times Pi on Terminal-Bench 2.0 (geometric means).
+- Pi, with four tools (read, write, edit, bash), sat on the cost-success frontier on both benchmarks. Claude Code's first model call carried over ten times the context of Pi's.
+- For the six Anthropic and OpenAI models, a harness other than the model maker's had the top success rate in nine of twelve comparisons.
 
-**Pricing tiers (approximate, subject to change):**
+Caveats, partly the authors' own: only two open-source benchmarks, which models may have seen in training; small samples (30 tasks, so look at the confidence intervals the authors give); a mean cost depends on caching and later turns, not only the first call; and a richer harness may help on work these tasks do not test. Do not read it as "Claude Code is wasteful". Read it as "measure cost per solved task on your own work before accepting any default harness."
 
-| Model | Input tokens (per 1M) | Output tokens (per 1M) | Cache read (per 1M) |
-|-------|----------------------|------------------------|---------------------|
-| Claude Haiku 4.5 | ~$1 | ~$5 | ~$0.10 |
-| Claude Sonnet 4.6 | ~$3 | ~$15 | ~$0.30 |
-| Claude Opus 4.6 | ~$5 | ~$25 | ~$0.50 |
+### An Empirical Study of Harness Design for Coding Agents (arXiv 2609.20804)
 
-Prompt caching is automatic — Claude Code caches CLAUDE.md, system prompts, and other stable content. Cache reads cost approximately 10% of normal input price, which substantially reduces costs in long sessions where the same context is reused.
+By Run-Ze Fan and eight co-authors, submitted 2026-09-17: https://arxiv.org/abs/2609.20804. A lightweight harness with a fixed execution loop, varying planning, action space and context management; four models, two benchmarks, 176 matched settings. Reported results: context management matters more as the budget shrinks, mostly by preventing overflow failures; rule-based elision before LLM summarization was the most efficient strategy tested; planning helps weaker models' accuracy but lowers cost for stronger ones without changing accuracy; and models with strong bash skills do better, cost-wise, with a bash-only interface. Caveat: it tests a lightweight research harness, not Claude Code itself, so treat it as evidence about design choices rather than about any product. HarnessTax is a different project from this paper; they are often cited together.
 
-**Typical task costs (Sonnet, approximate):**
+## How to use this appendix
 
-| Task | Estimated Cost |
-|------|---------------|
-| Quick question / single function explain | $0.01–$0.05 |
-| Write a unit test | $0.03–$0.10 |
-| Implement a CRUD endpoint | $0.10–$0.30 |
-| Implement a medium feature | $0.30–$0.80 |
-| Debug a complex issue | $0.40–$1.50 |
-| Full PR review (large PR) | $0.80–$2.50 |
-| Architecture planning session | $1.00–$4.00 |
+- Quote a score only with its benchmark, its effort setting and who ran it.
+- Compare cost per solved task, not just solve rate.
+- Prefer a 20-task eval drawn from your own repository over any public leaderboard when the decision is yours.
 
-**Model selection impact:**
-Running the same task on Opus 4.6 vs Sonnet 4.6 costs approximately 1.7x more per token. However, Opus sessions tend to use more tokens due to deeper reasoning, so the effective cost difference is often 2-3x in practice. For tasks where Sonnet produces satisfactory results, the cost difference over a month of heavy use is still meaningful.
+### Check that it worked
 
----
+Pick one model-and-harness change you are considering. Run the same ten to twenty real tasks before and after, recording success and the cost the CLI reports. If the difference is within the run-to-run spread of repeating the same configuration, you have not measured a difference.
 
-## Speed Benchmarks
+## Sources
 
-Latency is primarily determined by output length. Time-to-first-token is typically 1-3 seconds. Full response time depends on output length.
-
-| Task | Typical Total Time (Sonnet) |
-|------|--------------------------|
-| Short explanation | 3–8 seconds |
-| Write a function | 5–15 seconds |
-| Write a test file | 10–30 seconds |
-| Implement a medium feature | 30–120 seconds |
-| Large refactor (10+ files) | 2–8 minutes |
-| Complex debugging session | 5–20 minutes (interactive) |
-
-**Parallel agent speedup:**
-
-Running 3 parallel subagents for independent tasks provides roughly 2.5–3x speedup compared to sequential execution (accounting for orchestration overhead). For tasks that can be parallelized cleanly (such as reviewing 30 files), parallel execution reduces wall-clock time significantly.
-
----
-
-## Context Window Reference
-
-Claude models have different context window sizes. As of early 2026:
-
-| Model | Context Window | Notes |
-|-------|---------------|-------|
-| Claude Haiku 4.5 | 200,000 tokens | Standard |
-| Claude Sonnet 4.6 | 200,000 tokens | Standard |
-| Claude Opus 4.6 | 200,000 tokens | Standard |
-| Claude Opus 4.6 (1M) | 1,000,000 tokens | Max/Team/Enterprise automatically; disable with `CLAUDE_CODE_DISABLE_1M_CONTEXT=1` |
-
-200,000 tokens sounds large, but fills faster than expected:
-
-| Content | Approximate Tokens |
-|---------|-------------------|
-| 1,000 lines of TypeScript | ~6,000 tokens |
-| One CLAUDE.md file (200 lines) | ~1,500 tokens |
-| A 100-message conversation | ~20,000–60,000 tokens |
-| Full test suite output (200 tests) | ~15,000–30,000 tokens |
-| A large PR diff (500 lines changed) | ~10,000–20,000 tokens |
-
-**Practical limit for sustained quality:** Claude Code typically maintains high performance up to roughly 60-70% of context window capacity. Above that, quality degradation becomes perceptible. Above 90%, it becomes significant.
-
-For a 200K window, this means:
-- Comfortable working range: up to ~130,000 tokens
-- Quality begins degrading: 130,000–180,000 tokens
-- Compact or clear: above 180,000 tokens
-
----
-
-## Benchmarks: Subagent vs. Sequential Processing
-
-For tasks involving many files, using subagents provides meaningful performance advantages:
-
-**Scenario: Review 10 files for security issues**
-
-| Approach | Wall-Clock Time | Main Context Consumed | Quality |
-|----------|----------------|----------------------|---------|
-| Sequential (all in main context) | 3-5 min | ~30,000-50,000 tokens | Degrades on later files |
-| One subagent per file (parallel) | 1-2 min | ~5,000 tokens (summaries) | Consistent across all files |
-
-**Scenario: Implement a feature with extensive codebase exploration**
-
-| Approach | Context After Implementation | Context Available for Iteration |
-|----------|------------------------------|--------------------------------|
-| Explore everything in main context | 80,000-120,000 tokens | Limited |
-| Use subagent for exploration, summary back | 20,000-30,000 tokens | Substantial |
-
-The efficiency gain from delegating exploration to subagents is most pronounced on large codebases with many related files.
-
----
-
-## Tips for Reducing Token Consumption
-
-The following habits reduce token usage by 30-60% in typical workflows:
-
-1. **Be specific about files to read.** "Read src/auth/session.ts, specifically the `refreshToken` function" vs. "Read the auth module."
-
-2. **Use `/clear` between unrelated tasks.** Removing 30,000 tokens of irrelevant conversation before starting a new task saves real money on API plans.
-
-3. **Compact proactively.** Compacting at 50% context fill produces better summaries than waiting until 90%.
-
-4. **Use subagents for exploration.** A subagent that reads 20 files costs the same total tokens but keeps 80% of those tokens out of your main context.
-
-5. **Keep CLAUDE.md concise.** Every line of CLAUDE.md costs tokens on every session start. A 400-line CLAUDE.md might cost 3,000 tokens per session — at 100 sessions per month, that is 300,000 tokens of pure overhead.
-
-6. **Avoid re-reading unchanged files.** If Claude already read a file in this session, reference the information rather than asking Claude to re-read it.
-
-7. **Use `/btw` for quick lookups.** Quick reference questions answered in the `/btw` overlay consume zero main context tokens.
+- Claude Opus 5.5, Anthropic, 2026-09-22: https://www.anthropic.com/claude-opus-5-5
+- HarnessTax: How Much Does the Harness Matter for Coding Agents?, Pan et al., UC Berkeley, September 2026: https://harnesstax.github.io/
+- An Empirical Study of Harness Design for Coding Agents, Fan et al., arXiv 2609.20804, 2026-09-17: https://arxiv.org/abs/2609.20804
+- Benchmarking Opus 5 on SlopCodeBench, HumanLayer, July 2026: https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/benchmarking-opus-5-on-slop-code-bench.md
+- SlopCodeBench paper, March 2026: https://arxiv.org/html/2603.24755v1

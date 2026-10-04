@@ -1,261 +1,143 @@
-# Chapter 7: Reading and Understanding Code
+# Reading and Understanding Code
 
-## The Problem With Inherited Code
+> Verified on 2026-10-04 with Claude Code 2.1.289.
 
-Picture this: your colleague hands you a project they have been building for two years. The folder has hundreds of files. There is almost no documentation. Your colleague is now unreachable. And your manager has asked you to add one "simple" feature by end of week.
+## The problem with inherited code
 
-This scenario plays out constantly in software development. Even when you write the code yourself, coming back to a project after six months can feel like reading someone else's work.
+Picture this: a colleague hands you a project they have built for two years. There are hundreds of files and almost no documentation. Your colleague is unreachable, and you have been asked to add one "simple" feature by Friday.
 
-Claude Code's ability to read and explain code is, for many users, its single most immediately useful feature. Not writing new code. Not running commands. Just this: *tell me what is going on here.*
+Even code you wrote yourself can feel like this after six months away. For many people, the most useful thing Claude Code does is not writing new code. It is answering the question *"what is going on here?"*
 
-This chapter shows you how to use that capability to its fullest.
+There is a second reason this chapter matters more than it used to. As agents write more of the code, you will read less of it line by line. What you need instead is a reliable way to build a picture of what a project does, and to check that picture against reality. That skill is asking for explanations, not reading files one at a time.
 
----
+## Start with an overview
 
-## The Killer Starting Point: "Give Me an Overview"
+Start Claude Code in the project folder and ask a broad question:
 
-When you first drop Claude Code into an unfamiliar project, the best opening move is a broad question:
-
-```
-Give me an overview of this codebase
+```text
+give me an overview of this codebase
 ```
 
-What you will get back is not just a file listing. Claude reads through the project structure — looking at file names, folder organization, configuration files, package lists, entry points, and key source files — and synthesizes a summary of:
+Claude does not just list files. It looks at folder names, configuration files, package lists and entry points, then summarizes what the project does, how it is organized, which technologies it uses, and how the main parts relate. This is the opening move in the official [Common workflows](https://code.claude.com/docs/en/common-workflows) guide too.
 
-- What the project does
-- How it is organized
-- What technologies it uses
-- What the main components are and how they relate
+Then narrow down, one question at a time:
 
-This single question, asked in an empty session over a large codebase, can give you more situational awareness than an hour of poking around yourself.
-
-From there, you narrow down:
-
-```
-Explain the main architecture patterns used here
+```text
+explain the main architecture patterns used here
 ```
 
-```
-What are the key data models in this project?
-```
-
-```
-How does the authentication system work?
+```text
+what are the key data models?
 ```
 
-Each follow-up builds on the previous one. You are doing a guided tour of the codebase, with Claude as your guide.
-
----
-
-## Asking About Specific Files
-
-Sometimes you know which file you care about. You can be direct:
-
-```
-Explain what src/api/handlers.js does
+```text
+how is authentication handled?
 ```
 
-Or use the `@` reference syntax to pull a file directly into the conversation:
+Each answer builds on the last. You are taking a guided tour with Claude as the guide.
 
+### Ask for the shape, not the lines
+
+When you are not a programmer, or when the project is large, the most useful requests describe the *form* of the answer you want:
+
+- **A summary:** "Summarize this project in one page for someone who has never seen it. Say what it does, who uses it, and which three files matter most."
+- **A glossary:** "List the project-specific terms and what each one means." The official docs suggest this too.
+- **A diagram:** "Draw a diagram of how a request flows through the system, as text I can paste into a document." Claude can write diagrams as plain text (for example the Mermaid format, which many tools render as pictures).
+- **A visual page:** if you are on a plan that supports artifacts, ask for the explanation as a page rather than as terminal text. For example: "Make an artifact that walks through the checkout flow, with the key files labeled." Artifacts are covered in the [website chapter](/en/book1-getting-started/11-build-website); for this use, a page you can scroll and share is often easier than a long reply.
+- **A reading order:** "If I had one hour to understand this project, which five files should I read, in what order, and why?"
+
+You are asking Claude to do the reading and hand you the conclusions. Then you decide where the answer matters enough to look at the real code.
+
+## Ask about specific files and functions
+
+When you already know which file matters, point at it with `@`:
+
+```text
+Explain the logic in @src/utils/auth.js
 ```
-Walk me through the logic in @src/utils/validation.js
-```
 
-The `@` prefix tells Claude to read that specific file and focus the conversation on it. You can mention multiple files at once:
+The `@` includes the file's full content in the conversation. You can mention several files in one message ("how do @src/auth/login.js and @src/auth/session.js work together?"), and a directory reference such as `@src/components` shows a listing of what is inside rather than every file's contents. Type `@` and a menu of paths appears; press Enter or Tab to accept one.
 
-```
-How do @src/auth/login.js and @src/auth/session.js work together?
-```
+For a single function, just name it:
 
-This is useful when you know a bug or feature involves multiple files and you want to understand their relationship before changing anything.
-
----
-
-## Asking About Specific Functions
-
-Large files can be overwhelming. If you want to drill down to a specific piece of logic:
-
-```
+```text
 Explain what the processPayment function does, step by step
 ```
 
-```
-What does the useFormValidation hook return, and when should I use it?
-```
-
-```
-Walk me through what happens when the exportToPDF function is called
+```text
+Trace what happens from a click on "Submit Order" to the order being saved
 ```
 
-Claude will read the function, trace its inputs and outputs, explain any side effects, and tell you what edge cases it handles (or fails to handle). This is significantly faster than reading the code yourself if you are unfamiliar with the language or the patterns being used.
+Tracing a user action through the code is one of the best ways to learn how a system fits together. It also shows you where a bug could hide.
 
----
+## What does this error mean?
 
-## "What Does This Error Mean?"
+When you run something and get a wall of red text, paste the error and, if you can, the file it names:
 
-This is one of the most common reasons people turn to Claude Code. You run something, you get a wall of red text, and you have no idea where to start.
-
-The simplest approach:
-
-```
+```text
 I got this error when I ran npm test:
 
 TypeError: Cannot read properties of undefined (reading 'map')
     at ProductList (/src/components/ProductList.jsx:23:15)
-    at renderWithHooks (/node_modules/react-dom/cjs/react-dom.development.js:16141:18)
-    ...
+
+Can you look at @src/components/ProductList.jsx and tell me what's wrong?
 ```
 
-Claude will:
-1. Identify the root cause (something is `undefined` when the code expects an array)
-2. Point you to the exact file and line number (`ProductList.jsx` line 23)
-3. Explain why this probably happened
-4. Suggest a fix
+Claude will usually identify the cause (here, something is `undefined` where a list was expected), point to the line, and suggest a fix. When it can see both the error and the code, its diagnosis is better than when it sees only one. The [Check the Work](/en/book1-getting-started/12-check-the-work) chapter goes deeper on errors.
 
-You can also paste the error and ask Claude to look at the relevant file:
+## Unfamiliar languages, and your own level
 
-```
-I'm getting this error: [error text]. Can you look at @src/components/ProductList.jsx and tell me what's wrong?
+Claude reads code in any common language and explains it in plain English. Tell it your level:
+
+```text
+I'm primarily a Python developer. Explain this JavaScript in terms I'd understand, comparing to Python where it helps.
 ```
 
-When Claude can see both the error and the code, its diagnosis is much more accurate than if it only sees one or the other.
-
----
-
-## Understanding Unfamiliar Languages
-
-One of Claude Code's underrated superpowers: it reads code in any programming language, and it will explain that code in plain English regardless of what language you know.
-
-If you are a Python developer looking at a JavaScript project:
-
-```
-I'm primarily a Python developer. Can you explain this JavaScript code in terms I would understand, drawing comparisons to Python where helpful?
+```text
+I'm not a programmer. Explain what this code does in plain language, as if to someone who has never coded.
 ```
 
-If you are entirely new to programming and looking at any code:
+There is no penalty for asking for a simpler explanation. It is better than nodding along to something you did not understand.
 
-```
-I'm not a programmer. Can you explain what this code does in plain language, as if explaining it to someone who has never coded before?
-```
+## Questions that pay off
 
-Claude will adjust its explanation to your stated level. Do not be embarrassed to ask for simpler explanations — it is always better to ask than to pretend you understood something you did not.
+- **Start broad, then narrow.** Understand what the system does before you ask how to change it.
+- **Ask "why", not only "what".** "Why does this function make three API calls instead of one?" can surface a design decision or a historical reason that reading the code never shows. For history, you can also say: "Look through this file's git history and summarize how it came to be this way."
+- **Ask what is missing.** "Which error cases does this module not handle?"
+- **Say your goal.** "I need to add bulk upload. Explain how single-file upload works so I can build on it" gets a focused answer instead of a tour of everything.
+- **Ask follow-ups freely.** "You said 'middleware'. What does that mean here?" costs nothing, and Claude keeps the context.
 
----
+## Keep long explorations from filling the session
 
-## Exploring Large Codebases
+Everything Claude reads goes into its context window, and the official best-practices guide notes that performance degrades as that window fills. A broad "investigate how auth works" can mean hundreds of file reads. Two habits help:
 
-Some projects have thousands of files. You cannot read everything. Claude Code gives you a smarter way to navigate.
+- Ask Claude to use a subagent for the exploration: "Use a subagent to investigate how our authentication handles token refresh and report back a summary." The subagent reads in its own context and returns only the findings. (Subagents get their own chapter: [Subagents](/en/book2-advanced/05-subagents).)
+- Run `/clear` when you switch to an unrelated task.
 
-**Find where something lives:**
+## When Claude gets it wrong
 
-```
-Where in this codebase is the email notification logic handled?
-```
+Claude infers what code does by reading it. It can be wrong, especially with unusual patterns or behavior that depends on things not visible in the files, such as data in a database.
 
-```
-Which files would I need to modify to change how user profiles are displayed?
-```
+If an explanation does not match what you see when you run the program, trust what you see and say so:
 
-**Trace the flow of a feature:**
-
-```
-Trace what happens from when a user clicks "Submit Order" all the way to when the order is stored in the database
+```text
+You said this function always returns a list, but when I call it with an empty name I get null. Look again.
 ```
 
-This kind of flow tracing — from a user action through the code to a final outcome — can reveal a lot about how a system works, which dependencies exist, and where a bug might hide.
+Treat explanations as claims to test. For anything important, ask Claude to prove it: "Show me the line that does that" or "Write a one-line command that demonstrates it."
 
-**Understand naming conventions and patterns:**
+### Check that it worked
 
-```
-What naming conventions does this project follow?
-```
+You have understood a codebase well enough when you can do these three things without opening a file:
 
-```
-What design patterns are used in this codebase? Are there any inconsistencies?
-```
+1. Explain in two sentences what the project does.
+2. Name the file where one specific behavior lives.
+3. Predict what will happen for one concrete input, then run the program (or ask Claude to) and see that you were right.
 
-Understanding a project's patterns helps you write code that fits in rather than code that sticks out.
+If step 3 surprises you, go back and ask Claude about the surprise. That is where the real learning is.
 
----
+## Sources
 
-## Tips for Better Code Reading Sessions
-
-### Start broad, then narrow
-
-Resist the urge to jump immediately to "how do I fix X?" Start with "what does this system do?" Understanding context makes specific questions much easier to answer correctly.
-
-### Ask "why" not just "what"
-
-```
-Why is the data being stored in localStorage instead of a database here?
-```
-
-```
-Why does this function make three API calls instead of one?
-```
-
-"Why" questions often reveal architectural decisions, historical context, or technical constraints that pure code reading will not tell you.
-
-### Ask about what's missing
-
-```
-What functionality would you expect to see in a module like this that seems to be missing?
-```
-
-```
-Are there any obvious error cases that this code doesn't handle?
-```
-
-Claude can identify gaps in your code — places where things could go wrong but there is no handling — just as easily as it can explain what is there.
-
-### Tell Claude your goal
-
-Context helps Claude give better answers:
-
-```
-I need to add a bulk upload feature. Before I start, can you help me understand how the existing single-file upload works so I can build on it?
-```
-
-Knowing your goal helps Claude focus its explanation on what matters for your specific task rather than explaining everything equally.
-
-### Ask follow-up questions freely
-
-You do not have to understand everything on the first pass. If Claude's explanation contains a term you do not recognize, ask:
-
-```
-You mentioned "middleware" — can you explain what that means in this context?
-```
-
-```
-I didn't understand the part about race conditions. Can you explain that more simply?
-```
-
-Claude remembers the context of your conversation. You can always ask for clarification without losing your place.
-
----
-
-## When Claude Gets It Wrong
-
-Claude Code is reading your code and making inferences. Sometimes it will be wrong — especially if the code is unusual, uses surprising patterns, or depends on context that is not visible in the files.
-
-If Claude's explanation does not match what you observe when you actually run the code, trust what you observe. Tell Claude what is different:
-
-```
-You said this function always returns an array, but when I call it, I sometimes get null. Can you look again?
-```
-
-Claude will re-examine its reasoning and usually correct itself. Treating it as a dialogue — where you can push back — makes for much better outcomes than accepting every explanation uncritically.
-
----
-
-## What Reading Code Teaches You
-
-Here is a secret that experienced developers know: the best way to learn a programming language or a framework is to read a lot of code written in it. Traditionally, that was slow and frustrating because you had to parse everything yourself.
-
-With Claude Code, you can read code much faster. You see a pattern, ask what it means, understand it in thirty seconds, and move on. Over time, those patterns accumulate. Your own mental model of how code works grows rapidly.
-
-Using Claude Code to understand code is not cheating. It is accelerated learning.
-
----
-
-**Next up:** [Chapter 8 — Editing Files](./08-editing-files.md) — How Claude makes changes to your code, and how to review and control those changes.
+- Anthropic, "Common workflows: Understand new codebases", Claude Code docs, accessed 2026-10-04. https://code.claude.com/docs/en/common-workflows
+- Anthropic, "Best practices for Claude Code" (context window, subagents for investigation, asking codebase questions), Claude Code docs, accessed 2026-10-04. https://code.claude.com/docs/en/best-practices
+- Anthropic, "Share session output as artifacts", Claude Code docs, accessed 2026-10-04. https://code.claude.com/docs/en/artifacts

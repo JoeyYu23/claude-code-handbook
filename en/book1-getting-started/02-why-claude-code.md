@@ -1,147 +1,160 @@
-# Chapter 2: Why Claude Code?
+# Why Claude Code?
 
-## The Problem with Traditional Programming Tools
+> Verified on 2026-10-04 with Claude Code 2.1.289.
 
-Learning to code has never been easier — and yet building real things has never felt more overwhelming. Frameworks change faster than documentation can keep up. Every project involves ten different tools, each with their own syntax and quirks. And if you want help, you either pay for a developer, spend hours on Stack Overflow, or paste code into a chat window and hope for the best.
+## The problem it solves
 
-Claude Code does not replace the fundamentals of software development. But it dramatically lowers the friction between *having an idea* and *having a working thing*. And that friction is exactly what stops most people.
+Building software has never been easier to start and never more tiring to finish. Every project involves a dozen tools with their own quirks, documentation lags behind the code, and the gap between "I have an idea" and "it works" is mostly mechanical effort: setup, glue code, tests, error messages.
 
----
+Coding agents attack that gap. They do not remove the need to know what you want. They remove much of the typing, looking up and trial and error between the idea and the working thing.
 
-## When to Reach for Claude Code
+This chapter covers when Claude Code is the right tool, when it is not, and how it compares with the alternatives in October 2026. It tries to be fair: Claude Code is not the best choice for everyone.
+
+## When to reach for it
 
 ### "I inherited a codebase I don't understand"
 
-This is one of the most common and painful situations in software: you are handed someone else's project — a predecessor's work, an open-source repo, a client's old system — and you need to understand it fast.
-
-Without Claude Code, this means weeks of reading code, chasing down variable names, drawing diagrams, and hoping the comments are accurate (they rarely are).
-
-With Claude Code, you navigate to the project folder and ask:
+You are handed someone else's project and need to understand it fast. Open a terminal in the project folder, start Claude Code and ask:
 
 ```
 What does this project do?
 Walk me through the folder structure.
-What happens when a user logs in?
+What happens when a user logs in? Draw it as a simple diagram.
 ```
 
-Claude Code reads the actual files and builds you a map of the system. It is not summarizing documentation — it is reading the source code directly and synthesizing a human-readable explanation. What used to take weeks of onboarding can take hours.
+Claude Code reads the source files and builds you a map. It is reading the code itself, not trusting the comments. What used to take a week of onboarding can take an afternoon. Chapter 7 shows how to do this well.
 
-### "I want to build something but don't know how to start"
+### "I want to build something but don't know where to start"
 
-Most people who want to learn to code get stuck at the blank page. You have an idea for a website, a script, a tool — but the gap between the idea and the first working version feels enormous.
-
-Claude Code lets you start with your idea in plain language:
+The blank page stops most beginners. With an agent you start from the idea:
 
 ```
 Create a simple personal website with my name, a short bio, and links to my social profiles.
 ```
 
-Within seconds, Claude Code creates the files, writes the HTML and CSS, and you can open it in a browser. You did not need to know HTML syntax to get there. And now that you can *see* the code in a real project, you can ask Claude Code to explain any part of it, which is a far better way to learn than reading a textbook.
+A minute later you have files you can open in a browser. Then you can ask about any part of it, which is a better way to learn than reading a textbook first.
 
-### "I need to automate a tedious, repetitive task"
+### "I have a tedious, repetitive job"
 
-Repetitive work is where Claude Code shines brightest. Consider scenarios like:
+This is where agents earn their keep:
 
-- You have 200 files that all need the same small update (changing an old function name to a new one)
-- You need to write the same kind of test for thirty different functions
-- Every week you manually extract numbers from a spreadsheet, do calculations, and paste them into a report
-- You need to rename and reorganize hundreds of image files according to a naming convention
+- 200 files that all need the same small update
+- The same kind of test for thirty functions
+- A weekly report built by copying numbers from one place to another
+- Hundreds of files to rename to a new convention
 
-These tasks are boring, error-prone, and time-consuming when done by hand. They are exactly the kind of thing Claude Code can handle in a single conversation.
+Boring, error-prone work by hand. One clear request for an agent, followed by a check that it did all 200 and not 190.
 
-### "I'm a professional developer who wants to move faster"
+### "I'm a developer and want to move faster"
 
-Even experienced developers spend large portions of their day on tasks that do not require deep expertise — writing boilerplate, looking up API syntax, updating dependencies, resolving merge conflicts, writing test cases for logic that is already working, drafting pull request descriptions.
+Experienced developers spend much of the day on work that needs care but not deep thought: boilerplate, dependency updates, merge conflicts, tests for code that already works, pull request descriptions. Hand those off and your attention stays on the parts only you can do. In 2026 many teams go further and let agents write most of the code while people specify, review and verify. Book 3 covers what that takes.
 
-Claude Code takes all of these off your plate. The result is not that you work less — it is that your attention stays on the problems only you can solve, while the mechanical overhead shrinks. Most developers who adopt Claude Code describe the experience as a permanent shift in what they consider a "productive day."
+### "I'm stuck on a bug"
 
-### "I need to debug something and I'm completely stuck"
-
-Debugging is where even experienced developers lose hours. You are staring at an error message, the code looks right to you, and nothing you try makes a difference.
-
-Claude Code is exceptionally good at this. You can paste the error:
+Paste the error and say where it happens:
 
 ```
-I'm getting this error: TypeError: Cannot read properties of undefined (reading 'map')
-It happens when I load the dashboard page. Here's the relevant component.
+I'm getting TypeError: Cannot read properties of undefined (reading 'map')
+when I load the dashboard page.
 ```
 
-Claude Code reads the component, traces the data flow, identifies that the API response shape does not match what the component expects, and fixes it. It often catches things a human eye skips because it reads without assumptions.
+Claude Code reads the component, traces where the data comes from, finds that the API returns a different shape than the page expects, fixes it, and runs the page again. It reads without the assumptions that made you miss it.
 
----
+## When not to use it, or not alone
 
-## When NOT to Use Claude Code
+### Production systems without a checkpoint
 
-Honesty matters here. Claude Code is powerful, but there are situations where you should be careful — or where it is simply the wrong tool.
-
-### Sensitive production systems without review
-
-If you are making changes to a live system that serves real users — a payment processor, a healthcare database, an authentication service — do not let Claude Code make changes without careful human review. Claude Code can and does make mistakes. In low-stakes environments, mistakes are learning experiences. In production, they can be outages or security incidents.
-
-Always review AI-generated changes before deploying to production. Use it to draft and explore, not to deploy blindly.
+If a change goes straight to a live system that handles money, health data or logins, do not let any agent ship it without a human checkpoint. Auto mode blocks production deploys by default (Chapter 6), but that is a safety net, not a review process.
 
 ### Security-critical code
 
-Code involving encryption, authentication, input validation, and data access controls needs careful human scrutiny. Claude Code is helpful for drafting these components, but it is not a substitute for a security review. Treat its output as a starting point, not a finished product.
+Authentication, encryption, permission checks and input validation need human scrutiny and, ideally, a security review. Agents are good at drafting this code and good at finding bugs in it. Neither replaces someone accountable for the result.
 
-### Tasks where you need to understand the result
+### When you need to learn the skill yourself
 
-If you are in a situation where you need to fully understand and be accountable for every line of code — a university assignment, a technical interview, a code review where you will be expected to explain your decisions — be honest with yourself about how much you are learning versus delegating.
+For a course assignment, an interview or anything you will have to explain line by line, be honest about how much you are learning. Addy Osmani calls the risk "agentic skill decay": agents finish tasks without teaching you. Ask Claude Code to explain as it goes, or write the first version yourself and ask it to review.
 
-Claude Code is at its best when it accelerates your understanding, not when it replaces it. Use it to learn faster, not to skip learning entirely.
+### Decisions that depend on things it cannot see
 
-### Replacing human judgment on complex architecture decisions
+Which database, which architecture, which trade-off between speed and safety: these depend on your team, budget and plans. Claude Code is a good thinking partner here and will surface options you missed. The decision is still yours.
 
-Should you use a relational database or a document store? Should this be a microservice or part of a monolith? What is the right trade-off between consistency and availability for this specific system?
+## How it compares, October 2026
 
-Claude Code can inform these conversations, weigh trade-offs, and point out considerations you might have missed. But architecture decisions require understanding your team, your organization, your constraints, and your future needs in ways that no AI fully grasps. Use it as a thinking partner, not a decision-maker.
+There are now several serious coding agents. Here is an honest summary of the main ones. All of them change monthly, so check the current state before you commit a team to one.
 
----
+| | Claude Code | OpenAI Codex | Cursor | Google Antigravity CLI |
+|---|---|---|---|---|
+| Made by | Anthropic | OpenAI | Cursor | Google |
+| Main form | Terminal, desktop, web, IDE | Terminal, desktop, IDE, cloud | Code editor with agents | Terminal and desktop |
+| Models | Claude only | OpenAI GPT models | Several vendors | Google Gemini |
+| Open source | No | CLI is open source (Apache-2.0) | No | Not stated |
 
-## The Productivity Multiplier Concept
+### Where Claude Code is strong
 
-There is a useful way to think about what Claude Code actually does to your output: it is a **multiplier**, not an adder.
+**The models.** Anthropic's current line-up (Fable 5.1, Opus 5.5, Sonnet 5.5) is among the strongest for coding, and Claude Code is tuned for them. Claude models are popular enough that rivals offer them too: GitHub Copilot added Sonnet 5.5 the day it launched.
 
-An adder would mean: "I used to produce 10 units of work per day, now I produce 11." A multiplier means: "I used to produce 10 units of work per day, now I produce 40."
+**One engine, many surfaces.** The same session engine runs in the terminal, the desktop app, the web, and VS Code and JetBrains. Your instructions and settings travel with you, and you can move a running session from terminal to desktop or from cloud to terminal.
 
-The multiplier effect comes from a few places:
+**Customization.** Claude Code has the deepest set of ways to shape the agent: `CLAUDE.md` instruction files, skills (packaged procedures), hooks (scripts that run on events), subagents, MCP connections and a plugin marketplace. Books 2 and 3 cover them. Since version 2.1.277 (18 September 2026) it also reads `AGENTS.md`, the instruction file other agents use, when a project has no `CLAUDE.md`.
 
-**Elimination of context switching.** Every time you stop coding to look something up, you break your flow and spend time re-entering the problem space. Claude Code keeps you in the flow — you ask your question right where you are working, get an answer in context, and keep going.
+**A considered safety model.** Auto mode uses a separate classifier model to block risky actions instead of asking you about each one. It is not perfect (Chapter 6 explains its limits), but it is a real middle ground between approving everything by hand and turning all checks off.
 
-**Compression of the long tail.** Every project has a core interesting problem and a long tail of mechanical work (writing tests, handling edge cases, updating documentation, reformatting code). The core problem might take 20% of the time; the long tail takes 80%. Claude Code attacks the long tail.
+**Long autonomous work.** The Fable models are built for tasks "larger than a single sitting", in Anthropic's words, and Claude Code adds background agents, scheduled routines and cloud sessions around them.
 
-**Faster feedback loops.** When you can go from "I wonder if I could do X" to "here is X working" in five minutes instead of three hours, you attempt more things. And attempting more things means discovering better solutions.
+### Where Claude Code is weaker
 
-**Lower barrier to unfamiliar territory.** Every developer has areas they avoid because the learning curve feels too steep — maybe databases, or deployment, or regular expressions, or mobile development. Claude Code dramatically flattens those curves by giving you a guide who knows the territory.
+**Claude models only.** You cannot pick a GPT or Gemini model inside Claude Code without third-party workarounds. Cursor and open-source harnesses let you switch models freely, which matters when one vendor's model is better at a particular job, or cheaper.
 
-The multiplier varies by person and task. For repetitive mechanical work, you might see a 10x or 20x speedup. For novel architecture work, it might be 1.5x. But across a typical day of mixed development work, developers consistently report being able to accomplish in one day what used to take three to five.
+**A heavy harness.** Claude Code sends a lot of instructions and tool descriptions with every request. A widely discussed July 2026 measurement by Systima found about 33,000 tokens of overhead before your first word, against about 7,000 for OpenCode. Critics pointed out that the test used an older model and that most of that overhead is cached after the first turn. Chapter 3 explains what this means in practice.
 
----
+**Usage limits.** Subscription plans have session and weekly limits, and changes to them are a recurring source of complaints on Hacker News. If you hit limits often, Book 2's [Tokens, Limits and Caching](/en/book2-advanced/16-tokens-limits-caching) chapter helps. The top model, Fable, can bill to extra usage credits rather than your plan's included usage.
 
-## Claude Code vs. Other AI Coding Tools
+**Closed source.** You cannot read or modify Claude Code's own code. Codex's CLI and tools such as OpenCode and Pi are open source, which some teams require.
 
-You may have heard of GitHub Copilot, Cursor, or other AI coding tools. How does Claude Code compare?
+**Fast change.** Claude Code ships new versions almost daily. That brings features quickly, and it also means behavior and defaults shift under you. This handbook pins every how-to to a version for that reason.
 
-The main distinction is *scope*. Most AI coding tools are designed to help you *while you type* — they autocomplete lines of code, suggest function implementations, and catch obvious errors. They are deeply integrated into your editor and excel at in-the-flow assistance.
+### Where the others are strong
 
-Claude Code operates at a higher level. It thinks about your *whole project*, not just the line you are typing. It can be asked to refactor an entire module, understand the relationships between files, run your tests, analyze the results, and fix failures — all in a single conversation. It is less of a typing assistant and more of a development partner.
+- **Codex** is the closest rival in scope, with OpenAI's models and strong cloud environments. If your organization standardizes on OpenAI, it is the natural choice.
+- **Cursor** is the best fit if you want to live in an editor and see every change as you type, with your pick of models.
+- **Antigravity CLI** fits teams already on Google Cloud and Gemini.
+- **Open-source harnesses** fit people who want full control over what the agent sends, which model it uses and what it costs.
 
-Many developers use both. Copilot or Cursor for line-by-line flow; Claude Code for larger tasks, exploration, and problem-solving.
+### You do not have to choose only one
 
----
+Moving between agents is easier than it was. Claude Code can import settings from other agents:
 
-## A Simple Framework for Deciding
+```bash
+claude import --dry-run codex
+```
 
-When you face a task, ask yourself three questions:
+The `import` command accepts `codex`, `gemini` or `cursor`, and `--dry-run` shows what it would import without writing anything. A shared `AGENTS.md` file gives every tool the same project instructions. Book 3's [Portability](/en/book3-architect/11-portability) chapter goes further.
 
-1. **Is this primarily mechanical?** (Writing repetitive code, updating many files, formatting, test boilerplate) — Claude Code will likely save you significant time.
+## A simple way to decide
 
-2. **Is this primarily about understanding?** (Exploring a new codebase, debugging a confusing error, learning a new technology) — Claude Code is excellent at this too, but stay engaged and learn alongside it.
+When you face a task, ask three questions:
 
-3. **Is this primarily about judgment?** (Architecture decisions, security design, trade-off analysis, understanding your users) — Use Claude Code as a thinking partner, but keep your own judgment central.
+1. **Is it mostly mechanical?** Repetitive edits, boilerplate, test scaffolding. Hand it to the agent and check the result.
+2. **Is it mostly about understanding?** A new codebase, a confusing error, a new technology. The agent is excellent here, but stay engaged and ask it to explain.
+3. **Is it mostly about judgment?** Architecture, security design, what your users need. Use the agent as a thinking partner and keep the decision.
 
-When in doubt, try it. The cost of asking Claude Code to help is essentially zero. The cost of not asking when it could have helped is real time.
+When in doubt, try it. Asking costs little. Not asking, when it could have helped, costs you the afternoon.
 
----
+### Check that it worked
 
-**Next up:** [Chapter 3 — How It Works](./03-how-it-works.md) — The mental model behind the tool: tools, context, conversations, and how Claude Code thinks.
+You should now be able to say, for your own situation, which of the three kinds of work dominates your week and whether Claude Code or one of the alternatives fits better. If you already use another agent, run `claude import --dry-run` with its name (`codex`, `gemini` or `cursor`) after you install Claude Code in Chapter 4, and look at what would carry over.
+
+## Sources
+
+- "Overview", Claude Code Docs, Anthropic, accessed 2026-10-04. https://code.claude.com/docs/en/overview
+- "Model configuration" (Fable, aliases, usage credits), Claude Code Docs, Anthropic, accessed 2026-10-04. https://code.claude.com/docs/en/model-config
+- "Store instructions and memories" (AGENTS.md), Claude Code Docs, Anthropic, accessed 2026-10-04. https://code.claude.com/docs/en/memory
+- `claude import --help`, Claude Code 2.1.289, run 2026-10-04.
+- "Models overview", Claude Platform Docs, Anthropic, accessed 2026-10-04. https://platform.claude.com/docs/en/about-claude/models/overview
+- Systima, "Claude Code vs OpenCode token overhead", 2026-07-12. https://systima.ai/blog/claude-code-vs-opencode-token-overhead ; Hacker News discussion https://news.ycombinator.com/item?id=48883275
+- "Claude Sonnet 5.5 in GitHub Copilot", GitHub Changelog, 2026-09-28. https://github.blog/changelog/2026-09-28-claude-sonnet-5-5-in-github-copilot
+- "Codex changelog", OpenAI, accessed 2026-10-04. https://learn.chatgpt.com/docs/changelog
+- "Changelog", Cursor, accessed 2026-10-04. https://cursor.com/changelog
+- "An important update: transitioning Gemini CLI to Antigravity CLI", Google Developers Blog, 2026-05-19. https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/
+- Addy Osmani, "Agentic Skill Decay", 2026-08-31. https://addyo.substack.com/p/agentic-skill-decay
+- openai/codex repository (license Apache-2.0), GitHub, accessed 2026-10-04. https://github.com/openai/codex

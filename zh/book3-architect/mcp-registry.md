@@ -1,5 +1,9 @@
 # 附录 B：MCP 服务器目录
 
+::: info 中文版仍为第一版（2026 年 3 月）
+第二版（2026 年 10 月）目前只有英文：[阅读英文第二版 →](/en/book1-getting-started/)
+:::
+
 Claude Code 常用 MCP 服务器的精选参考列表。如需查看完整的实时目录，可运行 `claude mcp add` 浏览，或访问 [MCP 服务器注册表](https://github.com/modelcontextprotocol/servers)。
 
 ---

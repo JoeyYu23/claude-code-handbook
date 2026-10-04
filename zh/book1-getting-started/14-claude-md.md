@@ -1,5 +1,9 @@
 # 第十四章：CLAUDE.md — 你的 AI 说明书
 
+::: info 中文版仍为第一版（2026 年 3 月）
+第二版（2026 年 10 月）目前只有英文：[阅读英文第二版 →](/en/book1-getting-started/)
+:::
+
 ## 问题：Claude Code 还不了解你
 
 每次你启动一个新的 Claude Code 对话，Claude 都是全新的开始。它不知道你更喜欢 TypeScript 而不是 JavaScript，不知道你用 Prettier 做格式化、用 Vitest 跑测试，不知道你项目的 API 处理函数在 `src/api/handlers/` 目录，也不知道你从不直接提交到 main 分支。

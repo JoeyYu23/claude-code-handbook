@@ -1,5 +1,9 @@
 # 第四章：Sub-agents 详解
 
+::: info 中文版仍为第一版（2026 年 3 月）
+第二版（2026 年 10 月）目前只有英文：[阅读英文第二版 →](/en/book1-getting-started/)
+:::
+
 ## 什么是 Sub-agent？
 
 Sub-agent 是 Claude Code 生成的专门子进程。每个 sub-agent 都有：

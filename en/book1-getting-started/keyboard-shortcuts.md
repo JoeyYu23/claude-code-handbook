@@ -1,275 +1,160 @@
 # Keyboard Shortcuts
 
-A complete reference for every keyboard shortcut available in Claude Code. Organized by context: terminal/CLI shortcuts, VS Code extension shortcuts, and general text editing.
+> Verified on 2026-10-04 with Claude Code 2.1.289.
 
----
+Every shortcut below was checked against Anthropic's documentation. Shortcuts can vary by platform and terminal. Press `?` on an empty prompt to see the list for your own setup.
 
-## Before You Start: Platform Notes
+**Mac note.** Shortcuts that use `Alt` (`Alt+B`, `Alt+F`, `Alt+D`, `Alt+Y`, `Alt+P`) need your terminal set to treat Option as Meta. The setting is under your terminal's keyboard preferences; Anthropic's page "Terminal configuration" lists it for each terminal.
 
-Many shortcuts differ between Mac and Windows/Linux. This guide uses:
-- **Mac:** `Cmd` for the Command key, `Option` for the Option/Alt key
-- **Windows/Linux:** `Ctrl` for the Control key, `Alt` for the Alt key
+## Everyday controls
 
-**macOS users:** Several shortcuts use the `Option` key as Meta. These require a one-time terminal configuration:
-- **iTerm2:** Settings → Profiles → Keys → set Left/Right Option key to "Esc+"
-- **Terminal.app:** Settings → Profiles → Keyboard → check "Use Option as Meta Key"
-- **VS Code integrated terminal:** Settings → Profiles → Keys → set Option key to "Esc+"
+| Shortcut | What it does |
+| --- | --- |
+| `Ctrl+C` | Interrupts a running operation. With nothing running, the first press clears the prompt and a second press exits |
+| `Esc` | Stops Claude mid-response so you can redirect; Claude keeps the work done so far. Also closes a dialog |
+| `Esc` `Esc` | With text in the prompt: clears it (and saves the draft so `Up` brings it back). With an empty prompt: opens the rewind menu to restore code and conversation to an earlier point |
+| `Ctrl+D` | Exits Claude Code (press twice). If the prompt has text, deletes the character after the cursor |
+| `Shift+Tab` | Cycles permission modes |
+| `Option+P` (Mac) / `Alt+P` | Switches model without clearing your prompt |
+| `Option+T` (Mac) / `Alt+T` | Turns extended thinking on or off. No effect on models that always think |
+| `Option+O` (Mac) / `Alt+O` | Turns fast mode on or off |
+| `Ctrl+O` | Opens or closes the transcript viewer: detailed tool use, and lines that are collapsed by default |
+| `Ctrl+T` | Shows or hides Claude's task checklist |
+| `Ctrl+B` | Moves running Bash commands and agents to the background (tmux users press it twice) |
+| `Ctrl+X` `Ctrl+K` | Stops all background subagents in this session. Press twice within 3 seconds to confirm |
+| `Ctrl+G` or `Ctrl+X` `Ctrl+E` | Opens your prompt in your default text editor |
+| `Ctrl+L` | Redraws the screen if it looks garbled. Conversation is kept |
+| `Ctrl+R` | Searches previous commands |
+| `Ctrl+S` | Stashes the prompt text; press again on an empty prompt to restore it |
+| `Ctrl+Z` | Suspends Claude Code (Unix only); type `fg` to resume |
+| `Ctrl+V` (`Cmd+V` in iTerm2, `Alt+V` on Windows and WSL) | Pastes an image from the clipboard |
+| `Up` / `Down` | Move the cursor in a multi-line prompt, then step through history |
+| `Tab` | Accepts an autocomplete suggestion |
 
-Once configured, `Option+B`, `Option+F`, etc. will work as expected.
+Changes from earlier guidance: the model and thinking toggles use `Option` on Mac, not `Cmd`. `Ctrl+O` now opens the transcript viewer rather than a "verbose" switch.
 
-Press `?` inside a Claude Code session to see shortcuts available in your specific environment.
+## Permission modes
 
----
+`Shift+Tab` cycles through `default` (shown as Manual), `acceptEdits`, `plan`, and, when available, `bypassPermissions` and then `auto`. From `auto`, the first press goes back to `default`. See [Auto Mode and Permissions](/en/book1-getting-started/06-auto-mode-and-permissions). On Windows when VT input mode is not enabled, `Alt+M` does the same.
 
-## Terminal / CLI Shortcuts
+## Editing text in the prompt
 
-### Session Control
+| Shortcut | What it does |
+| --- | --- |
+| `Ctrl+A` / `Ctrl+E` | Start / end of the current line |
+| `Alt+B` / `Alt+F` | Back / forward one word |
+| `Ctrl+K` | Delete to the end of the line (saved for pasting) |
+| `Ctrl+U` | Delete to the start of the line (saved for pasting) |
+| `Ctrl+W` | Delete back to the previous whitespace, so one press removes a whole file path |
+| `Alt+D` | Delete to the end of the word |
+| `Ctrl+Y` | Paste the text you last deleted; `Alt+Y` afterward cycles through earlier deletions |
+| `Ctrl+_` or `Ctrl+Shift+-` | Undo the last edit to the prompt |
 
-| Shortcut | Action |
-|---|---|
-| `Ctrl+C` | Cancel the current operation or input |
-| `Ctrl+D` | Exit Claude Code (sends end-of-file signal) |
-| `Ctrl+L` | Clear the terminal screen (conversation history is preserved) |
-| `Ctrl+R` | Search through command history (type to filter, `Ctrl+R` again to cycle older matches) |
-| `Esc` + `Esc` | Rewind or summarize (restore code/conversation to a previous point, or summarize from a message) |
+## New lines in a prompt
 
-### Navigation and Output
+| Method | Works in |
+| --- | --- |
+| `\` then `Enter` | All terminals |
+| `Ctrl+J` | Any terminal, no setup |
+| `Shift+Enter` | iTerm2, WezTerm, Ghostty, Kitty, Warp, Apple Terminal, Windows Terminal. Other terminals: see Anthropic's "Terminal configuration" page |
+| `Option+Enter` | macOS, after setting Option as Meta |
+| Paste | Pasting multi-line text works directly |
 
-| Shortcut | Action |
-|---|---|
-| `Ctrl+O` | Toggle verbose output (shows detailed tool usage and execution steps) |
-| `Ctrl+G` | Open current prompt (or plan) in your default text editor |
-| `Ctrl+T` | Toggle task list visibility in the terminal status area |
-| `Up arrow` | Navigate to previous command in history |
-| `Down arrow` | Navigate to next command in history |
-| `Left / Right arrows` | Cycle through tabs in permission dialogs and menus |
+## Prefixes: the first character of a prompt
 
-### Permission Mode Switching
+| Type | Result |
+| --- | --- |
+| `/` | Commands and skills. Filter by typing letters |
+| `!` | Shell mode: runs a command directly, adds the output to the session, and Claude responds to it |
+| `@` | File path autocomplete |
+| `:` | Emoji shortcodes such as `:tada:` |
+| `?` on an empty prompt | Shows the shortcut help panel |
 
-| Shortcut | Action |
-|---|---|
-| `Shift+Tab` | Cycle through permission modes (default → auto-accept → plan mode → default) |
+## Transcript viewer (`Ctrl+O`)
 
-### Background Tasks
+| Key | What it does |
+| --- | --- |
+| `q`, `Ctrl+C` or `Esc` | Leave the viewer |
+| `{` / `}` | Jump to the previous or next prompt (fullscreen rendering) |
+| `[` | Write the full conversation to terminal scrollback so your terminal's search works (fullscreen rendering) |
+| `v` | Open the conversation in your `$VISUAL` or `$EDITOR` (fullscreen rendering) |
 
-| Shortcut | Action |
-|---|---|
-| `Ctrl+B` | Background the currently running command (tmux users: press twice) |
-| `Ctrl+X Ctrl+K` | Kill all background agents (chord sequence: press `Ctrl+X`, then `Ctrl+K`) |
+## Picking up an earlier session
 
-### Model and Thinking
+Open the session picker with `claude --resume`, or `/resume` inside a session.
 
-| Shortcut | Action |
-|---|---|
-| `Cmd+P` (Mac) / `Meta+P` (Win/Linux) | Switch model without clearing your prompt |
-| `Cmd+T` (Mac) / `Meta+T` (Win/Linux) | Toggle extended thinking on/off (run `/terminal-setup` first) |
+| Key | What it does |
+| --- | --- |
+| `Up` / `Down` | Move between sessions |
+| `Left` / `Right` | Collapse or expand grouped sessions |
+| `Enter` | Resume the highlighted session |
+| `Space` | Preview the session |
+| `Ctrl+R` | Rename the highlighted session |
+| `/` or any letter | Search (you can also paste a pull request URL) |
+| `Ctrl+A` | Show sessions from all projects; press again to go back |
+| `Ctrl+B` | Show only sessions from the current git branch |
+| `Esc` | Close the picker |
 
-### Paste
+(The first edition listed single-letter keys `P`, `R`, `A` and `B` for these; the current picker uses the keys above.)
 
-| Shortcut | Action |
-|---|---|
-| `Ctrl+V` | Paste image from clipboard |
-| `Cmd+V` (iTerm2) | Paste image from clipboard (iTerm2 only) |
-| `Alt+V` (Windows) | Paste image from clipboard |
+## Vim mode
 
----
+Turn it on in `/config` under Editor mode. The old `/vim` command was removed in Claude Code 2.1.92. In NORMAL mode, the common keys are:
 
-## Text Editing Shortcuts (Within the Prompt)
-
-These shortcuts work while you are typing in the prompt box — before you send your message.
-
-### Line Editing
-
-| Shortcut | Action |
-|---|---|
-| `Ctrl+K` | Delete from cursor to end of line (deleted text is saved for pasting) |
-| `Ctrl+U` | Delete the entire current line (deleted text is saved for pasting) |
-| `Ctrl+Y` | Paste the most recently deleted text |
-| `Alt+Y` (after Ctrl+Y) | Cycle through paste history (Mac: requires Option as Meta) |
-
-### Word Navigation
-
-| Shortcut | Action |
-|---|---|
-| `Alt+B` (Mac: requires Option as Meta) | Move cursor back one word |
-| `Alt+F` (Mac: requires Option as Meta) | Move cursor forward one word |
-
-### Multiline Input
-
-| Method | How |
-|---|---|
-| Quick escape (all terminals) | Type `\` then press `Enter` |
-| macOS default | `Option+Enter` |
-| iTerm2, WezTerm, Ghostty, Kitty | `Shift+Enter` (works out of the box) |
-| VS Code, Alacritty, Zed, Warp | `Shift+Enter` (run `/terminal-setup` to enable) |
-| Control sequence | `Ctrl+J` (line feed) |
-
----
-
-## Quick Commands (Prompt Prefixes)
-
-Type these at the start of your prompt to trigger special behavior:
-
-| Prefix | Action |
-|---|---|
-| `/` | Open command menu — shows all available slash commands |
-| `!` | Run a shell command directly without asking Claude (output is added to conversation) |
-| `@` | Trigger file path autocomplete — reference a file in your prompt |
-
----
-
-## Slash Commands (Built-in)
-
-Type `/` in Claude Code to see all available commands. These are the most commonly used:
-
-| Command | What it does |
-|---|---|
-| `/help` | Show available commands and shortcuts |
-| `/clear` | Clear conversation history and start fresh (previous session is saved and resumable) |
-| `/compact` | Compress conversation history to free up context space |
-| `/memory` | View all loaded CLAUDE.md and auto-memory files; toggle auto-memory |
-| `/permissions` | View and manage permission rules (allowlist and denylist) |
-| `/resume` | Open a conversation picker to resume a previous session |
-| `/rename` | Give the current session a descriptive name |
-| `/init` | Generate a CLAUDE.md file for the current project |
-| `/config` | Open the settings interface |
-| `/theme` | Change the color theme |
-| `/vim` | Enable vim-style editing mode |
-| `/add-dir` | Add an additional directory for Claude to access in the current session |
-| `/agents` | List available subagents and create new ones |
-| `/mcp` | Manage MCP server connections |
-| `/btw` | Ask a quick side question without adding it to conversation history |
-| `/effort` | Set the reasoning effort level: `/effort low`, `/effort medium`, `/effort high` |
-| `/model` | Switch to a different Claude model |
-| `/fast` | Toggle fast mode (lower latency, less thorough reasoning) |
-
----
-
-## VS Code Extension Shortcuts
-
-These shortcuts work inside the VS Code Claude Code extension panel.
-
-### Opening Claude
-
-| Shortcut | Action |
-|---|---|
-| Click spark icon (editor top-right) | Open Claude panel (requires a file to be open) |
-| Click spark icon (Activity Bar) | Open sessions list |
-| `Cmd+Shift+P` / `Ctrl+Shift+P` → "Claude Code" | Open via Command Palette |
-| Click "✱ Claude Code" in Status Bar | Open Claude (always available, even without a file open) |
-
-### Navigation
-
-| Shortcut | Action |
-|---|---|
-| `Cmd+Esc` / `Ctrl+Esc` | Toggle focus between editor and Claude |
-| `Cmd+Shift+Esc` / `Ctrl+Shift+Esc` | Open new Claude conversation in editor tab |
-| `Cmd+N` / `Ctrl+N` | Start new conversation (when Claude is focused) |
-
-### Working with Files
-
-| Shortcut | Action |
-|---|---|
-| `Option+K` / `Alt+K` | Insert @-mention reference for current file and selection into prompt |
-| `Shift` + drag file into prompt | Add file as attachment |
-| `Cmd+click` / `Ctrl+click` on image reference | Open image in default viewer |
-
-### Sending Messages
-
-| Setting | Default | Alternative |
-|---|---|---|
-| Send message | `Enter` | Enable `useCtrlEnterToSend` setting to use `Ctrl+Enter` instead |
-| New line in prompt | `Shift+Enter` | |
-
-### Checkpoints (VS Code Only)
-
-| Action | How |
-|---|---|
-| Reveal rewind button | Hover over any message |
-| Fork conversation from this point | Click rewind → "Fork conversation from here" |
-| Revert file changes to this point | Click rewind → "Rewind code to here" |
-| Fork and revert | Click rewind → "Fork conversation and rewind code" |
-
----
-
-## Vim Mode Shortcuts
-
-Enable vim mode with `/vim` or in `/config`. These shortcuts are available in NORMAL mode.
-
-### Mode Switching
-
-| Key | Action |
-|---|---|
+| Keys | What they do |
+| --- | --- |
 | `Esc` | Enter NORMAL mode |
-| `i` | Insert before cursor |
-| `I` | Insert at beginning of line |
-| `a` | Insert after cursor |
-| `A` | Insert at end of line |
-| `o` | Open new line below |
-| `O` | Open new line above |
+| `i` `I` `a` `A` `o` `O` | Insert before cursor / at line start / after cursor / at line end / new line below / new line above |
+| `h` `j` `k` `l` | Left, down, up, right |
+| `w` `e` `b` | Next word, end of word, previous word |
+| `0` `$` `^` | Line start, line end, first non-blank character |
+| `gg` `G` | Start, end of input |
+| `x` `dd` `D` | Delete character, line, to end of line |
+| `cc` `C` `cw` | Change line, to end of line, word |
+| `yy` `p` `P` | Copy line, paste after, paste before |
+| `u` `.` | Undo, repeat last change |
+| `>>` `<<` | Indent, dedent line |
+| `v` `V` | Start character-wise or line-wise selection |
 
-### NORMAL Mode Navigation
+The documentation lists more motions, text objects and visual-mode commands; this table is the common core. You can map `jj` (or another two-key sequence) to Escape with the `vimInsertModeRemaps` setting in your user settings.
 
-| Key | Action |
-|---|---|
-| `h` / `j` / `k` / `l` | Left / down / up / right |
-| `w` | Next word |
-| `b` | Previous word |
-| `e` | End of word |
-| `0` | Beginning of line |
-| `$` | End of line |
-| `gg` | Beginning of input |
-| `G` | End of input |
-| `f{char}` | Jump to next occurrence of character |
+## VS Code extension
 
-### NORMAL Mode Editing
+| Shortcut | What it does |
+| --- | --- |
+| `Cmd+Esc` / `Ctrl+Esc` | Toggle focus between editor and Claude |
+| `Cmd+Shift+Esc` / `Ctrl+Shift+Esc` | Open a new conversation in an editor tab |
+| `Cmd+N` / `Ctrl+N` | New conversation. Works only when Claude is focused and the `enableNewConversationShortcut` setting is on |
+| `Cmd+Shift+T` / `Ctrl+Shift+T` | Reopen the most recently closed Claude tab |
+| `Option+K` / `Alt+K` | Insert an @-mention of the current file and selection (editor must be focused) |
+| `Ctrl+Option+F` / `Ctrl+Alt+F` | Toggle Focus view, which hides tool calls and thinking |
+| `Enter` | Sends the prompt. Turn on the `useCtrlEnterToSend` setting to require `Ctrl/Cmd+Enter` |
 
-| Key | Action |
-|---|---|
-| `x` | Delete character |
-| `dd` | Delete line |
-| `cc` | Change line |
-| `yy` | Copy (yank) line |
-| `p` | Paste after cursor |
-| `P` | Paste before cursor |
-| `.` | Repeat last change |
-| `>>` | Indent line |
-| `<<` | Dedent line |
+On macOS Tahoe and later, `Cmd+Esc` may be taken by the system; see [Troubleshooting](/en/book1-getting-started/troubleshooting).
 
----
+## JetBrains
 
-## Session Picker Shortcuts
+`Cmd+Esc` / `Ctrl+Esc` opens Claude Code from the editor. `Cmd+Option+K` (Mac) or `Alt+Ctrl+K` (Linux/Windows) inserts a file reference such as `@src/auth.ts#L1-99`.
 
-When the session picker is open (from `claude --resume` or `/resume`):
+## Handy command-line flags
 
-| Key | Action |
-|---|---|
-| `↑` / `↓` | Navigate between sessions |
-| `→` / `←` | Expand or collapse grouped sessions |
-| `Enter` | Resume highlighted session |
-| `P` | Preview session content |
-| `R` | Rename highlighted session |
-| `/` | Search/filter sessions |
-| `A` | Toggle between current directory and all projects |
-| `B` | Filter to sessions from current git branch |
-| `Esc` | Exit picker or cancel search |
-
----
-
-## CLI Flags That Function Like Shortcuts
-
-These command-line flags change Claude Code's behavior when starting a session:
-
-| Flag | Effect |
-|---|---|
+| Command | Effect |
+| --- | --- |
 | `claude -c` | Continue the most recent conversation |
-| `claude -r` | Open session picker (or `claude -r name` to resume by name) |
-| `claude -n name` | Start session with a custom name |
-| `claude --permission-mode plan` | Start in plan mode |
-| `claude --permission-mode acceptEdits` | Start in auto-accept mode |
-| `claude -v` | Print Claude Code version number |
-| `claude update` | Update Claude Code to the latest version |
+| `claude -r` | Open the session picker; `claude --resume <name>` resumes a named session |
+| `claude -n <name>` | Start a session with a display name |
+| `claude --permission-mode plan` | Start in plan mode (other choices include `acceptEdits`, `auto`, `manual`) |
+| `claude update` | Update Claude Code |
+| `claude -v` | Print the version |
 
----
+### Check that it worked
 
-*Press `?` in any Claude Code session to see shortcuts specific to your current terminal and platform configuration.*
+Start `claude`, type `?` on the empty prompt: the help panel opens with the shortcuts for your terminal. Then type a few words and press `Ctrl+U`: the line clears, and `Ctrl+Y` brings it back.
+
+## Sources
+
+- Anthropic, "Interactive mode" (keyboard shortcuts, vim mode), Claude Code documentation, accessed 2026-10-04. https://code.claude.com/docs/en/interactive-mode
+- Anthropic, "Work with sessions" (session picker), accessed 2026-10-04. https://code.claude.com/docs/en/sessions
+- Anthropic, "Use Claude Code in VS Code" and "JetBrains IDEs", accessed 2026-10-04. https://code.claude.com/docs/en/vs-code
+- Anthropic, Claude Code commands reference (`/vim` removed), accessed 2026-10-04. https://code.claude.com/docs/en/commands
+- Local CLI: `claude --help`, version 2.1.289.

@@ -1,294 +1,145 @@
 # Glossary
 
-A plain-language reference for terms you will encounter in this book and throughout the Claude Code ecosystem. Technical jargon translated into everyday language.
+> Verified on 2026-10-04 with Claude Code 2.1.289.
 
----
+Plain-language definitions for terms in this book. Claude Code terms follow Anthropic's own glossary; general programming terms are explained informally.
 
 ## A
 
-**Agent**
-A program that can take actions — not just produce text — to complete tasks. Claude Code is an agent: it reads files, runs commands, edits code, and makes git commits. Compare to a regular chatbot, which only produces text for a human to act on.
+**Agent.** A program that takes actions, not just produces text. Claude Code reads files, runs commands, and edits code. A plain chatbot only writes text for you to act on.
 
-**Agentic**
-Describing a program that can take autonomous actions. When Claude Code "acts agentically," it is completing a multi-step task by running tools and making decisions, not waiting for a human at every step.
+**Agent view.** A screen in the terminal that lists your background Claude Code sessions, grouped by state (needs input, working, completed), so you can manage many at once. Open it with `claude agents`, or press the left arrow on an empty prompt. Anthropic labels it a research preview. See [Agent View and Sessions](/en/book2-advanced/07-agent-view-and-sessions).
 
-**API (Application Programming Interface)**
-A defined way for one program to talk to another. When your weather app shows the current temperature, it is using a weather service's API to ask "what is the weather right now?" APIs define what questions you can ask and what format the answers come in. See Chapter 13.
+**Agentic loop.** The cycle Claude works through on every task: gather context, take an action, check the result, repeat until done. You can interrupt it at any point.
 
-**API key**
-A secret string of characters that identifies you when calling an API. Like a password, but for apps. Must be stored securely and never committed to git.
+**AGENTS.md.** A Markdown file of instructions for AI coding agents, used by several tools. Since Claude Code 2.1.277, if your repository has one and no CLAUDE.md, Claude reads it as your project instructions. See [CLAUDE.md and AGENTS.md](/en/book1-getting-started/14-claude-md).
 
-**Auto memory**
-A feature where Claude Code automatically saves notes about your project — build commands, workflow preferences, architectural discoveries — that are loaded at the start of future sessions. See Chapter 15.
+**API key.** A secret string that identifies you to a service. Treat it like a password: keep it in an environment variable, never in a file you commit to git.
 
-**Auto-accept mode**
-A permission mode where Claude Code applies file edits without asking for approval on each one. Useful for bulk changes when you trust Claude's direction. Activated with `Shift+Tab`. See Chapter 6.
+**Auto memory.** Notes Claude writes to itself from your corrections and preferences, stored on your computer under `~/.claude/projects/`. See [Memory](/en/book1-getting-started/15-memory).
 
----
+**Auto mode.** A permission mode in which a second model, the classifier, reviews Claude's actions instead of you, so most run without a prompt. It blocks things like going beyond what you asked, touching unrecognized infrastructure, or acting on instructions hidden in content Claude read. In Claude Code 2.1.283 and later it is the starting mode for interactive terminal and VS Code sessions. See [Auto Mode and Permissions](/en/book1-getting-started/06-auto-mode-and-permissions).
 
 ## B
 
-**Bash**
-The most common Unix shell (command-line interpreter). When Claude Code runs commands on your computer, it typically runs them in Bash. The `!` prefix in Claude Code lets you run Bash commands directly.
+**Branch (git).** An independent line of work in a git repository, so you can change things without touching the main version. See [Git Workflows](/en/book1-getting-started/10-git-workflows).
 
-**Branch (git)**
-An independent line of development in a git repository. Creating a branch lets you work on a feature or bug fix without affecting the main codebase. When the work is done, you merge the branch back in. See Chapter 10.
-
-**Build**
-The process of converting your source code into a form that can be run or deployed. A "build command" is what triggers this process (like `npm run build`).
-
----
+**Bash.** A common command-line interpreter. Claude Code uses a Bash tool to run commands on your machine. Typing `!` at the start of a prompt runs a command directly.
 
 ## C
 
-**CI/CD (Continuous Integration / Continuous Deployment)**
-Automated processes that run tests and deploy code whenever changes are pushed to a repository. Claude Code can be used inside CI/CD pipelines.
+**CLI (command-line interface).** A program you use by typing commands. Claude Code's terminal interface is a CLI.
 
-**CLI (Command-Line Interface)**
-A text-based way of interacting with a program by typing commands. Claude Code's terminal interface is a CLI. Contrasted with a GUI (Graphical User Interface), which uses visual elements like buttons and menus.
+**CLAUDE.md.** A Markdown file of persistent instructions you write for Claude. It loads at the start of every session. It can live at project, user, or organization level.
 
-**CLAUDE.md**
-A Markdown file that gives Claude Code persistent instructions for a project, your personal workflow, or your entire organization. Claude reads it at the start of every session. See Chapter 14.
+**Command.** Something you invoke by typing `/name`, such as `/clear`, `/model` or `/compact`. Older material calls these "slash commands" and "custom commands"; custom ones are now packaged as skills.
 
-**Commit**
-A saved snapshot of your project's state in git. Each commit has a message describing what changed and why. "Committing" means creating this snapshot. See Chapter 10.
+**Commit.** A saved snapshot of your project in git, with a message explaining what changed.
 
-**Context window**
-The total amount of text Claude can "see" and hold in its working memory at one time. Think of it like a desk — there is only so much you can have laid out at once. Long conversations or large files consume more of the context window.
+**Compaction.** Summarizing a long conversation automatically when the context window nears its limit: older tool output is cleared first, then the conversation is summarized. The project-root CLAUDE.md and auto memory survive and reload from disk; instructions you gave only in chat may be lost. Run `/compact` to do it yourself.
 
-**Conventional Commits**
-A widely-used standard for writing git commit messages. Messages follow the format `type: description` where type is something like `feat`, `fix`, `docs`, or `chore`. Claude Code uses this format when writing commit messages.
-
----
+**Context window.** Claude's working memory for a session: your conversation, file contents, command output, CLAUDE.md, and more. Think of a desk with limited space. Run `/context` to see what is using it.
 
 ## D
 
-**Default mode**
-The standard permission mode in Claude Code where Claude asks for permission before editing files or running commands. The safe starting point for most work. See Chapter 6.
+**Default mode (Manual).** The permission mode where Claude asks before most edits and commands. The setting is called `default`; screens label it Manual.
 
-**Denylist**
-A list of tools or commands that Claude Code is never allowed to use, regardless of other settings. Created using `deny` rules in your settings file. See Chapter 6.
-
-**Dependency**
-A library or package that your project needs to function. Dependencies are listed in files like `package.json` (JavaScript) or `requirements.txt` (Python) and installed by running commands like `npm install`.
-
-**Diff**
-A view showing what has changed between two versions of a file. Lines starting with `-` are removed; lines starting with `+` are added. Claude Code shows you diffs of proposed edits before applying them. See Chapter 8.
-
-**Directory**
-A folder. "Navigate to a directory" means "go to a folder" in your terminal.
-
----
+**Diff.** A view of what changed between two versions of a file: removed lines and added lines. Claude shows diffs of proposed edits.
 
 ## E
 
-**Environment variable**
-A value stored in your system's environment, accessible to programs but not hardcoded in their source files. API keys and database passwords are typically stored as environment variables. Defined in `.env` files. See Chapter 13.
+**Effort level.** A setting for how much reasoning Claude applies on each step. Lower is faster and cheaper; higher thinks harder. Set it with `/effort`. The levels depend on the model: `low`, `medium`, `high`, `xhigh` and `max` on the current models, without `xhigh` on Opus 4.6 and Sonnet 4.6. See [Voice, Fast Mode and Effort](/en/book2-advanced/20-voice-fast-effort).
 
-**.env file**
-A file containing environment variables for your project. Typically gitignored (not committed to version control) because it contains secrets. Named literally `.env` with no file extension.
+**Environment variable.** A named value stored in your system environment rather than in code. API keys usually live here.
 
-**Effort level**
-A setting that controls how much reasoning Claude applies to a task. Set with `/effort low|medium|high|max`. The `max` level uses Claude's extended thinking and is only available with Claude Opus.
-
----
+**Extended thinking.** Visible step-by-step reasoning the model does before answering.
 
 ## F
 
-**File path**
-The location of a file on your computer, described as a series of directories separated by `/`. Absolute paths start from the root (`/Users/alice/project/src/app.js`). Relative paths start from the current directory (`./src/app.js`).
+**Fork.** A copy of your conversation so far, made so a second line of work can continue from it. `/fork [prompt]` copies the conversation into a new background session while you keep working (version 2.1.212 and later). `/subtask <task>` instead spawns a forked subagent that inherits the conversation and returns its result to it; on versions 2.1.161 to 2.1.211 that command was named `/fork`. `/branch [name]` copies the conversation and switches you into the copy. Not to be confused with a git or GitHub fork, which is a personal copy of a repository. See [Slash Commands](/en/book2-advanced/01-slash-commands).
 
-**Fork (git)**
-Creating a copy of a repository that you control independently. On GitHub, "forking" is how you make your own copy of someone else's project to modify.
-
----
+**Frontmatter.** A block of settings at the very top of a Markdown file between two `---` lines. Skills, subagents and rule files read their configuration from it.
 
 ## G
 
-**Git**
-A version control system that tracks changes to your files over time. Lets you view history, undo changes, work on multiple features simultaneously, and collaborate with others. See Chapter 10.
+**Git / GitHub.** Git tracks changes to files over time. GitHub is a website for hosting git repositories and collaborating through pull requests.
 
-**.gitignore**
-A file that tells git which files to ignore. Common entries: `.env` (secrets), `node_modules` (installed packages), compiled output. Files in `.gitignore` are not tracked or committed.
-
-**GitHub**
-A website for hosting git repositories and collaborating on code. Provides pull requests, issue tracking, and project management on top of git.
-
-**Glob pattern**
-A simplified pattern-matching syntax used to match file paths. `*` matches anything within one directory level; `**` matches recursively. Example: `src/**/*.js` matches all `.js` files anywhere under `src/`.
-
----
+**Glob pattern.** A short pattern for matching file paths: `*` matches within one folder, `**` matches across folders. `src/**/*.js` matches every `.js` file under `src/`.
 
 ## H
 
-**Headless mode**
-Running Claude Code in a non-interactive, scriptable way using the `-p` flag. No interface — just input in, output out. Useful for automation and scripts.
+**Harness.** The software around the model that turns it into a coding agent: file access, running commands, permission checks, loading memory, and the loop that chains steps together. Claude Code is the harness; Claude is the model inside it. Anthropic's term is "agentic harness". See [Harness Engineering](/en/book3-architect/01-harness-engineering).
 
-**Hook**
-A custom command that runs automatically at specific points in Claude Code's workflow — before a tool use, after a file edit, when a commit is made, etc. Hooks are configured in settings files.
-
-**HTML (HyperText Markup Language)**
-The language used to define the structure of web pages. Every website is built on HTML. See Chapter 11.
-
----
+**Hook.** A handler that runs automatically at a fixed point in Claude Code's lifecycle, such as before a tool runs or after a file edit. Unlike instructions in CLAUDE.md, hooks always fire. See [Hooks](/en/book2-advanced/09-hooks).
 
 ## I
 
-**IDE (Integrated Development Environment)**
-A code editor with built-in tools for running, debugging, and managing code. VS Code, Cursor, and JetBrains products are IDEs. Claude Code has extensions for all of them. See Chapter 16.
-
----
-
-## J
-
-**JavaScript**
-The programming language that runs in web browsers and powers interactive websites. Also runs on servers via Node.js. The most widely used programming language in the world.
-
-**JSON (JavaScript Object Notation)**
-A text format for storing and transmitting structured data. API responses are usually JSON. It looks like: `{"name": "Alice", "age": 30}`.
-
----
-
-## L
-
-**Library**
-Pre-written code that you can use in your project. Instead of writing common functionality from scratch, you use a library that already implements it. Also called a "package" or "dependency."
-
----
+**IDE.** Integrated development environment: a code editor with built-in tools. VS Code, Cursor and the JetBrains editors are IDEs. See [IDE Integration](/en/book1-getting-started/16-ide-integration).
 
 ## M
 
-**Markdown**
-A simple text formatting syntax. This book is written in Markdown. `**bold**` becomes **bold**, `# Heading` becomes a heading. CLAUDE.md files use Markdown.
+**Markdown.** A simple text format: `# Heading`, `**bold**`. CLAUDE.md files are Markdown.
 
-**MCP (Model Context Protocol)**
-An open standard for connecting Claude Code to external tools and data sources. With MCP servers, Claude can access databases, read design documents in Google Drive, update tickets in Jira, and more.
+**MCP (Model Context Protocol).** An open standard for connecting Claude to outside tools and data, such as Slack, a database, or a browser. An MCP server is the program that provides them.
 
-**Merge**
-Combining changes from one git branch into another. A "merge conflict" occurs when the same part of a file was changed in both branches in incompatible ways. See Chapter 10.
-
-**Modal**
-A popup window or dialog that appears over the main interface, requiring attention before you can continue.
-
----
+**Mod.** A plugin that changes how Claude Code looks and behaves. It is made of JavaScript or TypeScript event handlers that run inside Claude Code, and can draw panes, add commands or step into tool calls. A mod runs with your permissions, so install only from authors you trust. See [Plugins, Marketplaces and Mods](/en/book2-advanced/04-plugins-marketplace-mods).
 
 ## N
 
-**Node.js**
-A runtime that lets you run JavaScript outside a web browser — on servers or on your own computer. Many development tools (including Claude Code) are built on Node.js.
-
-**npm (Node Package Manager)**
-The default package manager for Node.js projects. Used to install JavaScript packages and run scripts defined in `package.json`.
-
----
+**Non-interactive mode.** Running one prompt and exiting, with `claude -p`. Used in scripts and automation. Older material calls it "headless mode".
 
 ## P
 
-**Package**
-Another word for a library or dependency. A bundle of code you install and use in your project.
+**Permission mode.** The baseline for how much Claude may do without asking. Press `Shift+Tab` to cycle. The modes are `default` (Manual), `acceptEdits`, `plan`, `auto`, `dontAsk` and `bypassPermissions`. Which of them appear in the cycle depends on your setup.
 
-**Package manager**
-A tool for installing, updating, and managing packages. `npm`, `yarn`, and `pnpm` are JavaScript package managers. `pip` is Python's. `brew` is macOS's.
+**Plan mode.** A permission mode where Claude researches and proposes changes without editing your files, then waits for your approval.
 
-**Permission mode**
-One of Claude Code's six modes that controls how it asks for approval when using tools. The modes are: Default, Auto-accept, Plan, Auto, DontAsk, and Bypass. See Chapter 6.
+**Plugin.** A bundle of skills, hooks, subagents and MCP servers installed as one unit.
 
-**Plan mode**
-A permission mode where Claude Code can read and analyze your code but cannot modify anything. Claude produces a plan for you to review before it takes action. See Chapter 6.
+**Prompt.** The message you type to Claude.
 
-**Prompt**
-Your message to Claude Code. The text you type to tell Claude what you want. Also refers to the `>` character in the terminal that indicates Claude is waiting for input.
-
-**Pull request (PR)**
-A proposal to merge your branch into the main codebase, typically reviewed by others. The standard way to contribute changes to a shared repository. Claude Code can create pull requests automatically. See Chapter 10.
-
----
+**Pull request (PR).** A proposal to merge a branch into the main codebase, usually reviewed first.
 
 ## R
 
-**Refactoring**
-Improving the structure, readability, or organization of code without changing what it does. "Refactor the login function" means make the code better, not add new functionality.
+**Repository (repo).** A project tracked by git, with all its files and history.
 
-**Repository (repo)**
-A project tracked by git, including all its files and history. "The project's repository" is where all the code and its history live.
+**Routine.** A saved Claude Code setup (a prompt, one or more repositories, and connectors) that runs automatically on Anthropic's cloud, so it works with your laptop closed. It can start on a schedule, from an API call, or on a GitHub event. Create one at claude.ai/code/routines or with `/schedule`. Anthropic labels routines a research preview. See [Scheduled Agents and Routines](/en/book3-architect/06-scheduled-agents-routines).
 
-**REST API**
-The most common style of web API. REST APIs use HTTP methods (GET, POST, PUT, DELETE) and URLs to define operations. The weather API in Chapter 13 is a REST API.
-
----
+**Rules.** Instruction files in `.claude/rules/` that load alongside CLAUDE.md, optionally only when Claude touches matching files.
 
 ## S
 
-**Session**
-A single conversation with Claude Code, from when you start it to when you exit. Sessions can be resumed later with `claude --resume`.
+**Session.** One conversation with Claude Code in a directory, with its own context window. Resume with `claude --continue` or `claude --resume`.
 
-**Shell**
-A program that interprets your terminal commands. Bash and Zsh are common shells on Unix systems. PowerShell is common on Windows.
+**Skill.** A `SKILL.md` file with instructions or a workflow that Claude loads when relevant, or that you invoke with `/skill-name`. See [Custom Skills](/en/book2-advanced/02-custom-skills).
 
-**Slash command**
-A command you type in Claude Code starting with `/`. Examples: `/help`, `/clear`, `/memory`, `/permissions`, `/effort`, `/vim`, `/agents`, `/mcp`. See the Keyboard Shortcuts appendix for a full list.
-
-**SSH**
-A protocol for securely connecting to remote computers. Used when deploying code or accessing servers.
-
-**Subagent**
-A Claude Code process launched by another Claude Code process to handle a subtask in parallel. Claude can spin up multiple subagents for independent pieces of work and coordinate their results. See `/agents`.
-
-**Stack trace**
-The list of function calls that were active when a crash occurred. Reading a stack trace from bottom to top shows you the path from the outermost code to the exact line where the error happened. See Chapter 12.
-
-**Static site**
-A website made of plain HTML, CSS, and JavaScript files that can be served directly without a server running code. The portfolio built in Chapter 11 is a static site.
-
----
+**Subagent.** A helper that works in its own context window on a delegated task and reports a summary back. See [Subagents](/en/book2-advanced/05-subagents).
 
 ## T
 
-**Terminal**
-A text-based interface for interacting with your computer by typing commands. Also called "command line" or "command prompt." Claude Code runs in your terminal. See Chapters 1 and 4.
+**Terminal.** A text window where you type commands. Claude Code runs in it.
 
-**Token**
-The basic unit Claude uses to process text. Roughly, one token is about 4 characters or 3/4 of a word. Tokens affect billing (you pay per token with the API) and context window limits.
+**Token.** The unit a model reads and writes: roughly three quarters of an English word. Tokens drive cost and context limits.
 
-**Tool call**
-A request from Claude to use one of its tools (Read, Edit, Bash, WebSearch, etc.) during a conversation. Each tool call is shown to you before it executes in default permission mode.
-
-**Tool**
-In Claude Code, a tool is a specific capability Claude can invoke: reading files (Read tool), editing files (Edit/Write tools), running commands (Bash tool), searching the web (WebSearch tool). You control which tools Claude can use and when.
-
-**TypeScript**
-A version of JavaScript that adds type checking. TypeScript code catches many common bugs before they run. All TypeScript is compiled to JavaScript before running.
-
----
+**Tool.** An action Claude can take: read a file, edit code, run a command, search the web.
 
 ## V
 
-**Version control**
-A system that tracks changes to files over time, allowing you to view history and revert to previous states. Git is the most popular version control system.
+**Verification loop.** A check Claude can run itself, such as a test suite, so it keeps working until the check passes instead of stopping at "looks right". See [Check the Work](/en/book1-getting-started/12-check-the-work).
 
-**Vim mode**
-An optional editing mode inside Claude Code's prompt input that uses Vim-style key bindings. Enable with `/vim` or in `/config`. In NORMAL mode, you can navigate and edit with `h/j/k/l`, `w/b`, `dd`, `yy`, etc.
-
-**VS Code (Visual Studio Code)**
-A free, open-source code editor made by Microsoft. The most widely used code editor in the world. Has an official Claude Code extension. See Chapter 16.
-
----
+**Vim mode.** An optional editing mode for the prompt box with Vim-style keys. Turn it on in `/config` under Editor mode. (The old `/vim` command was removed.)
 
 ## W
 
-**Working directory**
-The folder your terminal is currently "in." Commands run relative to the working directory. When you start Claude Code, the working directory is your project root.
+**Worktree.** An extra checked-out copy of a repository in a separate folder, so parallel agents do not overwrite each other. See [Worktrees](/en/book2-advanced/08-worktrees).
 
----
+## Sources
 
-## Y
-
-**YAML**
-A text format for configuration files, popular for settings and build configuration. Uses indentation to show structure. You may encounter `.yaml` or `.yml` files in projects.
-
-**yolo mode**
-An informal name sometimes used for Claude Code's bypass permissions mode, where all permission prompts are skipped. Should only be used in safe, isolated environments. See Chapter 6.
-
----
-
-*This glossary covers terms used in Book 1. Additional terms specific to advanced topics appear in Book 2.*
+- Anthropic, Claude Code Glossary, accessed 2026-10-04. https://code.claude.com/docs/en/glossary
+- Anthropic, "Mods overview", accessed 2026-10-04. https://code.claude.com/docs/en/plugins/mods/overview
+- Anthropic, "Automate work with routines", accessed 2026-10-04. https://code.claude.com/docs/en/routines
+- Anthropic, "Agent view", accessed 2026-10-04. https://code.claude.com/docs/en/agent-view
+- Anthropic, "Create custom subagents" (fork section), accessed 2026-10-04. https://code.claude.com/docs/en/sub-agents
+- Anthropic, "Model configuration" (effort levels), accessed 2026-10-04. https://code.claude.com/docs/en/model-config
+- Anthropic, Claude Code commands reference, accessed 2026-10-04. https://code.claude.com/docs/en/commands

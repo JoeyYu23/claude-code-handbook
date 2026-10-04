@@ -4,7 +4,7 @@ layout: home
 hero:
   name: "Claude Code"
   text: "Handbook"
-  tagline: The definitive guide to Claude Code — from zero to mastery. For everyone, no prior coding experience required.
+  tagline: Second Edition · October 2026. The definitive guide to Claude Code — from zero to mastery. For everyone, no prior coding experience required.
   image:
     src: /logo.svg
     alt: Claude Code Handbook
@@ -27,12 +27,12 @@ features:
     linkText: Start Book 1 →
   - icon: ⚡
     title: Book 2 — Power User
-    details: Skills, sub-agents, hooks, MCP protocol, token optimization, desktop app, plugins. 22 chapters to unlock full power.
+    details: Skills, plugins and mods, subagents, the agent view, hooks, MCP or CLI, context engineering, limits and caching. 20 chapters.
     link: /en/book2-advanced/
     linkText: Explore Book 2 →
   - icon: 🏗️
     title: Book 3 — Architect
-    details: Harness engineering, agent teams, scheduled tasks, cloud deployment, team workflows, security & cost. 9 chapters on system-level design.
+    details: Harness engineering, verification, many agents and agents checking agents, containment, measured cost, portability. 13 chapters.
     link: /en/book3-architect/
     linkText: Explore Book 3 →
 ---
@@ -41,7 +41,7 @@ features:
 
 ## Three Books, One Complete Journey
 
-This handbook is organized as three standalone books. Read in order, or jump to what you need.
+This handbook is organized as three standalone books. Read in order, or jump to what you need. Coming from the first edition? Start with [What's New in the Second Edition](/en/whats-new).
 
 ### Book 1: Getting Started · 16 chapters
 
@@ -51,19 +51,19 @@ Takes you from "what is a terminal?" to building your first real project with Cl
 
 [Start reading Book 1 →](/en/book1-getting-started/01-what-is-claude-code)
 
-### Book 2: Power User · 22 chapters
+### Book 2: Power User · 20 chapters
 
 > *For developers ready to unlock the full power.*
 
-Skills, sub-agents, hooks, MCP, token optimization, desktop app, plugins, worktree.
+Skills, plugins and mods, subagents, the agent view, worktrees, hooks, MCP or CLI, agents that see, context engineering, limits and caching.
 
 [Start reading Book 2 →](/en/book2-advanced/)
 
-### Book 3: Architect · 9 chapters
+### Book 3: Architect · 13 chapters
 
 > *For those building system-level AI workflows.*
 
-Harness engineering, agent teams, scheduled tasks, cloud deployment, team workflows, security & cost.
+Harness engineering, verification and evals, orchestrating many agents, agents checking agents, routines, cloud agents, containment, measured cost, portability, and the builder's job now.
 
 [Start reading Book 3 →](/en/book3-architect/)
 
@@ -71,7 +71,7 @@ Harness engineering, agent teams, scheduled tasks, cloud deployment, team workfl
 
 ### About the Author
 
-**Joey Yu** — Developer and heavy Claude Code user. Built 50+ projects with Claude Code including AI tools, optimization systems, and quant trading platforms. This handbook is based on 7 weeks of intensive usage consuming $3,400+ in API-equivalent tokens.
+**Joey Yu** — Developer and heavy Claude Code user. Built 50+ projects with Claude Code including AI tools, optimization systems, and quant trading platforms. The first edition was based on 7 weeks of intensive usage consuming $3,400+ in API-equivalent tokens.
 
 [GitHub](https://github.com/JoeyYu23) · [LinkedIn](https://www.linkedin.com/in/chenyangyu023) · 2235062003ycy@gmail.com
 

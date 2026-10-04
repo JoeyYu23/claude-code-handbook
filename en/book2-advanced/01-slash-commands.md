@@ -1,321 +1,194 @@
-# Chapter 1: Built-in Slash Commands
+# Slash Commands
 
-Claude Code ships with a rich set of built-in slash commands that cover everything from session management to security analysis. These are not just shortcuts — they are the primary interface for controlling Claude's behavior during a session. Mastering them will dramatically change how efficiently you work.
+> Verified on 2026-10-04 with Claude Code 2.1.289.
 
----
+Slash commands are how you steer a session without writing a prompt: switch models, free up context, branch a conversation, review a diff, or hand a long task to a loop that keeps going until a condition holds. This chapter covers the commands that matter most to a developer who runs agents all day, and the few that changed meaning since early 2026.
 
-## How Commands Work
+The full list is long and changes almost weekly. Treat the official [commands reference](https://code.claude.com/docs/en/commands) as the source of truth, and this chapter as the map of what to reach for and when.
 
-Type `/` anywhere in the Claude Code prompt to see a filterable list of available commands. Type additional letters to narrow the results. Some commands take required arguments (`<arg>`) while others accept optional arguments (`[arg]`). Commands not listed here may exist on your installation depending on your platform, plan, and environment — for example, `/desktop` only appears on macOS and Windows.
+## How commands work
 
-Skills you or your team have created also appear in the `/` menu alongside built-in commands.
+Type `/` at the prompt to open a filterable menu, then keep typing to narrow it. A few things are worth knowing about how the menu and the parser behave:
 
----
+- **Only at the start.** A command is recognized only at the start of your message. Anything after the name becomes its arguments.
+- **Queued or immediate.** If you send a command while Claude is still responding, Claude Code usually queues it until the turn ends. Some, such as `/status`, `/tasks` and `/usage`, run immediately without interrupting the response.
+- **Not everything shows for everyone.** Availability depends on platform, plan and provider. `/desktop`, for example, appears only on macOS and x64 Windows with a Claude subscription, and the artifact-based commands are unavailable on Amazon Bedrock, Google Cloud and Microsoft Foundry.
+- **Built-ins vs bundled skills.** Most entries are built-in commands with fixed behavior. Others, marked **Skill** in the reference, are bundled skills: prompts handed to Claude, which then does the work with its tools. `/code-review`, `/doctor`, `/loop`, `/batch`, `/design` and `/verify` are bundled skills. The difference matters: a bundled skill spends tokens and its quality depends on the model and effort level.
+- **Your skills share the menu.** Skills you write appear alongside built-ins, and MCP servers can expose prompts that appear as commands. A skill with the same name as a built-in replaces it in a local terminal session, though not its aliases. See [Custom Skills](/en/book2-advanced/02-custom-skills).
 
-## Complete Command Reference
+## The commands you will use daily
 
-### Session Management
-
-| Command | What it does |
-|---|---|
-| `/clear` | Clears conversation history and frees context. Aliases: `/reset`, `/new` |
-| `/compact [instructions]` | Summarizes the conversation to reclaim context; optional instructions focus what is preserved |
-| `/fork [name]` | Creates a branch of the current conversation at this point |
-| `/resume [session]` | Resumes a previous session by name or ID, or opens a session picker. Alias: `/continue` |
-| `/rename [name]` | Renames the current session for easier identification in `/resume` |
-| `/rewind` | Rewinds the conversation and code to a previous checkpoint. Alias: `/checkpoint` |
-| `/export [filename]` | Exports the current conversation as plain text |
-| `/loop` | Enters continuous loop mode where Claude keeps working until a stopping condition is met |
-| `/schedule` | Schedules a task or reminder for later execution |
-
-### Information and Diagnostics
+### Context and conversation
 
 | Command | What it does |
 |---|---|
-| `/help` | Shows help and available commands |
-| `/cost` | Shows token usage statistics for the current session |
-| `/context` | Visualizes context usage as a colored grid with optimization suggestions |
-| `/doctor` | Diagnoses and verifies your Claude Code installation and settings |
-| `/status` | Shows version, model, account, and connection status |
-| `/stats` | Shows daily usage history, session streaks, and overall usage patterns |
-| `/insights` | Generates a session analysis report (interaction patterns, friction points) |
-| `/usage` | Shows current plan usage limits and rate limit status |
-| `/release-notes` | Shows what changed in the current Claude Code version |
+| `/clear [name]` | Starts a new conversation with empty context. Pass a name to label the old one in the `/resume` picker. Aliases: `/reset`, `/new` |
+| `/compact [instructions]` | Summarizes the conversation to free space, optionally focused by your instructions |
+| `/context [all]` | Shows context usage as a colored grid, with suggestions for heavy tools, memory bloat and capacity warnings |
+| `/resume [session]` | Resumes a conversation by ID or name, or opens the picker. Alias: `/continue` |
+| `/rename [name]` | Names the session; without a name, generates one from the conversation |
+| `/rewind` | Rolls code and conversation back to a checkpoint, or summarizes from a chosen message. Aliases: `/checkpoint`, `/undo` |
+| `/btw [question]` | Asks a side question without adding it to the conversation history |
+| `/export [filename]` | Exports the conversation as plain text |
 
-### Code and Git
+`/clear` is no longer a one-way door. In the same Claude Code process you can get the cleared conversation back from the rewind menu, or with `/resume`.
 
-| Command | What it does |
-|---|---|
-| `/diff` | Opens an interactive diff viewer showing uncommitted changes and per-turn diffs |
-| `/security-review` | Analyzes pending branch changes for security vulnerabilities |
-| `/pr-comments [PR]` | Fetches and displays GitHub PR comments (requires `gh` CLI) |
-| `/branch [name]` | Creates a new git branch. Alias: `/fork` (when used with a branch name) |
-| `/plan` | Enters plan mode where Claude proposes changes without executing them |
-
-### Configuration and Personalization
+### Model, effort and modes
 
 | Command | What it does |
 |---|---|
-| `/config` | Opens the Settings interface. Alias: `/settings` |
-| `/model [model]` | Selects or changes the AI model mid-session |
-| `/effort [low\|medium\|high\|max\|auto]` | Sets the model effort level |
-| `/theme` | Changes the color theme (light, dark, colorblind, ANSI variants) |
-| `/color [color\|default]` | Sets the prompt bar color for the current session |
-| `/vim` | Toggles Vim / Normal editing modes for the input prompt |
-| `/keybindings` | Opens or creates a keybindings configuration file |
-| `/memory` | Edits `CLAUDE.md` files and manages auto-memory entries |
-| `/init` | Initializes the project with a `CLAUDE.md` guide |
-| `/mobile` | Optimizes the interface for mobile or narrow-screen use |
-| `/sandbox` | Configures the sandboxing mode for code execution |
+| `/model [model]` | Switches the model and saves it as your default for new sessions. In the picker, press `s` on a row to switch for this session only |
+| `/effort [level\|auto\|status]` | Sets effort: `low` through `xhigh`, `max`, or `auto`. `max` lasts for the session only |
+| `/plan [description]` | Enters plan mode; with a description, starts planning that task right away |
+| `/fast [on\|off]` | Toggles fast mode |
+| `/permissions` | Manages allow, ask and deny rules, and shows recent auto mode denials. Alias: `/allowed-tools` |
+| `/config [key=value ...]` | Opens settings, or sets a key directly, for example `/config theme=dark` |
 
-### Agents and Tools
+Two behaviors are easy to miss. `/model` now persists your choice as the default unless you use the session-only `s` key. And changing the model or effort mid-session can cost you the prompt cache: Claude Code warns before a switch that would invalidate it. [Voice, Fast Mode and Effort](/en/book2-advanced/20-voice-fast-effort) and [Tokens, Limits and Caching](/en/book2-advanced/16-tokens-limits-caching) cover the trade-off.
+
+### Before you ship
 
 | Command | What it does |
 |---|---|
-| `/agents` | Views, creates, and edits sub-agent configurations |
-| `/tasks` | Lists and manages background tasks |
-| `/permissions` | Views or updates tool permissions for the current session. Alias: `/allowed-tools` |
-| `/hooks` | Shows all hook configurations organized by event type |
-| `/skills` | Lists available skills |
-| `/mcp` | Manages MCP server connections and OAuth authentication |
-| `/plugin` | Manages Claude Code plugins |
-| `/reload-plugins` | Reloads all plugins without restarting the session |
+| `/diff` | Reviews working-tree changes, including Claude's edits so far |
+| `/code-review [level] [--fix] [--comment] [--max-findings n] [target]` | Reviews the current diff, or a PR number, branch or path, for correctness bugs. Alias: `/review` |
+| `/security-review` | Checks the branch's diff against `origin`'s default branch for security vulnerabilities |
+| `/simplify [target]` | Looks for cleanup opportunities (reuse, simplification, efficiency, abstraction level) and applies them. It does not hunt for bugs |
+| `/verify` | Builds and runs your app to confirm a change works, rather than relying on tests alone. Runs only when you invoke it |
 
-### Quick Queries and Utilities
+## The new commands in depth
 
-| Command | What it does |
-|---|---|
-| `/btw <question>` | Asks a side question without adding it to the conversation history |
-| `/copy` | Copies the last assistant response to the clipboard |
-| `/fast [on\|off]` | Toggles fast mode (lower latency, reduced thoroughness) |
-| `/feedback [report]` | Submits feedback or a bug report. Alias: `/bug` |
-| `/remote-control` | Enables remote control of the current session. Alias: `/rc` |
+### `/goal`: keep working until a condition holds
 
-### IDE and Integrations
-
-| Command | What it does |
-|---|---|
-| `/chrome` | Configures Chrome browser integration |
-| `/install-github-app` | Sets up the Claude GitHub Actions app for a repository |
-| `/install-slack-app` | Installs the Claude Slack app via OAuth flow |
-
----
-
-## Key Commands in Depth
-
-### `/clear` — Reset Context
-
-Clears the conversation history and frees up context window space. Aliases: `/reset`, `/new`.
-
-Use this when a conversation has grown stale, you have solved one problem and are starting a new one, or the context is getting so large that Claude is losing track of early context.
+`/goal` sets a completion condition and lets Claude keep taking turns without you prompting each one. After every turn, a separate model checks whether the condition holds. If not, Claude starts another turn. The goal clears when the condition is met, when the evaluator judges it impossible, when a turn fails on an error you have to fix, or when you clear it.
 
 ```text
-/clear
+/goal all tests in test/auth pass and the lint step is clean
 ```
 
-This is not the same as quitting and restarting — it preserves your MCP connections, tool permissions, and session settings while wiping the message history.
+Setting a goal starts a turn at once, with the condition itself as the instruction. Run `/goal` with no argument to see the condition, how long it has run and how many turns were evaluated. `/goal clear` (or `stop`, `off`, `reset`, `none`, `cancel`) ends it early. One goal can be active per session.
 
-**The difference from `/compact`:** `/clear` completely discards history. `/compact` compresses it into a summary, keeping the essence. If you are mid-task and need to reduce context without losing your place, use `/compact`.
+Three things make a goal work well:
 
-```text
-/compact focus on the authentication changes we made
-```
+1. **The evaluator reads the transcript, not your disk.** It does not run commands or open files itself. Write the condition so that Claude's own output proves it: "`npm test` exits 0" works because the test output lands in the conversation.
+2. **One measurable end state, plus constraints.** A test result, a build exit code, a file count, an empty queue. Add what must not change, such as "no other test file is modified".
+3. **A bound.** Add a clause such as `or stop after 20 turns`. The condition can be up to 4,000 characters.
 
-### `/resume [session]` — Continue Previous Work
+A goal does not change your permission mode. In manual mode Claude still stops to ask before unapproved tool calls, so a goal only runs unattended in [auto mode](/en/book1-getting-started/06-auto-mode-and-permissions). The docs describe the pairing this way: auto mode removes per-tool prompts, and `/goal` removes per-turn prompts.
 
-Resumes a previous conversation by name or ID, or opens an interactive session picker. Alias: `/continue`.
+`/goal` is the session-scoped cousin of a Stop hook. A Stop hook lives in settings and applies to every session in its scope; `/goal` is typed once and lasts for this session. `/loop`, by contrast, repeats on a time interval. [Orchestrating Many Agents](/en/book3-architect/04-orchestrating-many-agents) shows `/goal` inside larger setups.
 
-```text
-/resume
-/resume auth-refactor
-```
+### `/branch`, `/fork` and `/subtask`: three ways to split a conversation
 
-Sessions are named automatically unless you used `/rename` or the `--name` flag at launch. Resuming is one of the most powerful features for long-running projects — you can pick up a multi-day refactor exactly where you left off.
+These three names are easy to mix up, and their meanings shifted during 2026. As of 2.1.289:
 
-### `/fork [name]` — Explore Without Risk
+| Command | What you get | Where the result goes |
+|---|---|---|
+| `/branch [name]` | A copy of the conversation, and you switch into it. The original stays available through `/resume` | You keep working in the branch |
+| `/fork [prompt]` | A copy of the conversation as a new **background session**, while you keep working here | The copy runs on its own; watch it in `claude agents` |
+| `/subtask <task>` | A forked **subagent** that inherits the full conversation and works in the background | Its result comes back into this conversation |
 
-Creates a fork of the current conversation at this point. Both the original and the fork continue independently from here.
+`/fork` with a prompt starts the copy working on it immediately. Unless the copy edits in place, Claude Code tells it to create its own worktree before changing code, so two copies do not trample each other's files. On versions 2.1.161 through 2.1.211, and whenever agent view is turned off, `/fork` starts a forked subagent instead, which is what `/subtask` does today. If an older tutorial says `/fork` "reports back", that is the behavior it describes.
 
-```text
-/fork try-approach-b
-```
+Use `/branch` to try a different direction yourself, `/fork` to let a second session pursue an idea in parallel, and `/subtask` for a side task whose answer you need in this conversation. [Subagents](/en/book2-advanced/05-subagents) and [The Agent View and Sessions](/en/book2-advanced/07-agent-view-and-sessions) go deeper.
 
-This is invaluable for exploring two different approaches to the same problem without losing either path.
+### `/usage`: one place for cost, limits and stats
 
-### `/rewind` — Go Back in Time
+`/usage` shows session cost, your plan's usage limits and activity stats. On Pro, Max, Team and Enterprise plans it includes a breakdown of what counts against your limits, including which skills, subagents and MCP servers drove usage. `/cost` and `/stats` are now aliases of `/usage` (`/stats` opens on the Stats tab).
 
-Rewinds the conversation and code to a previous checkpoint. Alias: `/checkpoint`.
+When a usage limit blocks you, `/rate-limit-options` lists ways to keep going: wait and continue automatically when the limit resets, add usage credits, or upgrade. [Tokens, Limits and Caching](/en/book2-advanced/16-tokens-limits-caching) covers how to read these numbers.
 
-```text
-/rewind
-```
+### `/doctor`: setup checkup and prompt audit
 
-Running this shows the conversation history so you can select where to rewind to. Claude Code automatically creates checkpoints as it works.
-
-### `/context` — Understand Context Usage
-
-Visualizes current context usage as a colored grid. Shows which tools and memory sources are consuming the most tokens. Includes warnings when you are approaching context limits and optimization suggestions.
-
-```text
-/context
-```
-
-This is the command to reach for when Claude seems to be forgetting earlier parts of the conversation, or when you want to preemptively check whether you need to compact.
-
-### `/cost` — Monitor Token Usage
-
-Shows token usage statistics for the current session. The output varies by subscription type — API key users see dollar amounts; subscription users see relative usage metrics.
-
-```text
-/cost
-```
-
-### `/doctor` — Diagnose Problems
-
-Diagnoses and verifies your Claude Code installation and settings. Checks for common configuration problems, connectivity issues, and version mismatches.
+`/doctor` used to be a read-only diagnostics screen. It is now a bundled skill that checks installation health (duplicate installs, `PATH` problems, unparseable settings files), flags slow hooks, finds skills, MCP servers and plugins whose context cost outweighs their use, and can trim checked-in `CLAUDE.md` files by cutting what Claude could derive from the code. It reports findings first and asks before changing anything. Alias: `/checkup`.
 
 ```text
 /doctor
+/doctor prompt-audit
 ```
 
-Run this first when anything is behaving unexpectedly. It often surfaces the problem immediately.
+`/doctor prompt-audit` (2.1.283 and later) is a different job: Claude audits your `CLAUDE.md` files, skills, agents and commands for outdated or conflicting instructions, including prompting patterns written for older models. Run it after a model upgrade. From the shell, `claude doctor` prints read-only installation diagnostics without starting a session.
 
-### `/model [model]` — Change the Model
+### `/code-review`: review at a chosen depth
 
-Selects or changes the AI model mid-session. Supports model aliases (`sonnet`, `opus`, `haiku`) or full model IDs. For models that support effort levels, use left/right arrows to adjust.
+`/code-review` reviews the current diff for correctness bugs, or a PR number, branch or path you pass. It takes an effort level and a few flags:
 
 ```text
-/model
-/model opus
-/model claude-sonnet-4-6
+/code-review
+/code-review high 1234
+/code-review --fix
+/code-review --comment
+/code-review ultra
 ```
 
-### `/effort [level]` — Control Reasoning Depth
+- The level (`low`, `medium`, `high`, `xhigh`, `max`) sets depth. With no level, it reuses the last one you typed.
+- `--fix` applies the findings. `--comment` posts them on the GitHub PR or GitLab merge request.
+- `--max-findings <n>|all|default` (2.1.288 and later) reports more or fewer findings than the usual limit.
+- `ultra` runs a deep multi-agent review in a cloud sandbox ([ultrareview](https://code.claude.com/docs/en/ultrareview)). It includes 3 free runs on Pro and Max, then needs usage credits. `/ultrareview` is an alias, and `claude ultrareview` runs it from the shell.
 
-Sets the model effort level without changing the model. Higher effort means more careful reasoning, at the cost of speed and token usage.
+`/code-review` runs as a background subagent, so you can keep working while it reviews. `/review` is now an alias of `/code-review`; before 2.1.223 it was a separate single-pass PR reviewer.
+
+### `/design`: draft UI as artboards
+
+`/design [brief]` (research preview, 2.1.265 and later) drafts UI mockups, screen flows, landing pages or posters as artboards on one canvas, published as a Claude Design artifact. You edit the artboards in a desktop browser, export them as PNG or PDF, and have Claude implement the one you pick.
 
 ```text
-/effort low
-/effort medium
-/effort high
-/effort max
-/effort auto
+/design a settings screen for a mobile banking app
 ```
 
-`max` applies to the current session only and requires Opus 4.6. Without an argument, shows the current level.
+It needs a session where artifacts are available and an account where the Design template is on, so it is unavailable on Bedrock, Google Cloud, Foundry and Claude Platform on AWS. [Agents That See](/en/book2-advanced/14-agents-that-see) covers the visual loop.
 
-### `/btw <question>` — Side Questions
+## Other commands worth knowing
 
-Asks a quick side question without adding it to the conversation history. Claude uses its current context to answer but the exchange is discarded afterward.
+| Command | What it does |
+|---|---|
+| `/background [prompt]` | Detaches this session to run as a background agent and frees the terminal. Alias: `/bg` |
+| `/tasks` | Lists background work in this session, including finished subagents |
+| `/batch <instruction>` | Splits a large change into 5 to 30 independent units, each in its own worktree and background subagent |
+| `/loop [interval] [prompt]` | Repeats a prompt while the session is open; omit the interval and Claude paces itself |
+| `/schedule [description]` | Creates and manages cloud [routines](/en/book3-architect/06-scheduled-agents-routines). Alias: `/routines` |
+| `/skills`, `/skill-doctor`, `/reload-skills` | List skills, show each skill's context cost and usage, and pick up skills changed on disk |
+| `/plugin`, `/reload-plugins` | Manage plugins and apply changes without restarting |
+| `/hooks`, `/mcp` | Show hook configuration; manage MCP servers (`/mcp reconnect all` retries failed ones) |
+| `/memory`, `/init` | Edit `CLAUDE.md` and auto memory; generate a starter `CLAUDE.md` |
+| `/import [codex\|gemini\|cursor]` | Brings instruction files, MCP servers, commands, subagents and skills over from another agent. `--dry-run` previews |
+| `/advisor [model\|off]` | Pairs your model with a stronger advisor it consults at key moments |
+| `/autocompact [auto\|<tokens>]` | Sets how full the context gets before auto-compaction |
+| `/output-style [style]` | Lists or switches output styles, for example `concise` |
+| `/remote-control`, `/teleport`, `/desktop` | Continue this session from another device, pull a cloud session here, or open it in the desktop app |
+| `/status`, `/help`, `/release-notes` | Version, model and account; help; changelog picker |
 
-```text
-/btw what does the AuthMiddleware class do?
-```
+### Removed or renamed commands
 
-This is ideal for quick clarifying questions while you are in the middle of a task. Unlike a regular prompt, `/btw` does not accumulate in your context.
+- `/pr-comments` was removed in 2.1.91. Ask Claude to read the PR comments instead.
+- `/vim` was removed in 2.1.92. Use `/config` and set the editor mode.
+- `/agents` no longer opens an editor (since 2.1.198). It reminds you to ask Claude to create subagents or to edit `.claude/agents/` directly.
+- `/mobile` shows a QR code to download the mobile app; it does not change the layout.
+- `/ultraplan` was removed. Use plan mode.
 
-### `/diff` — Interactive Diff Viewer
+## Patterns that pay off
 
-Opens an interactive diff viewer showing uncommitted changes and per-turn diffs. Use left/right arrows to switch between the current git diff and individual Claude turns. Use up/down to browse files.
+**Pair `/goal` with a check Claude can show.** "Done" should be a command whose output lands in the transcript. Vague goals ("make it better") run until the evaluator gives up or your turn bound hits.
 
-```text
-/diff
-```
+**Run `/context` before you `/compact`.** It tells you what is actually filling the window. Often the answer is an MCP server or a skill listing, not the conversation, and compaction will not fix that.
 
-Particularly useful for reviewing what Claude has changed across multiple turns before committing.
+**Review at two depths.** Use `/code-review` at your normal level on every change, and save `ultra` for changes that touch money, auth or data. Use `/simplify` separately; it looks at cleanup, not bugs.
 
-### `/security-review` — Security Scan Before Merging
+**Use `/btw` for questions that should not stick.** It answers from current context and leaves no trace in history, so it does not crowd out the task.
 
-Analyzes pending changes on the current branch for security vulnerabilities. Reviews the git diff and identifies risks like injection vulnerabilities, authentication issues, and data exposure.
+**Run `/doctor prompt-audit` after every model change.** Instructions written to coax an older model can fight a newer one.
 
-```text
-/security-review
-```
+### Check that it worked
 
-Run this before merging any branch that touches authentication, user input handling, or external API calls.
+1. Run `/status` and confirm the version line shows 2.1.289 or later. Several commands in this chapter have minimum versions.
+2. Type `/go` and confirm `/goal` is highlighted in the menu. If it is missing, see [Troubleshooting](/en/book1-getting-started/troubleshooting).
+3. Run `/usage` and confirm you see your plan's limits (or session cost on an API key).
+4. Run `/doctor`. It should finish with a findings report and ask before changing anything.
 
-### `/plan` — Review Before Acting
+## Sources
 
-Enters plan mode directly from the prompt. Claude analyzes your codebase and proposes changes without executing them, letting you review before anything is modified.
-
-```text
-/plan
-```
-
-### `/loop` — Continuous Execution Mode
-
-Enters continuous loop mode where Claude keeps working autonomously until a defined stopping condition is met. Useful for long-running tasks like processing all files in a directory or completing a series of related fixes.
-
-```text
-/loop
-```
-
-### `/schedule` — Deferred Tasks
-
-Schedules a task or reminder to run at a later time, letting you queue work without blocking your current session.
-
-```text
-/schedule
-```
-
-### `/permissions` — Tool Access Control
-
-Views or updates tool permissions for the current session. Alias: `/allowed-tools`.
-
-```text
-/permissions
-```
-
-### `/hooks` — View Hook Configuration
-
-Shows all hook configurations for the current session, organized by event type. Tells you which settings file each hook comes from and what command it runs.
-
-```text
-/hooks
-```
-
-### `/mcp` — MCP Server Management
-
-Manages MCP server connections and handles OAuth authentication flows for remote servers. Use this to check server status, authenticate with servers that require OAuth, and diagnose connection problems.
-
-```text
-/mcp
-```
-
-### `/agents` — Sub-agent Management
-
-Manages sub-agent configurations. View available agents, create new ones with guided setup or Claude-generated prompts, edit existing configurations, and see which agents are active when duplicates exist.
-
-```text
-/agents
-```
-
-### `/install-github-app` — GitHub Actions Setup
-
-Sets up the Claude GitHub Actions app for a repository. Walks you through selecting a repo and configuring the integration, including creating the required secrets.
-
-```text
-/install-github-app
-```
-
----
-
-## Power User Patterns
-
-**Start every new project with `/init`.** This one-time investment creates a `CLAUDE.md` that dramatically improves Claude's performance on your codebase for all future sessions.
-
-**Use `/compact` before big tasks.** If you have had a long exploratory conversation and now want Claude to implement something, compact first. Claude will have a fresh summary of the key decisions rather than a long raw history.
-
-**Chain `/pr-comments` with a fix request.** Fetch review comments, then immediately ask Claude to address them. Claude will read both the comments and the current code state and make targeted fixes.
-
-**Use `/btw` aggressively.** Many developers do not realize `/btw` exists. It is perfect for quick clarifying questions mid-task without polluting context.
-
-**Set effort explicitly for complex tasks.** For architecture decisions or security reviews, `/effort high` or `/effort max` gives you Claude's most careful reasoning. Drop back to `/effort auto` for routine tasks to preserve speed.
-
-**Use `/fork` to explore alternatives.** Before committing to a major refactor direction, fork the conversation and try both paths. You can always return to the original fork.
-
-**Rename sessions for multi-project workflows.** When working across multiple projects or long-running tasks, use `/rename` to give sessions meaningful names, then use `/resume` to switch between them by name.
-
----
-
-**Next up:** [Chapter 2 — Custom Skills](./02-custom-skills.md) — How to write your own slash commands and automate repeatable workflows.
+- Commands reference, Anthropic, accessed 2026-10-04. https://code.claude.com/docs/en/commands
+- Keep Claude working toward a goal, Anthropic, accessed 2026-10-04. https://code.claude.com/docs/en/goal
+- What's new, weekly digests for Weeks 20–37 (May 11 – September 11, 2026), Anthropic. https://code.claude.com/docs/en/whats-new
+- Claude Code changelog, entries 2.1.283 (2026-09-25) and 2.1.288 (2026-10-02), Anthropic. https://code.claude.com/docs/en/changelog
+- `claude --help`, Claude Code 2.1.289, run 2026-10-04.

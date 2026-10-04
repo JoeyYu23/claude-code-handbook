@@ -1,5 +1,9 @@
 # 第十三章：使用 API
 
+::: info 中文版仍为第一版（2026 年 3 月）
+第二版（2026 年 10 月）目前只有英文：[阅读英文第二版 →](/en/book1-getting-started/)
+:::
+
 ## 什么是 API？
 
 "API"是 Application Programming Interface（应用程序编程接口）的缩写。这听起来很技术性，但一旦你有了正确的类比，概念就很直接了。
