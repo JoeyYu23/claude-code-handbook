@@ -1,0 +1,397 @@
+# 第 4 章：云服务商与远程控制
+
+::: warning 第一版（2026 年 3 月）· 已存档
+你在看的是第一版，部分内容已过时。[阅读第二版 →](/zh/)
+:::
+
+## 在任何地方运行 Claude Code
+
+Claude Code 最初是为本地机器设计的。但如果你的工作跨越多个环境，该怎么办？如果你需要：
+
+- 在 AWS 的生产 GPU 集群上运行代码，同时从笔记本终端控制？
+- 坐在咖啡馆里调试运行在 Google Cloud 上的数据管道？
+- 从 Mac 向远程 Windows 机器执行代码？
+- 让多个团队成员通过 Web 界面同时贡献同一代码库？
+
+这些场景早已不是边缘情况，而是越来越成为默认工作方式。基于云的工作流、分布式团队和异构基础设施已是行业标准。Claude Code 通过三个集成系统处理所有这些场景：
+
+1. **云服务商集成** — 将 Claude Code 路由到 Bedrock、Vertex AI 或 Azure Foundry
+2. **远程控制** — 从你的终端访问和修改远程机器上的代码
+3. **Web 会话** — 以 claude.ai/code 作为桥梁连接云端虚拟机和协作环境
+
+本章介绍如何架构跨越整个基础设施的 Claude Code 部署——从本地开发到全球规模。
+
+---
+
+## Amazon Bedrock 集成
+
+Bedrock 是 AWS 的基础模型托管 API，负责处理身份验证、速率限制和多区域故障转移，让你无需操心这些底层细节。优势显著：你的 Claude Code 会话可以利用 AWS 基础设施、区域延迟优化端点以及企业合规框架（SOC2、HIPAA、FedRAMP）。
+
+### 设置与配置
+
+首先确保 AWS 凭证已就位，Claude Code 会读取标准位置：
+
+```bash
+# ~/.aws/credentials
+[default]
+aws_access_key_id = AKIA...
+aws_secret_access_key = ...
+
+# 或使用环境变量
+export AWS_ACCESS_KEY_ID="AKIA..."
+export AWS_SECRET_ACCESS_KEY="..."
+export AWS_REGION="us-east-1"
+```
+
+Bedrock 要求你在 AWS 控制台申请模型访问权限。导航到 **Bedrock > Model Access**，查看你所在区域有哪些 Claude 模型可用。启用后，通过环境变量配置 Claude Code 使用 Bedrock：
+
+```bash
+# 启用 Bedrock 作为后端
+export CLAUDE_CODE_USE_BEDROCK=1
+
+# 可选：指定默认模型
+export ANTHROPIC_DEFAULT_SONNET_MODEL="us.anthropic.claude-sonnet-4-6-20260320-v1:0"
+
+# AWS 区域（如果未在 AWS 配置中设定）
+export AWS_REGION="us-east-1"
+```
+
+将这些环境变量添加到你的 shell 配置文件（如 `~/.bashrc` 或 `~/.zshrc`）中以持久化。
+
+### 模型 ID 与区域可用性
+
+Bedrock 模型标识符遵循特定格式，最常用的如下：
+
+| 模型 | 模型 ID | 区域 | 最适合 |
+|---|---|---|---|
+| Claude Sonnet 4.6 | `claude-sonnet-4-6` | us-east-1, eu-west-1 | 默认选择：速度与精度兼顾 |
+| Claude Opus 4.6 | `claude-opus-4-6` | us-east-1, us-west-2 | 复杂推理、大上下文 |
+| Claude Haiku 4.5 | `claude-haiku-4-5` | us-east-1, us-west-2, ap-southeast-1 | 成本优化 |
+
+Bedrock 会将请求路由到指定的区域端点。访问 Bedrock 时，Claude Code 按以下顺序检查凭证：
+1. `~/.aws/credentials` 或环境变量中的凭证
+2. IAM 角色（在 EC2、ECS 或 Lambda 上运行时）
+3. STS 临时凭证（用于假设角色）
+
+常见错误及解决方法：
+
+| 错误 | 原因 | 解决方法 |
+|---|---|---|
+| `AccessDenied` | IAM 策略缺少 Bedrock 权限 | 向 IAM 策略添加 `bedrock:InvokeModel` |
+| `ModelNotAccessible` | 模型未在控制台中申请 | 在 AWS Console > Bedrock > Model Access 中启用 |
+| `ThrottlingException` | 超过预置吞吐量 | 使用按需定价或申请更高配额 |
+
+---
+
+## Google Vertex AI
+
+Vertex AI 是 Google Cloud 的统一 ML 平台，与 BigQuery、Dataflow 和 Pub/Sub 深度集成。如果你的数据管道已经在 GCP 上，这是理想选择。
+
+通过环境变量配置 Claude Code 使用 Vertex AI：
+
+```bash
+# 启用 Vertex AI 作为后端
+export CLAUDE_CODE_USE_VERTEX=1
+
+# 指定 GCP 区域和项目
+export CLOUD_ML_REGION="us-east5"
+export ANTHROPIC_VERTEX_PROJECT_ID="my-gcp-project-123"
+```
+
+Claude Code 使用应用默认凭证（Application Default Credentials），一次性设置即可：
+
+```bash
+gcloud auth application-default login
+```
+
+这会创建 `~/.config/gcloud/application_default_credentials.json`。也可以使用服务账号密钥：
+
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS="/path/to/service-account-key.json"
+```
+
+Vertex AI 使用与 Bedrock 相同的 Claude 模型，但提供 GCP 原生集成。例如，你可以直接从 BigQuery 数据集读取数据：
+
+```claude
+Read the file data/customers.csv and load it into BigQuery dataset 'analytics.staging'.
+```
+
+Claude Code 会自动将其转换为 `bq load` 命令，并使用你的 GCP 凭证执行。
+
+---
+
+## Microsoft Foundry
+
+微软的 AI 平台与 Azure ML 和 Copilot Studio 集成。如果你的组织以 Azure 为标准，Foundry 提供：
+
+- 带 GPU 资源池的托管推理
+- 企业合规（ISO 27001、SOC2）
+- 与 Azure DevOps、GitHub 和 Codespaces 的集成
+- 通过 Azure Cost Management 进行成本治理
+
+通过环境变量配置 Claude Code 使用 Foundry：
+
+```bash
+# 启用 Foundry 作为后端
+export CLAUDE_CODE_USE_FOUNDRY=1
+```
+
+使用 Azure CLI 进行身份验证：
+
+```bash
+az login
+az account set --subscription "12345678-..."
+```
+
+> **注意：** Microsoft Foundry 集成是较新的功能，具体配置细节可能随版本更新而变化。建议查阅 Claude Code 官方文档获取最新的 Foundry 配置指南。
+
+---
+
+## LiteLLM 网关（模型路由）
+
+LiteLLM 是一个开源代理，将多个 AI 服务商统一在同一个 API 后面。**注意：LiteLLM 不是 Claude Code 的原生 provider**，而是通过 API 代理的方式间接使用。
+
+### 配置方式
+
+首先在 LiteLLM 中定义路由规则：
+
+```yaml
+# ~/.litellm/config.yaml
+model_list:
+  - model_name: claude-default
+    litellm_params:
+      model: bedrock/claude-sonnet-4-6
+      region: us-east-1
+
+  - model_name: claude-fallback
+    litellm_params:
+      model: vertex-ai/claude-opus-4-6
+      project: my-gcp-project
+
+  - model_name: claude-budget
+    litellm_params:
+      model: bedrock/claude-haiku-4-5
+      region: us-west-2
+
+fallbacks:
+  - claude-default
+  - claude-fallback
+  - claude-budget
+```
+
+在本地启动 LiteLLM 服务器：
+
+```bash
+litellm --config ~/.litellm/config.yaml --port 8000
+```
+
+通过设置 `ANTHROPIC_BASE_URL` 环境变量将 Claude Code 指向 LiteLLM 代理：
+
+```bash
+export ANTHROPIC_BASE_URL="http://localhost:8000"
+```
+
+优势：
+
+- **自动故障转移**：Bedrock 宕机时，LiteLLM 自动切换到 Vertex AI
+- **成本优化**：廉价任务路由到 Haiku，高要求任务路由到 Opus
+- **服务商抽象**：无需修改代码即可切换服务商
+
+---
+
+## 远程连接
+
+有时你不在机器旁边——可能相隔 3000 英里，或者正在帮助同事调试他们的系统。Claude Code 支持通过 SSH 连接远程机器，在远端环境中直接运行。
+
+### 通过 SSH 使用 Claude Code
+
+最直接的远程使用方式是在远程机器上安装 Claude Code，然后通过 SSH 连接使用：
+
+```bash
+# 在远程机器上安装 Claude Code
+ssh user@remote-server
+npm install -g @anthropic-ai/claude-code
+
+# 之后每次使用时，SSH 连接后直接运行
+ssh user@remote-server
+cd /path/to/project
+claude
+```
+
+Claude Code 在远程机器上运行，所有文件操作和命令执行都在远端完成。你的本地终端只是 SSH 会话的显示窗口。
+
+### VS Code Remote 集成
+
+如果你使用 VS Code Remote SSH 或 Remote Containers，Claude Code 可以在远程环境中运行，同时利用 VS Code 的远程开发能力：
+
+1. 通过 VS Code 连接到远程机器
+2. 在远程终端中运行 `claude`
+3. Claude Code 会在远程文件系统上操作
+
+### 多机器工作流
+
+对于需要在多台机器间切换的场景，推荐使用 SSH 配置文件管理连接：
+
+```bash
+# ~/.ssh/config
+Host dev-gpu
+    HostName gpu-server.internal
+    User developer
+    IdentityFile ~/.ssh/id_rsa
+
+Host staging
+    HostName staging-01.prod.internal
+    User deploy
+    IdentityFile ~/.ssh/id_rsa
+```
+
+然后通过 SSH 连接到任意机器并使用 Claude Code：
+
+```bash
+ssh dev-gpu
+cd /home/ml/project
+claude
+```
+
+所有凭证、SSH 密钥和 API 密钥都留在远程机器上，你的笔记本始终看不到它们。
+
+---
+
+## Teleport（Web ↔ CLI 桥接）
+
+Teleport 是一个桥接 Web 会话和 CLI 会话的功能。你在一端开始工作，暂停，切换到另一端，然后继续。把它想象成上下文检查点。
+
+### `--teleport` 标志
+
+启动支持 Teleport 的会话：
+
+```bash
+claude --teleport
+```
+
+输出：
+```
+Session ID: tp_7f3a8c4b5d2e9a1f
+Share link: https://claude.ai/code/tp_7f3a8c4b5d2e9a1f
+```
+
+复制链接，粘贴到浏览器中。你现在在两个地方拥有同一个会话：终端和 Web。你读取的文件、做出的编辑、运行的命令——全部实时同步。
+
+典型工作流：
+
+1. **本地启动**：在终端运行 `claude --teleport`
+2. **构建上下文**：读取文件、运行测试、收集信息
+3. **切换到 Web**：点击分享链接，将会话移到 claude.ai
+4. **向同事说明**："这是我发现的"——他们在浏览器中看到你的文件和命令
+5. **获得帮助**：他们通过 Web UI 提出修改建议
+6. **回到终端**：切换回终端（你的机器持续运行）
+7. **完成工作**：在本地执行最终命令
+
+### 与远程机器结合
+
+在远程机器上通过 SSH 启动带 `--teleport` 的会话，然后将分享链接发给同事：
+
+```bash
+ssh user@staging-env-01
+cd /path/to/project
+claude --teleport
+```
+
+这在以下情况极为有用：
+
+- **事故响应**："所有人，看我的终端，我来追踪这个生产 Bug"
+- **结对调试**：无需屏幕共享，直接发送链接
+- **异步协作**：团队成员可以稍后查看你做了什么并添加评论
+
+会话链接在会话结束后自动失效。
+
+---
+
+## Web 会话（claude.ai/code）
+
+claude.ai/code 的 Web 界面提供了不同的控制模式：通过浏览器而非终端进行交互。对于基于云的工作流，这开辟了全新的可能。
+
+### 云端虚拟机
+
+如果你的代码运行在云端虚拟机上（EC2、GCE、Azure VM），可以从 Web 界面指向 Claude Code：
+
+1. 确保虚拟机已安装 Claude Code：
+
+```bash
+# 在虚拟机上安装 Claude Code（二选一）
+npm install -g @anthropic-ai/claude-code
+# 或
+curl -fsSL https://claude.ai/install.sh | bash
+```
+
+2. 在 claude.ai/code 中连接到你的云端环境
+3. 选择你的服务商（AWS、GCP、Azure）
+4. 使用你的云凭证进行身份验证
+5. 选择你想控制的实例
+6. 开始工作
+
+浏览器充当 CLI 的 GUI 层。你仍然可以运行任何命令，同时还获得：
+
+- 左侧文件树（点击可打开）
+- 语法高亮
+- 带可点击链接的终端输出
+- 可视化变更差异查看器
+
+### 连接器
+
+> **注意：** 连接器功能为实验性功能，可能并非所有版本都可用。以下描述基于已公开的信息，具体命令和参数请以官方文档为准。
+
+对于团队使用，可以使用连接器注册共享环境（如 GitHub、Slack、Linear 等服务）。连接器抽象掉了凭证管理，让团队成员无需各自维护凭证即可连接到共享基础设施。
+
+### 网络策略
+
+> **注意：** 以下网络策略配置为实验性功能，可能并非所有版本都可用。对于受监管行业（金融、医疗），建议通过企业级网络基础设施（防火墙、VPN、代理服务器）来实施网络访问控制，而非仅依赖 Claude Code 层面的配置。
+
+默认情况下，Claude Code 连接经过加密和身份验证。对于企业部署，可以通过管理策略（Managed Policy）来限制 Claude Code 的网络访问行为。具体配置方式请参考 Claude Code 官方的企业部署文档。
+
+---
+
+## 实际架构示例
+
+以下是一个真实场景：一个数据科学团队跨三个环境使用 Claude Code。
+
+**配置思路：**
+
+不同环境通过环境变量切换后端 provider。可以使用 shell 脚本或 `.env` 文件来管理不同环境的配置：
+
+```bash
+# local-dev.env — 本地开发（直连 Anthropic API）
+# 无需额外环境变量，使用默认配置
+
+# shared-gpu.env — 团队共享 GPU（使用 Bedrock）
+export CLAUDE_CODE_USE_BEDROCK=1
+export AWS_REGION="us-east-1"
+
+# production.env — 生产环境（使用 Vertex AI）
+export CLAUDE_CODE_USE_VERTEX=1
+export CLOUD_ML_REGION="us-east5"
+export ANTHROPIC_VERTEX_PROJECT_ID="company-prod-123"
+```
+
+**工作流：**
+
+1. **本地开发**：`claude`（直连 Anthropic API）
+2. **在共享 GPU 上测试**：`source shared-gpu.env && claude`（使用 Bedrock）
+3. **部署到生产**：`source production.env && claude`（使用 Vertex AI）
+4. **与同事结对调试**：`claude --teleport`（开启 Web 会话）
+
+这种架构通过环境变量分离不同关注点：本地实验、团队资源和生产系统。
+
+---
+
+## 参考资料
+
+- AWS Bedrock CLI：`aws bedrock-runtime invoke-model --help`
+- Google Vertex AI 文档：https://cloud.google.com/vertex-ai/docs
+- Microsoft Azure ML：https://learn.microsoft.com/en-us/azure/machine-learning/
+- LiteLLM GitHub：https://github.com/BerriAI/litellm
+- Claude Code 官方文档：https://docs.anthropic.com/en/docs/claude-code
+
+---
+
+**接下来：** [第 5 章 — CLAUDE.md 最佳实践](./05-claude-md-patterns.md) — 适用于各类项目的经过实战检验的配置方案。

@@ -352,6 +352,23 @@ const book3Zh = [
   },
 ]
 
+// First edition (March 2026), archived under /v1/. Sidebars are frozen copies of the
+// first-edition structure with links moved to /v1/.
+type Item = { text: string, link?: string, items?: Item[], collapsed?: boolean }
+const toV1 = (s: Item[]): Item[] => s.map(i => ({
+  ...i,
+  ...(i.link ? { link: '/v1' + i.link } : {}),
+  ...(i.items ? { items: toV1(i.items) } : {}),
+}))
+const v1Sidebar = {
+  '/v1/en/book1-getting-started/': toV1(book1En),
+  '/v1/en/book2-advanced/': toV1(book2En),
+  '/v1/en/book3-architect/': toV1(book3En),
+  '/v1/zh/book1-getting-started/': toV1(book1Zh),
+  '/v1/zh/book2-advanced/': toV1(book2Zh),
+  '/v1/zh/book3-architect/': toV1(book3Zh),
+}
+
 export default defineConfig({
   base: '/claude-code-handbook/',
 
@@ -393,11 +410,16 @@ export default defineConfig({
           { text: 'Book 1: 入门', link: '/zh/book1-getting-started/' },
           { text: 'Book 2: 进阶', link: '/zh/book2-advanced/' },
           { text: 'Book 3: 架构师', link: '/zh/book3-architect/' },
+          { text: '第二版 · 2026.10', items: [
+            { text: '第二版（当前）', link: '/zh/' },
+            { text: '第一版 · 2026.3（存档）', link: '/v1/zh/book1-getting-started/' },
+          ] },
         ],
         sidebar: {
           '/zh/book1-getting-started/': book1Zh,
           '/zh/book2-advanced/': book2Zh,
           '/zh/book3-architect/': book3Zh,
+          ...v1Sidebar,
         },
         outline: {
           label: '本页目录',
@@ -427,12 +449,17 @@ export default defineConfig({
       { text: 'Book 1: Getting Started', link: '/en/book1-getting-started/' },
       { text: 'Book 2: Advanced', link: '/en/book2-advanced/' },
       { text: 'Book 3: Architect', link: '/en/book3-architect/' },
+      { text: '2nd Edition · Oct 2026', items: [
+        { text: '2nd edition (current)', link: '/' },
+        { text: '1st edition · Mar 2026 (archived)', link: '/v1/' },
+      ] },
     ],
 
     sidebar: {
       '/en/book1-getting-started/': book1En,
       '/en/book2-advanced/': book2En,
       '/en/book3-architect/': book3En,
+      ...v1Sidebar,
     },
 
     socialLinks: [
