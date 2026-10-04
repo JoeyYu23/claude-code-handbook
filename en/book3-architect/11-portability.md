@@ -12,7 +12,7 @@ The short version: open formats now cover instructions, skills and tool servers.
 
 | Asset | Shared format | Claude Code | OpenAI Codex | Cursor | Verdict |
 | :- | :- | :- | :- | :- | :- |
-| Instructions | `AGENTS.md` | Reads it when no `CLAUDE.md` applies (v2.1.277+) | Reads it | Reads it | Transfers; nesting rules differ |
+| Instructions | `AGENTS.md` | Reads it when no `CLAUDE.md` applies (v2.1.277+; v2.1.281+ on Bedrock, Agent Platform, Foundry, gateways and telemetry-off sessions) | Reads it | Reads it | Transfers; nesting rules differ |
 | Skills | [Agent Skills](https://agentskills.io) (`SKILL.md`) | `.claude/skills/` | `.agents/skills/` | `.agents/skills/`, `.cursor/skills/`, also `.claude/skills/` and `.codex/skills/` | Transfers within the spec; folders differ |
 | Tool servers | MCP protocol | `.mcp.json` (JSON) | `config.toml`, `[mcp_servers.<name>]` | `.cursor/mcp.json` (JSON) | Server transfers; config must be translated |
 | Hooks | None | `hooks` in settings files | `hooks.json` or `config.toml` | Tool-specific | Scripts partly; registration does not |
@@ -57,7 +57,7 @@ Windows clones without `core.symlinks` turn each link into a small text file. If
 ### Check that it worked
 
 - In Claude Code, run `/skills` and confirm each shared skill is listed. Type `/` plus the skill name to invoke it.
-- Validate the shared copies against the spec with the [skills-ref](https://github.com/agentskills/agentskills/tree/main/skills-ref) reference library: `skills-ref validate .agents/skills/<name>`.
+- Validate the shared copies against the spec with the [skills-ref](https://github.com/agentskills/agentskills/tree/main/skills-ref) reference library (its README calls it a demonstration library): `skills-ref validate .agents/skills/<name>`.
 - In Codex and Cursor, ask for a task the skill's description covers and confirm the agent picks it up. Cursor's docs list both `.agents/skills/` and `.claude/skills/`, so check that a linked skill does not appear twice in its skill list.
 
 ## Tool servers: one MCP server, three config files
@@ -93,7 +93,7 @@ The translation is mostly mechanical, with a few traps:
 - **Sign-ins do not carry over.** OAuth for a remote server is stored by each tool, so every developer signs in once per tool.
 - **Approval is per tool.** Claude Code does not connect a project's `.mcp.json` servers until the developer trusts the workspace and approves them.
 
-Going one way, from Codex, Gemini CLI or Cursor into Claude Code, is automated. `/import codex` (or `claude import codex --dry-run` from the shell to preview) brings over instruction files, MCP servers, commands, subagents and skills. It needs version 2.1.213 or later, and 2.1.265 or later for Cursor. It is not available on Amazon Bedrock, Google Cloud's Agent Platform, Microsoft Foundry, or through a Claude apps gateway. The CLI has no matching export command, so going from Claude Code to another tool is the manual work this chapter describes.
+Going one way, from Codex, Gemini CLI or Cursor into Claude Code, is automated. `/import codex` (or `claude import codex --dry-run` from the shell to preview) brings over instruction files, MCP servers, commands, subagents and skills. It needs version 2.1.213 or later, and 2.1.265 or later for Cursor. It is not available on Amazon Bedrock, Google Cloud's Agent Platform, Microsoft Foundry, Claude Platform on AWS, or through a Claude apps gateway. The CLI has no matching export command, so going from Claude Code to another tool is the manual work this chapter describes.
 
 ### Check that it worked
 
@@ -126,7 +126,7 @@ Each model has its own prompt cache. A switch in the middle of a conversation re
 
 ### What a measured router looks like
 
-LangChain's October 2026 write-up on Open SWE, its coding agent, is a useful reference because it reports outcomes, not just cost. The router classified each thread from its first message and picked one of three model tiers for the whole thread. Across 973 threads, median cost per thread fell 64% ($0.94 against $2.61), while 29.2% of routed threads ended in a merged pull request against 27.3% for the control group. Most threads went to the middle tier (56%), 34% to the cheapest and only 10% to the most capable. The authors argue that "an effective model router belongs in the harness, not a generic gateway," because choosing a model needs the task context that only the harness has. They name mid-thread rerouting as an open question, and the price of rerouting is the prompt cache.
+LangChain's October 2026 write-up on Open SWE, its coding agent, is a useful reference because it reports outcomes, not just cost. The router classified each thread from its first message and picked one of three model tiers for the whole thread. Across 973 threads, median cost per thread fell 64% ($0.94 against $2.61), while 29.2% of routed threads ended in a merged pull request against 27.3% for the control group (a difference LangChain reports as not significant, p = 0.49). Most threads went to the middle tier (56%), 34% to the cheapest and only 10% to the most capable. The authors argue that "an effective model router belongs in the harness, not a generic gateway," because choosing a model needs the task context that only the harness has. They name mid-thread rerouting as an open question, and the price of rerouting is the prompt cache.
 
 Three lessons carry over to any setup:
 
@@ -201,6 +201,7 @@ Pick one repository and one non-trivial task. Run it in each tool your team uses
 - OpenAI, Codex docs, accessed 2026-10-04: "Build skills" https://learn.chatgpt.com/docs/build-skills ; "MCP" https://learn.chatgpt.com/docs/extend/mcp?surface=cli ; "Hooks" https://learn.chatgpt.com/docs/hooks ; "Subagents" https://learn.chatgpt.com/docs/agent-configuration/subagents
 - Cursor docs, accessed 2026-10-04: "Agent Skills" https://cursor.com/docs/context/skills ; "Model Context Protocol" https://cursor.com/docs/context/mcp ; "Rules" https://cursor.com/docs/context/rules
 - Sydney Runkle and Eugene Yurtsev, "How to Build a Model Router in the Harness", LangChain, 2026-10-01. https://www.langchain.com/blog/how-to-build-a-model-router-in-the-harness
+- Ollama, "Anthropic compatibility", accessed 2026-10-04. https://docs.ollama.com/api/anthropic-compatibility
 - musistudio, claude-code-router README and repository metadata (GitHub API), accessed 2026-10-04. https://github.com/musistudio/claude-code-router
 - LM Studio, "Use your LM Studio Models in Claude Code", 2026-01-30. https://lmstudio.ai/blog/claudecode
 - Run-Ze Fan et al., "An Empirical Study of Harness Design for Coding Agents", arXiv:2609.20804, 2026-09-17. https://arxiv.org/abs/2609.20804

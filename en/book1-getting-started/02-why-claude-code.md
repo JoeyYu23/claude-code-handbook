@@ -95,7 +95,7 @@ There are now several serious coding agents. Here is an honest summary of the ma
 
 **One engine, many surfaces.** The same session engine runs in the terminal, the desktop app, the web, and VS Code and JetBrains. Your instructions and settings travel with you, and you can move a running session from terminal to desktop or from cloud to terminal.
 
-**Customization.** Claude Code has the deepest set of ways to shape the agent: `CLAUDE.md` instruction files, skills (packaged procedures), hooks (scripts that run on events), subagents, MCP connections and a plugin marketplace. Books 2 and 3 cover them. Since September 2026 it also reads `AGENTS.md`, the instruction file other agents use, if a project has one.
+**Customization.** Claude Code has the deepest set of ways to shape the agent: `CLAUDE.md` instruction files, skills (packaged procedures), hooks (scripts that run on events), subagents, MCP connections and a plugin marketplace. Books 2 and 3 cover them. Since version 2.1.277 (18 September 2026) it also reads `AGENTS.md`, the instruction file other agents use, when a project has no `CLAUDE.md`.
 
 **A considered safety model.** Auto mode uses a separate classifier model to block risky actions instead of asking you about each one. It is not perfect (Chapter 6 explains its limits), but it is a real middle ground between approving everything by hand and turning all checks off.
 
@@ -156,5 +156,5 @@ You should now be able to say, for your own situation, which of the three kinds 
 - "Codex changelog", OpenAI, accessed 2026-10-04. https://learn.chatgpt.com/docs/changelog
 - "Changelog", Cursor, accessed 2026-10-04. https://cursor.com/changelog
 - "An important update: transitioning Gemini CLI to Antigravity CLI", Google Developers Blog, 2026-05-19. https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/
-- Addy Osmani, "Agentic Skill Decay", 2026-08-31. https://addyo.substack.com
+- Addy Osmani, "Agentic Skill Decay", 2026-08-31. https://addyo.substack.com/p/agentic-skill-decay
 - openai/codex repository (license Apache-2.0), GitHub, accessed 2026-10-04. https://github.com/openai/codex

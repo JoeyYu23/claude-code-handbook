@@ -37,6 +37,11 @@ features:
     linkText: 探索 Book 3 →
 ---
 
+::: info 中文版仍为第一版（2026 年 3 月）
+第二版（2026 年 10 月）目前只有英文：[阅读英文第二版 →](/en/book1-getting-started/)
+:::
+
+
 <div style="max-width: 800px; margin: 3rem auto; padding: 0 1.5rem;">
 
 ## 三本书，一条完整学习路径

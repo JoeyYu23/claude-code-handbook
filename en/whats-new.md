@@ -22,7 +22,7 @@ Read: [How It Works](/en/book1-getting-started/03-how-it-works), [Context Engine
 
 ### 3. Many agents at once is normal
 
-Background and nested subagents, forks, the agent view, cross-session messages, routines and cloud sessions all arrived between May and September. Anthropic, OpenAI, Cursor and GitHub shipped similar controls in the same quarter.
+Background and nested subagents, forks, the agent view, cross-session messages, routines and cloud sessions all arrived between April and September. Other tools moved the same way: Cursor launched Projects, which delegates work to many agents, on 10 September.
 
 Read: [Subagents](/en/book2-advanced/05-subagents), [The Agent View and Sessions](/en/book2-advanced/07-agent-view-and-sessions), [Orchestrating Many Agents](/en/book3-architect/04-orchestrating-many-agents), [Scheduled Agents and Routines](/en/book3-architect/06-scheduled-agents-routines), [Cloud and Managed Agents](/en/book3-architect/07-cloud-managed-agents).
 
@@ -34,7 +34,7 @@ Read: [Auto Mode and Permissions](/en/book1-getting-started/06-auto-mode-and-per
 
 ### 5. Cost and portability are everyday concerns
 
-Weekly limits changed, prices fell, and prompt caching now drives most of the bill. Claude Code reads `AGENTS.md` since version 2.1.277, and many teams run more than one coding agent.
+Weekly limits changed on 14 September, and prompt caching shapes what each turn costs. Claude Code reads `AGENTS.md` when there is no `CLAUDE.md`, since version 2.1.277 (18 September), and many teams run more than one coding agent.
 
 Read: [Tokens, Limits and Caching](/en/book2-advanced/16-tokens-limits-caching), [Cost Reality, Measured](/en/book3-architect/10-cost-reality-measured), [CLAUDE.md and AGENTS.md](/en/book1-getting-started/14-claude-md), [Portability](/en/book3-architect/11-portability).
 

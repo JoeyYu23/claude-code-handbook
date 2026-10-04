@@ -21,7 +21,7 @@ Built-ins inherit the parent's permission rules. Explore and Plan skip your CLAU
 
 | Agent | Model | Tools | Used for |
 | --- | --- | --- | --- |
-| `Explore` | The main conversation's model. (When the main model is Fable, Explore runs on the Opus the `opus` alias resolves to if you connect with a subscription, Console account or LLM gateway through `ANTHROPIC_BASE_URL`; on Bedrock, Google Cloud's Agent Platform, Microsoft Foundry and similar providers it stays on the main model.) | Read-only; Write and Edit denied. | File discovery and code search. Claude picks a thoroughness level: quick, medium or very thorough. |
+| `Explore` | The main conversation's model. (When the main model is Fable, Explore runs on the Opus the `opus` alias resolves to if you connect with a subscription, Console account or LLM gateway through `ANTHROPIC_BASE_URL`; on Bedrock, Google Cloud's Agent Platform, Microsoft Foundry, Claude Platform on AWS and a Claude apps gateway it stays on the main model.) | Read-only; Write and Edit denied. | File discovery and code search. Claude picks a thoroughness level: quick, medium or very thorough. |
 | `Plan` | Inherits the main conversation. | Read-only; Write and Edit denied. | Research during plan mode. |
 | `general-purpose` | `CLAUDE_CODE_SUBAGENT_MODEL` if set and nothing else assigns a model; otherwise the main conversation's model. | Every tool available to subagents. | Multi-step tasks that need both exploring and changing code. |
 | `claude` | None of its own. | Every tool available to subagents. | Catch-all; also the default agent for dispatched background sessions. |

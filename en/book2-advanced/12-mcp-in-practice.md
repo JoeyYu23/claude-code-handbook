@@ -8,7 +8,7 @@ If you are still deciding whether a capability should be an MCP server at all, r
 
 ## What the 2026-07-28 spec changed
 
-On 2026-07-28 the MCP maintainers released the largest revision since launch. The headline is a stateless core:
+On 2026-07-28 the MCP maintainers released the next revision of the spec. The headline is a stateless core:
 
 - **No handshake, no session.** The `initialize`/`initialized` exchange and the `Mcp-Session-Id` header are gone. Every request carries its protocol version, client identity and client capabilities in `_meta`. A client that wants capabilities up front can call a new, optional `server/discover`.
 - **Routable headers.** HTTP requests carry `Mcp-Method` and `Mcp-Name`, so a gateway, rate limiter or firewall can route and meter without parsing JSON.

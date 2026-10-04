@@ -1,5 +1,9 @@
 # 第八章：Hook 系统深入
 
+::: info 中文版仍为第一版（2026 年 3 月）
+第二版（2026 年 10 月）目前只有英文：[阅读英文第二版 →](/en/book1-getting-started/)
+:::
+
 ## Hook 是什么？
 
 Hook 是在 Claude Code session 的关键时刻自动执行的命令。它们不是 Claude 调用的——而是系统在特定事件发生时直接执行的 shell 命令、HTTP 请求、LLM 提示词或 agent。

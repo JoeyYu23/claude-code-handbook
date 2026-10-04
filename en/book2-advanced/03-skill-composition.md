@@ -20,7 +20,6 @@ The rules:
 
 - Up to six skills expand: the first plus five more.
 - Expansion stops at the first token that is not an inline, user-invocable skill. A skill that runs as a forked subagent, such as `/code-review`, ends the chain, and so does one whose arguments may start with a slash command, such as `/loop`. That token and everything after it become the arguments.
-- Stacking does not merge permissions in any special way. Each skill's `allowed-tools` applies for that turn as usual.
 
 ## Pattern 2: Research in a fork, act in the main thread
 

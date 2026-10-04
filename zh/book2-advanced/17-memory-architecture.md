@@ -1,5 +1,9 @@
 # 第十七章：Memory 架构
 
+::: info 中文版仍为第一版（2026 年 3 月）
+第二版（2026 年 10 月）目前只有英文：[阅读英文第二版 →](/en/book1-getting-started/)
+:::
+
 > 深入理解 Claude Code 的 Memory 系统——让 Claude 真正了解你的项目、偏好和工作方式。
 
 ---

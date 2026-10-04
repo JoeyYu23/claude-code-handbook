@@ -36,7 +36,7 @@ Do not adopt their number. Measure yours.
 
 ## The Claude 5 rules
 
-In July 2026 Thariq Shihipar of Anthropic published "The new rules of context engineering for Claude 5 generation models". The headline fact: Anthropic removed over 80% of Claude Code's system prompt for the newer models without a loss in performance. Instructions that helped older models now mostly get in the way. The post's recommendations, translated into actions on your own setup:
+In July 2026 Thariq Shihipar of Anthropic published "The new rules of context engineering for Claude 5 generation models". The headline fact: Anthropic removed over 80% of Claude Code's system prompt for the newer models with no measurable loss on its coding evaluations. Instructions that helped older models now mostly get in the way. The post's recommendations, translated into actions on your own setup:
 
 1. **Stop overconstraining.** Newer models infer intent well; piles of "never" and "always" rules conflict and crowd out the task. Delete rules that guard against mistakes the current model no longer makes.
 2. **Prefer judgment to rules.** The post's example: instead of "never write multi-paragraph docstrings", say "write code that reads like the surrounding code: match its comment density". One principle replaces a list of special cases.
@@ -81,7 +81,7 @@ A sensible cadence is after every model change and once a month otherwise. Instr
 ### Prune skills, MCP servers and always-on tools
 
 - **Skills:** every skill in the listing adds its description to context on every turn, used or not. `/skill-doctor` (v2.1.252 or later) shows each skill's context cost and how often it is used. Turn off what you do not use. Skills marked `disable-model-invocation: true` stay out of the listing entirely until you call them by name.
-- **MCP servers:** tool schemas are deferred by default, so an idle server costs mostly its name list and instructions. It still costs something, and a server that connects mid-session can affect the cache. Disable servers you are not using in `/mcp`. Where a good CLI exists (`gh`, `aws`, `gcloud`), the docs still call it more context-efficient than an MCP server. [MCP, CLI or Skill?](/en/book2-advanced/11-mcp-cli-or-skill) works through that choice.
+- **MCP servers:** tool schemas are deferred by default, so an idle server costs mostly its name list and instructions. It still costs something, and without tool search a server that connects mid-session can invalidate the cache. Disable servers you are not using in `/mcp`. Where a good CLI exists (`gh`, `aws`, `gcloud`), the docs still call it more context-efficient than an MCP server. [MCP, CLI or Skill?](/en/book2-advanced/11-mcp-cli-or-skill) works through that choice.
 - **Browser tools:** turning Claude in Chrome on by default loads its tools in every session. Use `claude --chrome` when you need it.
 
 ### Check that it worked
@@ -176,7 +176,7 @@ What belongs in files that load automatically versus files Claude reads on deman
 ## Sources
 
 - "The new rules of context engineering for Claude 5 generation models", Thariq Shihipar, Anthropic (Claude blog), 2026-07-24. https://claude.dev/blog/the-new-rules-of-context-engineering-for-claude-5-generation-models/
-- "Claude Code vs OpenCode: token overhead", Systima, 2026-07-12. https://systima.ai/blog/claude-code-vs-opencode-token-overhead (Hacker News discussion: https://news.ycombinator.com/item?id=48883275)
+- "Claude Code Is Way More Token-Hungry Than OpenCode. We Measured Exactly How Much" (page title: "Claude Code Sends 4.7x More Tokens Than OpenCode Before Reading Your Prompt"), Systima, 2026-07-12. https://systima.ai/blog/claude-code-vs-opencode-token-overhead (Hacker News discussion: https://news.ycombinator.com/item?id=48883275)
 - "Opus 5.5 built for coding sessions that use more context", Michael Segner, Anthropic (Claude blog), 2026-09-24. https://claude.com/blog/claude-opus-5-5-built-for-coding-sessions-that-use-more-context
 - "Maximizing the value of your Claude Code sessions", Lydia Hallie, Anthropic (Claude blog), 2026-08-14. https://claude.com/blog/maximizing-the-value-of-your-claude-code-sessions
 - "Explore the context window" (What survives compaction), Claude Code Docs, accessed 2026-10-04. https://code.claude.com/docs/en/context-window

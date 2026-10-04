@@ -196,7 +196,7 @@ Once loaded, every line of the body is a recurring token cost for the rest of th
 
 ### Audit for stale instructions
 
-Run `/doctor prompt-audit` after a model upgrade. It checks your `CLAUDE.md` files, skills, agents and commands for outdated or conflicting instructions and for prompting patterns written for older models. Addy Osmani makes the case in "Audit your Agent files" (August 2026): agent instructions have a half-life as models improve, files grow every time someone patches a misbehavior with a new rule, and the bloat lowers adherence. His advice is a diagnostic pass every few weeks to find forgotten, unused skills and outdated preferences.
+Run `/doctor prompt-audit` after a model upgrade. It checks your `CLAUDE.md` files, skills, agents and commands for outdated or conflicting instructions and for prompting patterns written for older models. Addy Osmani makes the case in "Audit your Agent files" (August 2026): agent instructions have a half-life as models improve, files grow every time someone patches a misbehavior with a new rule, and the bloat lowers adherence. He says he now runs `/doctor` every few weeks and makes each instruction earn its place again.
 
 To find skills whose frontmatter does not parse, run:
 

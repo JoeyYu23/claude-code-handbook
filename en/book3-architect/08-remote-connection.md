@@ -9,7 +9,7 @@ The key point: the session never leaves your machine. The `claude` process keeps
 ## Requirements
 
 - **A claude.ai subscription.** Pro, Max, Team or Enterprise. API keys don't work. On Team and Enterprise, an Owner must first turn on the Remote Control toggle in the Claude Code admin settings.
-- **A direct connection to the Anthropic API.** Remote Control is unavailable on Amazon Bedrock, Google Cloud's Agent Platform (formerly Vertex AI) and Microsoft Foundry, and when `ANTHROPIC_BASE_URL` points at a gateway or proxy.
+- **A direct connection to the Anthropic API.** Remote Control is unavailable on Amazon Bedrock, Google Cloud's Agent Platform (formerly Vertex AI) and Microsoft Foundry, when `ANTHROPIC_BASE_URL` points at a host other than `api.anthropic.com` (such as a gateway or proxy), and when you sign in through an enterprise Claude apps gateway.
 - **A full-scope login.** A long-lived token from `claude setup-token` or `CLAUDE_CODE_OAUTH_TOKEN` can only make model requests. Run `claude auth login` instead.
 - **A trusted folder.** In a folder you haven't trusted, `claude remote-control` asks before it starts. Without a terminal to ask on, run `claude` there once first.
 
@@ -51,7 +51,7 @@ To make every interactive session connect automatically, run `/config` and set *
 
 Open the printed URL in any browser, scan the QR code with the Claude app, or find the session by name in the session list at claude.ai/code (in the app, tap **Code**). Online sessions show a computer icon with a green dot. If you don't have the app yet, `/mobile` shows a QR code for it.
 
-From the phone or browser you can send messages, attach files, stop background subagents, and run commands such as `/compact`, `/usage` and `/model sonnet`. Terminal-only commands such as `/plugin` and `/resume` work only locally.
+From the phone or browser you can send messages, attach files, follow subagent progress, and run commands such as `/compact`, `/usage` and `/model sonnet`. Terminal-only commands such as `/plugin` and `/resume` work only locally.
 
 To get a push notification when a long task finishes or Claude needs a decision, run `/config` on your machine and turn on **Push when Claude decides**, **Push when actions required**, or both.
 

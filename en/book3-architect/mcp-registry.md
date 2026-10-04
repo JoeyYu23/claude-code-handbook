@@ -15,7 +15,7 @@ A short, checked list of MCP servers that exist today. Each remote URL below was
 The MCP specification dated 2026-07-28 turns the protocol from a stateful session into stateless request/response, according to the [MCP project's release post](https://blog.modelcontextprotocol.io/posts/2026-07-28/). What it says changed:
 
 - The `initialize` handshake and the `Mcp-Session-Id` header are retired. Each request carries the protocol version, client identity and capabilities itself, so any request can go to any server instance behind a load balancer.
-- Server-initiated asks (elicitation, sampling, roots) are replaced by a multi-round-trip pattern: the server returns an `input_required` result and the client retries with the answers.
+- Server-initiated asks such as elicitation and sampling are being redesigned around a multi-round-trip pattern: the server returns an `input_required` result and the client retries with the answers.
 - New `Mcp-Method` and `Mcp-Name` HTTP headers let gateways route and authorize without parsing JSON; list responses can carry cache hints (`ttlMs`, `cacheScope`).
 - Authorization tightens (issuer validation per RFC 9207) and Dynamic Client Registration is deprecated in favor of Client ID Metadata Documents. Roots, Sampling, Logging and the legacy HTTP+SSE transport are deprecated with a 12-month window.
 
@@ -45,7 +45,7 @@ All remote servers use OAuth unless noted. "Docs say" means the command is quote
 
 | Server | Endpoint or command | Notes |
 | --- | --- | --- |
-| GitHub | `https://api.githubcopilot.com/mcp/` | OAuth (recommended) or a personal access token in an `Authorization: Bearer` header. Maintained at github.com/github/github-mcp-server. |
+| GitHub | `https://api.githubcopilot.com/mcp/` | OAuth or a personal access token in an `Authorization: Bearer` header. Maintained at github.com/github/github-mcp-server. |
 | Linear | `claude mcp add --transport http linear-server https://mcp.linear.app/mcp` | Docs say. |
 | Atlassian (Jira, Confluence) | `https://mcp.atlassian.com/v2/mcp` | The docs describe a v2 endpoint and say that on 2027-03-01 existing v1 usage will start to expose v2 tools. Old `/sse` URLs from the first edition are not confirmed; use v2. |
 | Asana | `https://mcp.asana.com/v2/mcp` | The beta `/sse` server is documented as shut down on 2026-05-11, so first-edition configs pointing at it no longer work. |
@@ -102,6 +102,7 @@ Run `claude mcp list`. A healthy server shows as connected. Inside a session, `/
 - Model Context Protocol servers repository, modelcontextprotocol (accessed 2026-10-04): https://github.com/modelcontextprotocol/servers
 - Official MCP Registry (accessed 2026-10-04): https://registry.modelcontextprotocol.io/
 - MCP 2026-07-28 specification release, MCP blog, 2026-07-28: https://blog.modelcontextprotocol.io/posts/2026-07-28/
+- Vercel changelog, "Vercel MCP now supports the 2026-07-28 MCP specification": https://vercel.com/changelog
 - Simon Willison, "Stateless MCP has recaptured my interest", 2026-07-31: https://simonwillison.net/2026/Jul/31/stateless-mcp/
 - Connect Claude Code to tools via MCP, Anthropic: https://code.claude.com/docs/en/mcp
 - GitHub MCP server: https://github.com/github/github-mcp-server

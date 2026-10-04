@@ -12,7 +12,7 @@ There are four ways to pay for Claude Code, and they meter differently.
 
 | Route | How you pay | What limits you |
 |---|---|---|
-| Pro, Max | Flat monthly fee | A rolling five-hour window plus a weekly window, shared with Claude chat |
+| Pro, Max | Flat monthly fee | A rolling five-hour window plus a weekly window |
 | Team, Enterprise | Per seat (Enterprise adds usage at API rates) | Per-seat allowance; admin spend limits |
 | Claude Console (API) | Per token | Workspace spend and rate limits you set |
 | Bedrock, Agent Platform, Foundry | Per token, through your cloud bill | Your cloud's budget controls and quotas |
@@ -111,7 +111,7 @@ Use the measurements, not intuition.
 - **A team**: Team seats if usage is fairly even; mix Standard and Premium seats by measured usage instead of giving everyone Premium. On Enterprise you pay API rates for usage anyway, so cost per developer behaves like API spend.
 - **Spend that must sit in your cloud account**: Bedrock, Agent Platform or Foundry, accepting the features that need a claude.ai login.
 
-Plans change quickly. Since the first edition, Anthropic has made auto mode's classifier overhead free on Pro, Max and Team, run a weekly-limit promotion, and set new weekly limits from 14 September 2026 (see [Tokens, Limits and Caching](/en/book2-advanced/16-tokens-limits-caching)). Re-run the protocol whenever the plan or your default model changes.
+Plans change quickly. Since the first edition, Anthropic has made auto mode's classifier overhead free on Pro, Max and Team, ended a weekly-limit promotion on 13 September, and changed Claude Code's weekly limits from 14 September 2026; [Tokens, Limits and Caching](/en/book2-advanced/16-tokens-limits-caching) has the numbers and how to read them. Re-run the protocol whenever the plan or your default model changes.
 
 ## What moves the number
 

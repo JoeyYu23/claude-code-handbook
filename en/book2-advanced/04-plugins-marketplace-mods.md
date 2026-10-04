@@ -220,7 +220,7 @@ Once pushed, it is published. Users run `claude plugin marketplace add your-org/
 
 A mod is a plugin whose `hooks/hooks.json` points to a code module: JavaScript or TypeScript functions that Claude Code calls in its own process when events happen. Mods shipped in 2.1.287 on October 1, 2026, and are on by default. Settings [hooks](/en/book2-advanced/09-hooks) run a shell command or HTTP request on an event; a mod's hook is a function that can observe the event, rewrite it, or answer it so Claude Code's usual behavior never runs.
 
-That reach covers prompts (rewrite a prompt, change system prompt sections, drop a submission), tools (deny, rewrite or answer a tool call; approve or deny a permission decision), turns and subagents, and the interface (panes beside the transcript, a band above the prompt, buttons and text fields, or redrawing Claude Code's own rows and spinner). Mods run in the terminal and the Desktop app's Code tab; in the VS Code extension, `claude -p` and the Agent SDK their hooks run but nothing they draw appears.
+That reach covers prompts (rewrite a prompt, change system prompt sections, drop a submission), tools (deny, rewrite or answer a tool call; approve or deny a permission decision), turns and subagents, and the interface (panes beside the transcript, a band above the prompt, buttons and text fields, or redrawing Claude Code's own rows and spinner). Mods run in the terminal and the Desktop app's Code tab; in the VS Code extension, `claude -p` and the Agent SDK, their hooks run but nothing they draw appears.
 
 ### A small mod
 
@@ -256,7 +256,7 @@ Anthropic's announcement is direct: mods "aren't sandboxed", and you "should onl
 - read and write any file your account can, start programs and make network requests;
 - read environment variables and settings files, including API keys;
 - see every prompt and tool call, rewrite them, submit prompts as if you typed them, and message your other sessions;
-- approve a tool call before you are asked, including one an `ask` rule would prompt for; in auto mode, a call a mod approves skips the classifier;
+- approve a tool call before you are asked, including one an `ask` rule would prompt for or a `PreToolUse` hook blocked (unless that hook is in managed settings); in auto mode, a call a mod approves skips the classifier;
 - spend your usage by calling a model.
 
 If you turn on the Bash sandbox, it still does not contain processes a mod starts. Deny rules are not a full fence either. Where the built-in guard (below) loads, a user's mod cannot approve a call a `deny` rule refuses, but deny rules govern Claude's tool calls, not the mod's own file and process calls: with `Read(.env)` denied, a mod can still read `.env` itself. One thing a mod cannot do is change what the permission prompt shows.

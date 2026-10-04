@@ -56,7 +56,7 @@ Plain-language definitions for terms in this book. Claude Code terms follow Anth
 
 ## F
 
-**Fork.** A subagent that inherits your whole conversation so far, instead of starting blank. Start one with `/subtask <task>` (named `/fork` on versions 2.1.161 to 2.1.211). It runs in the background and returns its result to your conversation. Not to be confused with a git or GitHub fork, which is a personal copy of a repository.
+**Fork.** A copy of your conversation so far, made so a second line of work can continue from it. `/fork [prompt]` copies the conversation into a new background session while you keep working (version 2.1.212 and later). `/subtask <task>` instead spawns a forked subagent that inherits the conversation and returns its result to it; on versions 2.1.161 to 2.1.211 that command was named `/fork`. `/branch [name]` copies the conversation and switches you into the copy. Not to be confused with a git or GitHub fork, which is a personal copy of a repository. See [Slash Commands](/en/book2-advanced/01-slash-commands).
 
 **Frontmatter.** A block of settings at the very top of a Markdown file between two `---` lines. Skills, subagents and rule files read their configuration from it.
 

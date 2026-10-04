@@ -132,7 +132,7 @@ Because a fork's prefix is identical to the parent's, its first request reads th
 A non-fork subagent has a different system prompt and tool set, so its first request misses. It warms its own cache over its turns. Two details matter:
 
 - Subagent requests fall outside the main-conversation TTL bucket. Even on a subscription, where the main conversation gets a one-hour cache, subagents get five minutes unless you choose otherwise with the `subagentPromptCacheTtl` setting, the `CLAUDE_CODE_SUBAGENT_PROMPT_CACHE_TTL` variable, or per agent with `experimental: { cacheTtl: 1h }` in its frontmatter.
-- A resumed subagent's first request can read the cache its original run warmed, so resuming beats re-spawning for follow-up work.
+- Resuming a subagent keeps its earlier work in its context, so for follow-up work it is usually cheaper than spawning a fresh one and re-explaining. Whether its first request reuses the cache its original run warmed is not spelled out in the docs; check with `/usage` before you rely on it.
 
 The rule of thumb: if the side task needs most of what is already in your conversation, fork. If it needs a narrow slice, a fresh subagent with a tight prompt is cheaper because it carries less. [Tokens, Limits and Caching](/en/book2-advanced/16-tokens-limits-caching) covers TTLs in depth.
 
@@ -182,7 +182,7 @@ Delegation has a fixed cost: a fresh agent rebuilds context, sends its own reque
 - **You want a second opinion.** A reviewer subagent on the same model shares the author's blind spots, and agreement between them is not proof. See [Agents Checking Agents](/en/book3-architect/05-agents-checking-agents).
 - **The work outgrows one conversation.** Many independent tasks, or work that must keep running after you close the terminal, belong in separate sessions ([The Agent View and Sessions](/en/book2-advanced/07-agent-view-and-sessions)) or a scripted workflow ([Automated Workflows](/en/book2-advanced/10-automated-workflows)).
 
-How much does a subagent cost? It depends on your setup. Wes Sander (Practical Systems, September 14, 2026) compared published figures and found them ranging from about 15,000 tokens for a lean, tool-restricted agent to tens of thousands for a general-purpose one, and argues that "the cost is a function of your install, not the tool." Measure your own instead of trusting anyone's number, including this book's.
+How much does a subagent cost? It depends on your setup. Wes Sander (Practical Systems, September 14, 2026) compared published figures that ranged from 15,000 to 436,000 tokens per subagent. On his own machine, a general-purpose helper paid about 61,500 input tokens before its first tool call and a tool-restricted advisor about 18,700. He argues that "the cost is a function of your install, not the tool." Measure your own instead of trusting anyone's number, including this book's.
 
 <!-- AUTHOR-DATA: share of the author's weekly plan usage that /usage attributes to subagents, and what changed after trimming agent descriptions or switching Explore to a smaller model -->
 

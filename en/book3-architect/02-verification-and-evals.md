@@ -16,7 +16,7 @@ Book 1's [Check the Work](/en/book1-getting-started/12-check-the-work) covers th
 
 ## 1. Tasks that verify themselves
 
-Boris Cherny, who leads Claude Code at Anthropic, described in a 2026 interview how he had Claude Code rewrite the Electron Claude desktop app in Swift. As John Gruber quoted it, the instruction was: "I want you to run the Electron app in the Mac virtual machine, screenshot it, and then look pixel by pixel. Compare it to the Swift version. Don't stop until you're done." The task had been running for about two weeks when he described it.
+Boris Cherny, who leads Claude Code at Anthropic, described in a 2026 interview at Y Combinator's Startup School how he had Claude rewrite the Electron Claude desktop app in Swift, working through a Claude Tag session (Claude in Slack). As John Gruber quoted it, the instruction was: "I want you to run the Electron app in the Mac virtual machine, screenshot it, and then look pixel by pixel. Compare it to the Swift version. Don't stop until you're done." The task had been running for about two weeks when he described it.
 
 Whatever you think of the result (Gruber was not impressed by the app itself), the shape of the task is the point. It has a goal, a check the agent can run on its own (screenshot and compare), and a stop condition tied to that check. The Claude Code best-practices guide explains why this matters: "Claude stops when the work looks done. Without a check it can run, 'looks done' is the only signal available, and you become the verification loop."
 
@@ -101,14 +101,12 @@ cd "$CLAUDE_PROJECT_DIR" || exit 0
 if out=$(npm test 2>&1); then
   exit 0                                       # tests pass: allow the stop
 fi
-jq -n --arg log "$(printf '%s' "$out" | tail -n 40)" '{
-  hookSpecificOutput: {
-    hookEventName: "Stop",
-    decision: "block",
-    reason: "Tests are failing",
-    additionalContext: ("The test suite fails. Fix the cause, not the tests. Last lines:\n" + $log)
-  }
-}'
+# tests fail: exit 2 blocks the stop and sends stderr to Claude
+{
+  echo "The test suite fails. Fix the cause, not the tests. Last lines:"
+  printf '%s\n' "$out" | tail -n 40
+} >&2
+exit 2
 ```
 
 Register it in `.claude/settings.json`:
@@ -131,7 +129,7 @@ Register it in `.claude/settings.json`:
 }
 ```
 
-Why `additionalContext`: for a Stop hook, the `reason` field is shown to you, not to Claude. Claude sees the text in `additionalContext`, so the failing lines go there. Make the script executable with `chmod +x`.
+Exit code 2 is what blocks: Claude Code feeds the stderr text to Claude as the reason to keep going, so the failing lines go there. Exit 1 would not block. Make the script executable with `chmod +x`.
 
 Two cautions. Stop fires at the end of every turn, including turns where you only asked a question, so keep the check fast or scope it (the `git status` line is a crude version of that). And Claude Code stops honoring a Stop hook's block after a run of consecutive blocks without progress, so a hook cannot trap a session forever; the [hooks guide](https://code.claude.com/docs/en/hooks-guide) documents the cap and the `CLAUDE_CODE_STOP_HOOK_BLOCK_CAP` variable for raising it. [Hooks](/en/book2-advanced/09-hooks) in Book 2 covers the event model in full.
 
@@ -260,7 +258,7 @@ If humans stop reading every diff, what do they still check? The practitioners c
 - **The tests.** Osmani: "Tests as an independent check on an author you don't fully trust will be the most valuable code you own." Read the tests even when you skip the implementation. Check that they test the requirement, and that the agent did not change them to pass.
 - **The evidence.** Test output, screenshots, the command and its result. If the evidence is missing, the work is not done.
 - **The blast radius.** Osmani again: "Agents do the first pass and humans cover blast radius."
-- **An explanation on demand.** Huntley's point: ask the agent to explain the change, what it touches and what could break, and judge the explanation. If it cannot explain it clearly, neither can you, and it should not ship.
+- **An explanation on demand.** Huntley argues software only has to be explainable to a human, and has an LLM do the explaining. Osmani's test is "can I explain this?": what the change does, what it touches and why it is safe to ship. Ask the agent for that explanation and judge it. If you cannot explain the change after reading it, it should not ship.
 
 Turn this into a policy by risk. The tiers below are a starting point, not a standard; adjust them to your system:
 

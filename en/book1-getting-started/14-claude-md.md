@@ -52,7 +52,7 @@ Two things the first edition of this handbook got wrong or left out:
 
 `AGENTS.md` is a Markdown file of instructions for AI coding agents, used by several tools. If your repository already has one, you do not need to copy it into a second file for Claude.
 
-Starting with Claude Code 2.1.277, Claude reads `AGENTS.md` as your project instructions when there is no `CLAUDE.md`. Here is the default behavior:
+Starting with Claude Code 2.1.277 (released 2026-09-18), Claude reads `AGENTS.md` as your project instructions when there is no `CLAUDE.md`. Version 2.1.281 extended this to sessions on Amazon Bedrock, Google Vertex AI (Agent Platform), Microsoft Foundry, LLM gateways and sessions with telemetry disabled; on older versions those sessions read `CLAUDE.md` only. Here is the default behavior:
 
 | Your repository has | Claude reads |
 | --- | --- |

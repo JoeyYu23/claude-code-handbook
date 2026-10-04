@@ -15,7 +15,7 @@ Messages look like `You've hit your session limit · resets 3:45pm`. Your subscr
 
 1. Wait until the reset time shown.
 2. Run `/usage` to see your limits and reset times.
-3. Run `/model` to switch model family. The Opus and Sonnet limits are counted per model.
+3. For an Opus or Sonnet limit, run `/model` and switch to a model outside that family. Session and weekly limits are shared across all models, so switching does not help there.
 4. Run `/usage-credits` to buy extra usage on Pro or Max, or to ask your admin on Team or Enterprise.
 
 If the message says `You've hit your monthly spend limit`, raise the limit in your usage settings at claude.ai/settings/usage, or ask your admin.

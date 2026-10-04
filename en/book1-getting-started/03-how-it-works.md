@@ -59,7 +59,7 @@ Tools are what the harness lets the model do. Claude asks to use a tool, the har
 | Delegation | `Agent` | Hand a sub-task to a subagent with its own memory |
 | Asking | `AskUserQuestion` | Ask you a multiple-choice question |
 
-There are many more for planning, scheduling, worktrees and connected services. Run `/help` in a session, or see the official tools reference, for the full list. The tool names matter later, because permission rules are written in terms of them (Chapter 6).
+There are many more for planning, scheduling, worktrees and connected services. See the official tools reference for the full list. The tool names matter later, because permission rules are written in terms of them (Chapter 6).
 
 ### What gets sent on every turn
 
@@ -74,9 +74,9 @@ That sounds wasteful, and without help it would be. *Prompt caching* fixes most 
 
 ### The baseline debate
 
-How big is item 1 and 2 before you type anything? In July 2026 Systima put a logging proxy between Claude Code and the model and measured a simple first turn. They found about 32,800 tokens of overhead for Claude Code 2.1.207, against about 6,900 for the open-source OpenCode, on the same model. By their estimate, roughly 24,000 of Claude Code's tokens were tool definitions. The post reached the top of Hacker News under the headline "Claude Code sends 33k tokens before reading the prompt; OpenCode sends 7k".
+How big is item 1 and 2 before you type anything? In July 2026 Systima put a logging proxy between Claude Code and the model and measured a simple first turn. They found about 32,800 tokens of overhead for Claude Code 2.1.207, against about 6,900 for the open-source OpenCode, on the same model. By their estimate, roughly 24,000 of Claude Code's tokens were tool definitions. The post drew about 700 points on Hacker News under the headline "Claude Code sends 33k tokens before reading the prompt; OpenCode sends 7k".
 
-The pushback was just as instructive. Commenters noted that the test used Claude Sonnet 4.5, an older model; that after the first turn most of the overhead is cached and cheap; and that both tools scored the same on Systima's own task checks. One commenter compared it to judging contractors by their quote alone without asking what the work includes.
+The pushback was just as instructive. Commenters noted that the test used Claude Sonnet 4.5, an older model, and that after the first turn most of the overhead is cached and cheap. Systima's own checks found both tools completed every scored task correctly, so the extra tokens bought no visible quality difference on those tasks. One commenter compared the headline number to judging contractors by their quote alone without asking what the work includes.
 
 Both sides have a point, and the practical lesson for you is simple:
 
@@ -116,7 +116,7 @@ Claude Code runs on Anthropic's Claude models. As of October 2026 the current li
 | Claude Sonnet 5.5 | `sonnet` | Fast, strong everyday coding | $2 / $10 |
 | Claude Haiku 4.5 | `haiku` | Quick, simple tasks | $1 / $5 |
 
-The prices are Anthropic's API list prices. On a Pro, Max or Team subscription you pay a flat fee and draw down usage limits instead, though Fable usage can be billed to extra usage credits depending on your plan; Claude Code asks before it does that.
+Anthropic's models page lists Haiku 4.5 as not retiring before 15 October 2026, so check it is still offered. The prices are Anthropic's API list prices. On a Pro, Max or Team subscription you pay a flat fee and draw down usage limits instead, though Fable usage can be billed to extra usage credits depending on your plan; Claude Code asks before it does that.
 
 On the Anthropic API and on Pro, Max, Team and Enterprise plans, the default model is Opus 5.5. Switch with `/model` during a session (with no argument it opens a picker), or start with a flag:
 
@@ -138,7 +138,7 @@ Current models use *adaptive reasoning*: on each step the model decides whether 
 | `xhigh` | Deeper reasoning at higher cost |
 | `max` | Hard problems you want worked through without you. Can overthink; test before using it routinely |
 
-Set it with `/effort` (with no argument it opens a slider), `/effort high`, or at launch with `claude --effort high`. For one hard question without changing the session, put the word `ultrathink` in your message. The current level shows in the session header next to the model name.
+Set it with `/effort` (with no argument it opens a slider), `/effort high`, or at launch with `claude --effort high`. For one hard question without changing the session, put the word `ultrathink` in your message.
 
 A practical rule: stay on the default, and raise effort for a task only when the default visibly cuts corners. Book 2's [Voice, Fast Mode and Effort](/en/book2-advanced/20-voice-fast-effort) chapter covers the trade-offs.
 
@@ -146,7 +146,7 @@ A practical rule: stay on the default, and raise effort for a task only when the
 
 Because Claude Code acts on your real files, two mechanisms protect you.
 
-**Checkpoints.** Before Claude edits a file, it saves a snapshot. Press `Esc` twice on an empty prompt to open the rewind menu and go back to an earlier point, or just ask Claude to undo. Checkpoints cover file edits only; they cannot undo a database change, a sent message or a deploy.
+**Checkpoints.** Before Claude edits a file, it saves a snapshot. Press `Esc` twice on an empty prompt to open the rewind menu and go back to an earlier point, or just ask Claude to undo. Checkpoints track only edits made through Claude's file tools; they cannot undo files changed by a shell command, a database change, a sent message or a deploy.
 
 **Permissions.** The permission mode decides which actions run without asking you. By default, sessions now start in auto mode, where a classifier model blocks risky actions. Chapter 6 covers this in full.
 

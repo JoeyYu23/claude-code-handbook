@@ -26,7 +26,7 @@ Two details changed how people should think about this table:
 
 ### AGENTS.md
 
-Since v2.1.277, Claude Code reads `AGENTS.md`, the file Codex and other agents use, when there is no `CLAUDE.md`, `.claude/CLAUDE.md`, or `CLAUDE.local.md` in the working directory or above it. If any of those exist, it reads the CLAUDE.md files instead. To read both, set **Project instructions** to `claude-md-and-agents-md` in `/config`. The alternative that works everywhere is a one-line CLAUDE.md that imports `@AGENTS.md`.
+Since v2.1.277, Claude Code reads `AGENTS.md`, the file Codex and other agents use, when there is no `CLAUDE.md`, `.claude/CLAUDE.md`, or `CLAUDE.local.md` in the working directory or above it. If any of those exist, it reads the CLAUDE.md files instead. To read both, set **Project instructions** to `claude-md-and-agents-md` in `/config`. Sessions on Amazon Bedrock, Vertex (Agent Platform), Foundry, an LLM gateway, or with telemetry off read it only from v2.1.281 (2026-09-23). The alternative that works everywhere is a one-line CLAUDE.md that imports `@AGENTS.md`.
 
 One trap: adding a personal `CLAUDE.local.md` to a repository that relies on `AGENTS.md` makes Claude stop reading `AGENTS.md` for you, because CLAUDE.local.md counts in that check. [Portability](/en/book3-architect/11-portability) covers running one setup across several tools.
 

@@ -72,11 +72,11 @@ A short tour. Each item gets its own chapter later.
 
 Claude Code is not the only coding agent, and you should know the main alternatives. The field changes monthly, so treat this as a snapshot from October 2026.
 
-**OpenAI Codex.** OpenAI's coding agent, with a terminal CLI, a desktop app, an IDE extension and cloud environments. It runs OpenAI's GPT models; the newest at the time of writing is GPT-6.1 Sol, released 29 September 2026. It is the closest like-for-like competitor to Claude Code.
+**OpenAI Codex.** OpenAI's coding agent, with a terminal CLI, a desktop app, an IDE extension and cloud environments. It runs OpenAI's GPT models; GPT-6.1 Sol was added to it on 29 September 2026. It is the closest like-for-like competitor to Claude Code.
 
 **Cursor.** A code editor built around AI, based on VS Code. It started as an editor with an assistant and has grown agent features of its own: cloud agents and, since 10 September 2026, *Cursor Projects*, where a coordinator agent splits a larger job across several agents. Cursor lets you choose among models from several companies.
 
-**Google Antigravity CLI.** In May 2026 Google announced it was moving from Gemini CLI to Antigravity CLI, a new terminal agent that runs several agents at once in the background. Gemini CLI stopped serving individual Google AI Pro and Ultra users on 18 June 2026. Business customers with Gemini Code Assist licences keep Gemini CLI.
+**Google Antigravity CLI.** In May 2026 Google announced it was moving from Gemini CLI to Antigravity CLI, a new terminal agent that runs several agents at once in the background. Google's announcement said Gemini CLI would stop serving individual Google AI Pro and Ultra users, and free Code Assist for individuals users, on 18 June 2026. Business customers with Gemini Code Assist licences keep Gemini CLI.
 
 **GitHub Copilot.** Still the most common assistant inside editors, and it now runs agents too. Claude models, including Sonnet 5.5, are available inside Copilot.
 
@@ -90,7 +90,7 @@ As recently as March 2026, the usual picture of Claude Code was a skilled collea
 
 First, the asking has mostly stopped. Since 14 August 2026, new sessions on the Pro, Max and Team plans start in *auto mode*: a second AI model, the classifier, reviews each risky action in the background and blocks the dangerous ones, so Claude does not stop to ask you about every file edit and command. From version 2.1.283 that is the starting mode on every plan. Chapter 6 explains what this means for your safety.
 
-Second, the work got longer. Earlier tools helped you write a function. Current agents take a feature request and come back with a branch, tests and a summary. People who use them heavily describe their job as moving from writing code to specifying it and checking it. Addy Osmani, an engineering lead at Google, calls the result "the code nobody reads": line-by-line review is fading, so the checks you set up have to carry more of the weight.
+Second, the work got longer. Earlier tools helped you write a function. Current agents take a feature request and come back with a branch, tests and a summary. People who use them heavily describe their job as moving from writing code to specifying it and checking it. Addy Osmani, who writes about engineering with AI, calls the result "the code nobody reads": line-by-line review is fading, so the checks you set up have to carry more of the weight.
 
 That is why this book puts *checking the work* at its center. You do not have to read every line. You do have to know how to confirm that the thing works.
 

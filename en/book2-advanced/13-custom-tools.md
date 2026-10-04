@@ -67,7 +67,7 @@ Two `_meta` keys in a tool's `tools/list` entry change how Claude Code treats it
 
 | Key | Effect |
 | :- | :- |
-| `"anthropic/requiresUserInteraction": true` | A person must approve every call, in every permission mode, with no "don't ask again". Use it for consent steps, money and anything irreversible. |
+| `"anthropic/requiresUserInteraction": true` | A person must approve every call, even in `acceptEdits`, `auto` and `bypassPermissions`, with no "don't ask again" and no allow rule that skips it (`dontAsk` mode denies the call instead). Use it for consent steps, money and anything irreversible. |
 | `"anthropic/alwaysLoad": true` | The tool's schema loads at session start instead of waiting for tool search. Use it sparingly; each one costs context in every request. |
 
 The standard `readOnlyHint` and `destructiveHint` annotations describe a tool's behaviour to clients and reviewers. They are hints, not enforcement.

@@ -6,7 +6,7 @@ When an agent writes most of your UI code, reading every line stops being the ch
 
 That loop is now mostly closed. Claude Code can open your app in a browser pane, drive an iOS Simulator, control native apps on your desktop, and publish a page that shows you what it built. This chapter covers each of those tools, when to pick which, and how to set them up so the agent checks its own UI work before it tells you it is done.
 
-Boris Cherny, who leads Claude Code, put it this way at Y Combinator's Startup School 2026 (quoted by John Gruber on Daring Fireball, August 2, 2026): "The verification is probably the single most important thing that people do not get right." His example was an experiment that had Claude rewrite the Electron Claude desktop app in Swift, screenshot both versions, and compare them pixel by pixel; it had been running for about two weeks. Gruber's reply is worth keeping in mind too: pixel matching proves the copy matches the reference, not that the reference is any good. Visual checks answer "did it build what I specified?" You still own "was that the right thing to specify?"
+Boris Cherny, who leads Claude Code, put it this way at Y Combinator's Startup School 2026 (quoted by John Gruber on Daring Fireball, August 2, 2026): "The verification is probably the single most important thing that people do not get right, largely." His example was an experiment that had Claude rewrite the Electron Claude desktop app in Swift, screenshot both versions, and compare them pixel by pixel; it had been running for about two weeks. Gruber's reply is worth keeping in mind too: pixel matching proves the copy matches the reference, not that the reference is any good. Visual checks answer "did it build what I specified?" You still own "was that the right thing to specify?"
 
 You do not need a two-week project to use the idea. You need a way for the agent to see.
 
@@ -184,7 +184,7 @@ Computer use lets Claude see your screen and control the mouse and keyboard. It 
 Availability matters here, because it is narrower than the other tools:
 
 - **CLI:** research preview on macOS, Pro or Max plans only, interactive sessions only (not with `-p`).
-- **Desktop:** research preview on macOS and Windows, Pro or Max only. Not on Team or Enterprise plans. Since early September 2026 it can also run in the background on macOS (beta), working in approved apps while you keep working.
+- **Desktop:** research preview on macOS and Windows, Pro or Max only. Not on Team or Enterprise plans. Since early September 2026 it can also run in the background on macOS, working in approved apps while you keep working.
 
 ### Enable it in the CLI
 

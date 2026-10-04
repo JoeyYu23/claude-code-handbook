@@ -8,19 +8,19 @@ The rule for reading any number here: a benchmark score tells you about that mod
 
 ## Vendor-reported model scores
 
-On 2026-09-22 Anthropic published scores for Claude Opus 5.5 alongside Fable 5.1, Opus 5, GPT-6 Astra and GPT-5.6 Sol. These are the coding and agent rows from [that page](https://www.anthropic.com/claude-opus-5-5). All are the vendor's own measurements.
+On 2026-09-22 Anthropic published scores for Claude Opus 5.5 alongside Fable 5.1, Opus 5, GPT-6 Astra and GPT-5.6 Sol. These are the coding and agent rows from [that page](https://www.anthropic.com/claude-opus-5-5). The Claude figures are Anthropic's own measurements; its footnote says the GPT-6 Astra and GPT-5.6 Sol Terminal-Bench figures are as reported by OpenAI.
 
 | Benchmark | What it measures | Opus 5.5 | Fable 5.1 | Opus 5 | GPT-6 Astra | GPT-5.6 Sol |
 | --- | --- | --- | --- | --- | --- | --- |
-| Terminal-Bench 4.0 | Agentic work in a terminal; Anthropic ran it with Claude Code as the harness | 66.4% (xhigh effort) | 55.8% | 52.3% | 57.9% (high effort) | 37.3% |
+| Terminal-Bench 4.0 | Agentic work in a terminal; the public leaderboard Anthropic's footnote cites uses the Claude Code harness | 66.4% (xhigh effort) | 55.8% | 52.3% | 57.9% (high effort) | 37.3% |
 | FrontierCode v1.1 (Main) | Likelihood that agent-written code would be merged | 54.4% | 50.3% | 48.0% | 53.3% | 47.5% |
 | CursorBench 4.0 | Multi-file, ambiguous tasks drawn from real sessions | 57.8% | 51.8% | 46.6% | not listed | 41.7% |
 | OSWorld 2.1 | Computer use (partial-credit scoring) | 81.8% | 80.7% | 74.0% | not listed | not listed |
 
 Caveats, most important first:
 
-1. **Vendor-run.** The same company built the model and chose the benchmarks, effort settings and harness. Terminal-Bench 4.0 carries a standard error of about 2.6 points for Opus 5.5 and 1.6 to 2 for the others, so adjacent rows are not clearly different.
-2. **Settings differ by row.** Opus 5.5 is quoted at xhigh effort on Terminal-Bench 4.0 but at default effort on FrontierCode; GPT-6 Astra at high effort. A cell is not a like-for-like comparison unless the effort matches.
+1. **Vendor-run.** The same company built the model and chose the benchmarks, effort settings and harness. Terminal-Bench 4.0 carries a standard error of about 2.6 points for Opus 5.5 and 1.6 to 2 for the other Claude models, so adjacent rows are not clearly different.
+2. **Settings differ by row.** Unless noted, Opus 5.5's results use max effort; Terminal-Bench 4.0 is quoted at xhigh for Opus 5.5 and at high effort for GPT-6 Astra (each model's highest score, per the page). The same page reports that at its default (medium) effort Opus 5.5 scores 54.6% on FrontierCode and 52.5% on CursorBench, so a cell is not a like-for-like comparison unless the effort matches.
 3. **Anthropic says so itself.** The page states that "benchmark margins have become a less reliable guide to real-world differences" and that, in its own use, the gap between Opus 5.5 and Fable 5.1 is narrower than the scores suggest.
 4. **Footnotes matter.** The page attaches numbered footnotes to several rows; read them before quoting a number.
 

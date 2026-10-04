@@ -30,7 +30,7 @@ He adds one more line that is easy to skip: "A human still has to own what code 
 
 Each item on that list maps to work this book has described. Choosing the problem and setting the bar is the spec and the "done when" line in [Verification and Evals at Scale](/en/book3-architect/02-verification-and-evals). Choosing which signals to trust is the harness, the checks and the eval sets in [Harness Engineering](/en/book3-architect/01-harness-engineering). Deciding when evidence is enough is the risk tiers in [Team Workflows](/en/book3-architect/12-team-workflows). Setting limits on what an agent can touch, and what it can spend, is [Containment and Security](/en/book3-architect/09-containment-and-security) and [Cost Reality, Measured](/en/book3-architect/10-cost-reality-measured). None of these are new activities. What is new is that they are now most of the job, rather than the overhead around it.
 
-Osmani's most practical warning is about scale: "Your cognitive bandwidth does not scale with the agents." Running more agents does not give us more attention. The best setups, he argues, will not be the ones that remove humans most completely, but the ones that "place" human involvement most intelligently.
+Osmani's most practical warning is about scale: we can fire up dozens or thousands of agents in parallel, but "your own cognitive bandwidth does not scale in the same way." Running more agents does not give us more attention. The best setups, he argues, will not be the ones that remove humans most completely, but the ones that "place" human involvement most intelligently.
 
 ## "Builder"
 

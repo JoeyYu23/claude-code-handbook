@@ -4,7 +4,7 @@
 
 There are two ways to limit the damage an agent can do. You can supervise what it does, by approving actions or having a classifier approve them. Or you can contain what it is able to do, with boundaries the operating system enforces whatever the agent decides. Anthropic's engineering post "How we contain Claude across products" (May 2026) puts it plainly: supervision is probabilistic and has a miss rate; containment is deterministic and is "what gets hit when everything probabilistic misses."
 
-Since August 2026, Claude Code supervises by default: auto mode is the starting permission mode. This chapter is about what that does and doesn't buy you, and how to add the containment that has to sit underneath it once agents run for hours without you watching.
+Claude Code now supervises by default: auto mode became the default for Pro, Max and Team on 14 August 2026 and is the starting permission mode on all plans from v2.1.283. The mode that asks every time is now called Manual (config value `default`). This chapter is about what that does and doesn't buy you, and how to add the containment that has to sit underneath it once agents run for hours without you watching.
 
 ## Three sources of risk
 

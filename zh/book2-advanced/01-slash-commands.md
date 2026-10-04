@@ -1,5 +1,9 @@
 # 第一章：内置 Slash Commands 完全指南
 
+::: info 中文版仍为第一版（2026 年 3 月）
+第二版（2026 年 10 月）目前只有英文：[阅读英文第二版 →](/en/book1-getting-started/)
+:::
+
 Claude Code 内置了丰富的 slash commands，涵盖从 session 管理到安全分析的方方面面。这些不仅仅是快捷方式——它们是控制 Claude 在 session 中行为的主要接口。熟练掌握它们将显著改变你的工作效率。
 
 ---

@@ -5,7 +5,7 @@
 Three different meters run while you work, and most confusion about "usage" comes from mixing them up:
 
 1. **The context window**, per session. How much the model can see at once. Running into it triggers compaction, not a bill. [Context Engineering](/en/book2-advanced/15-context-engineering) covers it.
-2. **Plan limits**, on a Pro, Max, Team, or Enterprise subscription. A rolling five-hour session window and a weekly window, shared across your Claude Code surfaces (and, on Team and Enterprise seats, with Claude chat and Cowork).
+2. **Plan limits**, on a Pro, Max, Team, or Enterprise subscription. A rolling five-hour session window and a weekly window. Claude Code shares these limits with the rest of your plan: per Anthropic's pricing page, your work in the terminal and your Claude chats draw from one pool.
 3. **Dollars**, when you use an API key, a cloud provider, or usage credits past your plan's allowance.
 
 The same habits move all three, but you diagnose them differently. This chapter covers the weekly limit changes of September 2026, how to read `/usage`, how prompt caching works in Claude Code (including the one-hour cache), and how effort and model choice change what each turn costs. For measuring spend across a team and setting budgets, see [Cost Reality, Measured](/en/book3-architect/10-cost-reality-measured).
@@ -161,7 +161,7 @@ On the Anthropic API the aliases resolve to `opus` = Opus 5.5, `sonnet` = Sonnet
 
 Practical rules:
 
-- **Pick model and effort at the start of a session** and leave them. Lydia Hallie's guide on the Claude blog puts cache breaks first in its list of what drives cost.
+- **Pick model and effort at the start of a session** and leave them. Lydia Hallie's guide on the Claude blog gives the same advice: set model and effort before you start, because changing either mid-conversation can bust the cache.
 - **Use the default model for most work.** Reach for `fable` or `opus` at higher effort for long autonomous runs and hard debugging, not for renames.
 - **Set cheaper models for simple subagents** with `model: haiku` in the subagent file, so a model switch in your main session does not drag every helper along.
 
@@ -203,6 +203,7 @@ In rough order of impact:
 - "Customize your status line" (rate limit and prompt cache fields), Claude Code Docs, accessed 2026-10-04. https://code.claude.com/docs/en/statusline
 - "Run Claude Code programmatically" (`total_cost_usd`), Claude Code Docs, accessed 2026-10-04. https://code.claude.com/docs/en/headless
 - "Pricing" (model prices, prompt caching multipliers), Claude Platform Docs, accessed 2026-10-04. https://platform.claude.com/docs/en/about-claude/pricing
+- "Pricing" (plans; Claude Code shares usage limits with Claude chat), Anthropic, accessed 2026-10-04. https://claude.com/pricing
 - "Opus 5.5 built for coding sessions that use more context", Michael Segner, Anthropic (Claude blog), 2026-09-24. https://claude.com/blog/claude-opus-5-5-built-for-coding-sessions-that-use-more-context
 - "Maximizing the value of your Claude Code sessions", Lydia Hallie, Anthropic (Claude blog), 2026-08-14. https://claude.com/blog/maximizing-the-value-of-your-claude-code-sessions
 - "We're going to need default hard budget caps on pretty much everything", Simon Willison, 2026-10-03. https://simonwillison.net/2026/Oct/3/default-hard-budget-caps/

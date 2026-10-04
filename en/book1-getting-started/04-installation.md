@@ -234,7 +234,7 @@ claude --version
 claude doctor
 ```
 
-The first should print a version number followed by `(Claude Code)`. The second should end with `No installation issues found.` Then start `claude` in any folder and confirm you reach a prompt with no sign-in request. On the desktop app, the check is simpler: the **Code** tab opens and lets you select a folder.
+The first should print a version number followed by `(Claude Code)`. The second should report `No installation issues found.` Then start `claude` in any folder and confirm you reach a prompt with no sign-in request. On the desktop app, the check is simpler: the **Code** tab opens and lets you select a folder.
 
 ## Sources
 

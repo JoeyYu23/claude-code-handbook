@@ -35,7 +35,7 @@ Two design details are worth knowing. The classifier sees your messages, Claude'
 - Installing dependencies already declared in your project (for example in `package.json` or `requirements.txt`)
 - Reading `.env` and sending credentials to the service they belong to
 - Read-only web requests
-- Pushing to any branch of the repository you are working in, and opening a pull request for the work you asked for
+- Pushing to a branch of the repository you are working in (branches named like deploy targets, such as `production` or `gh-pages`, are judged separately), and opening a pull request for the work you asked for
 - Reading, reviewing and writing security-related code as part of your task
 
 ### What auto mode blocks by default
@@ -72,7 +72,7 @@ The classifier reads the conversation, so what you say matters.
 You see a short notice near the input, such as `bash denied by auto mode · [Data Exfiltration] · /permissions`. The text in brackets names the rule that matched. Then:
 
 - Open `/permissions` and go to the **Recently denied** tab to see what was blocked. Select an entry and press `r` to retry it with your manual approval.
-- If the same kind of action keeps getting blocked because it touches something you trust (a company package registry, a team bucket), an administrator can list it as trusted infrastructure. Run `/auto-mode-setup` to have Claude Code draft those entries.
+- If the same kind of action keeps getting blocked because it touches something you trust (a company package registry, a team bucket), an administrator can list it as trusted infrastructure. Run `/auto-mode-setup` (Pro, Max and Team plans only) to have Claude Code draft those entries.
 - If the classifier blocks 3 actions in a row, or 20 in one session, auto mode pauses and Claude Code goes back to asking you. Approving the prompted action resumes auto mode.
 
 ### What auto mode is not
@@ -213,6 +213,6 @@ Finally, in a separate terminal, run `claude auto-mode config` and confirm it pr
 - "Configure permissions", Claude Code Docs, Anthropic, accessed 2026-10-04. https://code.claude.com/docs/en/permissions
 - "Configure auto mode", Claude Code Docs, Anthropic, accessed 2026-10-04. https://code.claude.com/docs/en/auto-mode-config
 - "What's new" (Week 13 research preview; Week 32 default from 14 August), Claude Code Docs, Anthropic, accessed 2026-10-04. https://code.claude.com/docs/en/whats-new
-- Conner Phillippi et al., "Auto mode is now the default in Claude Code", Claude blog, Anthropic, 2026-08-07. https://claude.com/blog/auto-mode-default-in-claude-code
+- Conner Phillippi et al., "Auto mode is now the default in Claude Code for Pro, Max, and Team plans", Claude blog, Anthropic, 2026-08-07. https://claude.com/blog/auto-mode-default-in-claude-code
 - Johann Rehberger, "Breaking Claude Code Opus 5 Auto Mode", Embrace The Red, 2026-08-26. https://embracethered.com/blog/posts/2026/breaking-claude-code-opus-5-and-automode/
 - `claude --help`, `claude auto-mode --help`, `claude auto-mode defaults`, Claude Code 2.1.289, run 2026-10-04.

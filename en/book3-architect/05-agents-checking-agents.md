@@ -110,7 +110,7 @@ In a debate, agents argue toward an answer instead of one agent checking another
 **Evidence that it often doesn't:**
 
 - Smit et al. ("Should we be going MAD?", 2023) found that multi-agent debate, as usually implemented, does not reliably outperform other prompting strategies such as self-consistency. Some variants become competitive only after tuning.
-- Choi, Zhu and Li ("Debate or Vote", arXiv:2508.17536, 2025) found that plain majority voting performs about as well as debate across seven benchmarks.
+- Choi, Zhu and Li ("Debate or Vote", arXiv:2508.17536, 2025) found across seven benchmarks that majority voting alone accounts for most of the gains usually attributed to multi-agent debate.
 - Wynn, Satija and Hadfield ("Talk Isn't Always Cheap", arXiv:2509.05396, 2025) found that debate can *reduce* accuracy over rounds. Models switched from correct to incorrect answers under peer pressure, favoring agreement over challenging flawed reasoning.
 
 The practical reading: debate earns its cost when there is something to find, such as a hidden root cause or competing hypotheses that can each be tested. It is weak when agents only exchange opinions. The agent-teams docs use it for exactly that case:
@@ -149,11 +149,11 @@ Agent checks lower the error rate. They don't remove the need for someone who is
 
 Put people where mistakes are expensive or slow to show up:
 
-- **Design, before work starts.** Agents can't yet judge maintainability reliably, so architecture and program design are where human review has the most leverage (see [Orchestrating Many Agents](/en/book3-architect/04-orchestrating-many-agents)).
+- **Design, before work starts.** Addy Osmani argues that humans are needed up front for product intent, system design, and the quality bar, and again where maintainability trade-offs come up. That is where review has the most leverage (see [Orchestrating Many Agents](/en/book3-architect/04-orchestrating-many-agents)).
 - **Irreversible actions.** Merges to the main branch, production deploys, data migrations, and anything that touches money or permissions.
 - **Changes to the rules themselves**, covered in the next section.
 
-Then make human review cheap. A human should receive a short list of confirmed findings, each with severity and evidence, sorted by risk, and not a raw transcript. OpenAI's internal pipeline, as Gergely Orosz describes it, routes review rigor by risk: low-risk changes can be approved automatically, and high-risk ones get stricter review. Addy Osmani's warning sets the limit: the number of checks is not the same as quality, and your attention does not grow as you add agents. [Verification and Evals at Scale](/en/book3-architect/02-verification-and-evals) covers how to decide what a human must see, and [Team Workflows](/en/book3-architect/12-team-workflows) covers how a team divides that work.
+Then make human review cheap. A human should receive a short list of confirmed findings, each with severity and evidence, sorted by risk, and not a raw transcript. OpenAI's internal pipeline, as Gergely Orosz describes it, classifies changes by risk: high-risk ones can get stricter review, and areas of the codebase can opt in to an agent that auto-approves low-risk PRs. Addy Osmani's warning sets the limit: "Number of checks != quality", and every approach still routes its output to one person's attention. [Verification and Evals at Scale](/en/book3-architect/02-verification-and-evals) covers how to decide what a human must see, and [Team Workflows](/en/book3-architect/12-team-workflows) covers how a team divides that work.
 
 ## Change control: taking in opinions without chasing them
 

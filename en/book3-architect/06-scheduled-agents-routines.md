@@ -37,7 +37,7 @@ Routines are in research preview and available on Pro, Max, Team, and Enterprise
 /schedule weekdays at 9:07, list pull requests merged since the previous run, group them by area, and open an issue titled "Merged yesterday" with the summary
 ```
 
-Claude asks follow-up questions about the repository and schedule before saving. `/schedule list`, `/schedule update`, and `/schedule run` manage routines from the CLI. For a schedule the presets don't offer, pick the closest preset and then set a cron expression with `/schedule update`. Anything more frequent than once an hour is rejected. `/schedule` needs a claude.ai subscription login. With an API key or a cloud provider login, the command is hidden.
+Claude asks follow-up questions about the repository and schedule before saving. `/schedule list`, `/schedule update`, and `/schedule run` manage routines from the CLI. For a schedule the presets don't offer, pick the closest preset and then set a cron expression with `/schedule update`. Anything more frequent than once an hour is rejected. `/schedule` needs a claude.ai subscription login. With a Console API key it shows an error instead, and with a cloud provider login it is an unknown command.
 
 Things to design for:
 
@@ -163,8 +163,8 @@ Why each piece is there:
 
 - **The prompt covers "everything since the last success"**, not "today". A run after three days offline then covers three days in one pass. This matches the behavior of Desktop's catch-up run and launchd's merged wake-up run: one run covers the gap, instead of three runs racing each other.
 - **`--permission-mode dontAsk` plus `--allowedTools`** means anything you didn't list is denied instead of waiting for an approval that will never come. The trailing ` *` in `Bash(git log *)` is prefix matching, and the space before `*` matters. Make the allow list as narrow as the job allows.
-- **`--max-turns` and `--max-budget-usd`** bound a run that goes wrong. Both apply only in `-p` mode.
-- **Check both the exit code and `is_error`.** The JSON result's `subtype` field is not enough. In a test for this chapter, a run that failed on an API error ("Credit balance is too low") exited with code 1 and reported `"subtype": "success"` together with `"is_error": true`.
+- **`--max-turns` and `--max-budget-usd`** bound a run that goes wrong. Both apply only in `-p` mode. `--max-turns` is documented in the CLI reference but does not appear in `claude --help`.
+- **Check both the exit code and `is_error`.** The JSON result's `subtype` field is not enough: the SDK reference gives the `success` result its own `is_error` boolean, next to `api_error_status`. In testing for this chapter, a run that failed on an API error ("Credit balance is too low") exited with code 1 and reported `"subtype": "success"` together with `"is_error": true`.
 - **`jq`** reads the JSON result. Install it if your system lacks it.
 - **`CLAUDE_CODE_RETRY_WATCHDOG=1`** makes Claude Code keep retrying capacity errors (429 and 529) with backoff instead of giving up after the default retry count, which suits unattended jobs.
 - **Authentication.** A scheduler doesn't have your interactive login. `claude setup-token` creates a one-year OAuth token for a subscription account. Store it in a file only you can read (`chmod 600`) and export it as `CLAUDE_CODE_OAUTH_TOKEN`. An `ANTHROPIC_API_KEY` in the environment takes precedence over that token. If you add `--bare` for reproducible runs, it skips `CLAUDE.md` and hooks and does not read `CLAUDE_CODE_OAUTH_TOKEN`, so it needs an API key or `apiKeyHelper`.

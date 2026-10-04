@@ -10,7 +10,7 @@ The theme running through this edition is that you no longer read every line the
 
 ### Part I: Commands, skills and plugins
 
-1. [Slash Commands](/en/book2-advanced/01-slash-commands): the built-ins that matter, including `/goal`, `/fork`, `/usage`, `/doctor`, `/code-review` and `/design`
+1. [Slash Commands](/en/book2-advanced/01-slash-commands): the built-ins that matter, including `/goal`, `/branch`, `/fork`, `/subtask`, `/usage`, `/doctor`, `/code-review` and `/design`
 2. [Custom Skills](/en/book2-advanced/02-custom-skills): writing skills, and keeping a skill library healthy with `/skill-doctor`
 3. [Skill Composition](/en/book2-advanced/03-skill-composition): stacking and chaining skills into workflows
 4. [Plugins, Marketplace and Mods](/en/book2-advanced/04-plugins-marketplace-mods): installing, testing with `claude plugin eval`, publishing, and the power and risk of mods

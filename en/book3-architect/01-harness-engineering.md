@@ -189,6 +189,6 @@ With those three in place, the choice of harness becomes an engineering decision
 - Naman Vats, Oleg Golev, "The Scaffold Effect in Coding Agents: Harness Choice as a Hidden Variable in Coding-Agent Evaluation", arXiv 2607.22585, 2026. https://arxiv.org/abs/2607.22585
 - Lilian Weng, "Harness Engineering for Self-Improvement", Lil'Log, 2026-07-04. https://lilianweng.github.io/posts/2026-07-04-harness/
 - Earendil, "What Is a Harness?", 2026-08-20. https://earendil.com/posts/what-is-a-harness/
-- Systima, "Claude Code Is Way More Token-Hungry Than OpenCode. We Measured Exactly How Much", 2026-07-12. https://systima.ai/blog/claude-code-vs-opencode-token-overhead
+- Systima, "Claude Code Is Way More Token-Hungry Than OpenCode. We Measured Exactly How Much" (page title: "Claude Code Sends 4.7x More Tokens Than OpenCode Before Reading Your Prompt"), 2026-07-12. https://systima.ai/blog/claude-code-vs-opencode-token-overhead
 - Anthropic, Claude Code docs: "How Claude remembers your project" (memory), "Commands", "Skills", "Run Claude Code programmatically" (headless), "Monitoring" (OpenTelemetry), "Test plugins with evals", accessed 2026-10-04. https://code.claude.com/docs/en/memory , https://code.claude.com/docs/en/commands , https://code.claude.com/docs/en/skills , https://code.claude.com/docs/en/headless , https://code.claude.com/docs/en/monitoring-usage , https://code.claude.com/docs/en/plugin-evals
 - Claude Code 2.1.289 CLI help (`claude --help`, `claude plugin --help`), 2026-10-04.
