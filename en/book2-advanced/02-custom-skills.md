@@ -1,399 +1,247 @@
-# Chapter 2: Custom Skills
+# Custom Skills
 
-Skills are Claude Code's mechanism for extending its behavior with reusable, shareable workflows. A skill is a Markdown file with optional YAML frontmatter that teaches Claude how to perform a specific task — either when you invoke it explicitly with `/skill-name`, or automatically when Claude detects the skill is relevant to what you are asking.
+> Verified on 2026-10-04 with Claude Code 2.1.289.
 
-If you have used the built-in `/batch` or `/simplify` commands, you have already used skills. Those are bundled skills that ship with Claude Code. This chapter covers how to write your own.
+A skill is a reusable set of instructions that Claude loads when it is relevant, or that you run by name with `/skill-name`. Skills are the cheapest way to teach Claude Code a procedure: the body costs nothing until it is used. But every skill also has a small, permanent cost, and a library of fifty skills written over a year can quietly make every session worse. This chapter covers how to write a skill, and then how to keep a skill library healthy.
 
----
+Custom commands and skills are now the same thing. A file at `.claude/commands/deploy.md` and a skill at `.claude/skills/deploy/SKILL.md` both create `/deploy`. Old command files keep working, but new work should use the skill format, which adds supporting files and more frontmatter.
 
-## What a Skill Actually Is
+## What a skill is
 
-A skill is a directory containing a `SKILL.md` file. The file has two parts:
+A skill is a directory with a `SKILL.md` file. The file has two parts:
 
-1. **YAML frontmatter** (between `---` markers) — configuration metadata that tells Claude when and how to invoke the skill.
-2. **Markdown content** — the instructions Claude follows when the skill runs.
+1. **YAML frontmatter** between `---` markers: when and how the skill runs.
+2. **Markdown content**: the instructions Claude follows once the skill is invoked.
 
-When you type `/my-skill`, Claude reads the `SKILL.md`, follows the instructions in the markdown body, and uses the permissions defined in the frontmatter. When you do not invoke it directly, Claude still knows the skill exists because its `description` field is always loaded into context — so Claude can invoke it automatically when relevant.
-
-Skills follow the [Agent Skills open standard](https://agentskills.io), which means they work across multiple AI tools, not just Claude Code.
-
----
-
-## Skill File Format
-
-Here is a minimal skill:
+Claude knows a skill exists because its name and `description` sit in a skill listing that is in context on every turn. The body loads only when you or Claude invoke the skill. Claude Code skills follow the [Agent Skills](https://agentskills.io) open standard, with extensions such as invocation control, subagent execution and shell injection.
 
 ```yaml
 ---
-name: explain-code
-description: Explains code with visual diagrams and analogies. Use when explaining how code works, teaching about a codebase, or when the user asks "how does this work?"
+description: Summarizes uncommitted changes and flags anything risky. Use when the user asks what changed, wants a commit message, or asks to review their diff.
 ---
 
-When explaining code, always include:
+## Current changes
 
-1. **Start with an analogy**: Compare the code to something from everyday life
-2. **Draw a diagram**: Use ASCII art to show the flow, structure, or relationships
-3. **Walk through the code**: Explain step-by-step what happens
-4. **Highlight a gotcha**: What's a common mistake or misconception?
+!`git diff HEAD`
 
-Keep explanations conversational. For complex concepts, use multiple analogies.
+## Instructions
+
+Summarize the changes above in two or three bullet points, then list any risks
+such as missing error handling, hardcoded values, or tests that need updating.
+If the diff is empty, say there are no uncommitted changes.
 ```
 
-The `name` becomes the slash command. The `description` is what Claude reads to decide when to invoke the skill automatically. The markdown body is what Claude reads when the skill is actually running.
+Save this as `~/.claude/skills/summarize-changes/SKILL.md`. The directory name becomes the command, `/summarize-changes`. The `` !`git diff HEAD` `` line runs before Claude sees the skill, and its output replaces the line, so Claude works from the real diff.
 
----
+## Where skills live
 
-## Skill Directory Structure
-
-Each skill lives in its own directory:
-
-```text
-my-skill/
-├── SKILL.md           # Main instructions (required)
-├── template.md        # Template for Claude to fill in (optional)
-├── examples/
-│   └── sample.md      # Example output showing expected format (optional)
-└── scripts/
-    └── validate.sh    # Script Claude can execute (optional)
-```
-
-The `SKILL.md` is the entrypoint. Supporting files are loaded by Claude only when the instructions reference them — they do not consume context unless needed. This lets you build rich skills with detailed reference material without paying context cost upfront.
-
----
-
-## Where to Store Skills
-
-| Location | Path | Applies to |
+| Location | Path | Loads in |
 |---|---|---|
-| Enterprise | Managed settings | All users in your organization |
-| Personal | `~/.claude/skills/<skill-name>/SKILL.md` | All your projects |
-| Project | `.claude/skills/<skill-name>/SKILL.md` | This project only |
-| Plugin | `<plugin>/skills/<skill-name>/SKILL.md` | Where plugin is enabled |
+| Enterprise | `.claude/skills/<name>/SKILL.md` in the managed settings directory | Every user on machines where the organization deploys it |
+| Personal | `~/.claude/skills/<name>/SKILL.md` | All your projects on this machine |
+| Project | `.claude/skills/<name>/SKILL.md` | This repository; commit it to share |
+| Nested | `<subdir>/.claude/skills/<name>/SKILL.md` | Sessions started in or below `<subdir>`, or once Claude touches files there |
+| Plugin | `<plugin>/skills/<name>/SKILL.md` | Wherever the plugin is enabled, as `/plugin-name:skill-name` |
 
-Personal skills are available everywhere on your machine. Project skills are scoped to one repo and can be checked into version control for your team. When a skill exists at multiple levels with the same name, the higher-priority level wins (enterprise > personal > project).
+When two skills share a name, enterprise beats personal and personal beats project. Plugin skills never collide because they are namespaced. A skill with the same name as a bundled skill or built-in command replaces it in a local terminal session, but not its aliases: a project `code-review` skill replaces `/code-review`, while `/review` still runs the bundled one.
 
----
+Personal skills do not reach cloud or Cowork sessions. To use a skill there, enable it on your claude.ai account, which limits you to the six frontmatter fields in the Agent Skills spec.
 
-## Frontmatter Reference
+## Frontmatter reference
 
-All frontmatter fields are optional except that `description` is strongly recommended.
-
-```yaml
----
-name: deploy
-description: Deploy the application to production. Invoke manually; do not trigger automatically.
-disable-model-invocation: true
-allowed-tools: Bash(./scripts/deploy.sh *)
-argument-hint: [environment]
-context: fork
-agent: Explore
-model: opus
-effort: high
-hooks:
-  Stop:
-    - hooks:
-        - type: command
-          command: "./scripts/verify-deploy.sh"
----
-```
+All fields are optional; `description` is the one to always write. Field names must match exactly. Claude Code silently ignores a field it does not recognize, and a YAML parse error loads the skill with no fields at all.
 
 | Field | Purpose |
 |---|---|
-| `name` | The slash command name. Defaults to directory name. Lowercase, hyphens, max 64 chars. |
-| `description` | What the skill does and when to use it. Claude reads this to decide when to load the skill. |
-| `argument-hint` | Shown in autocomplete. Example: `[issue-number]` or `[filename] [format]`. |
-| `disable-model-invocation` | Set `true` to prevent Claude from triggering this skill automatically. Use for workflows with side effects. |
-| `user-invocable` | Set `false` to hide from the `/` menu. Use for background knowledge that users should not invoke directly. |
-| `allowed-tools` | Tools Claude can use without asking permission when this skill is active. |
-| `model` | Model to use when this skill runs. Accepts aliases like `haiku` or full model IDs. |
-| `effort` | Effort level for the model when this skill runs: `low`, `medium`, `high`, `max`, or `auto`. |
-| `context` | Set `fork` to run in an isolated subagent context. |
-| `agent` | Which subagent type to use when `context: fork` is set. |
-| `hooks` | Lifecycle hooks scoped to this skill's execution lifetime. |
+| `name` | Command name. Defaults to the directory name |
+| `description` | What the skill does and when to use it. Claude matches requests against it |
+| `when_to_use` | Extra trigger phrases, appended to the description |
+| `argument-hint` | Autocomplete hint, such as `[issue-number]` |
+| `arguments` | Named positional arguments, for `$name` substitution |
+| `disable-model-invocation` | `true`: only you can run it. Also removes the description from Claude's context |
+| `user-invocable` | `false`: hidden from the `/` menu; only Claude can run it |
+| `allowed-tools` | Tools pre-approved **for the turn that invokes the skill**. Does not restrict anything |
+| `disallowed-tools` | Tools removed from Claude's pool while the skill is active |
+| `model` | Model for the rest of the current turn, or for the forked subagent with `context: fork` |
+| `effort` | `low`, `medium`, `high`, `xhigh` or `max`, depending on the model |
+| `context` | `fork` runs the skill in a subagent |
+| `agent` | Which subagent type runs a forked skill (default `general-purpose`) |
+| `background` | With `context: fork`, `false` waits for the result instead of running in the background |
+| `hooks` | Hooks registered when the skill is invoked; they stay active for the rest of the session |
+| `paths` | Globs; Claude auto-loads the skill only when working with matching files |
+| `shell` | `bash` (default) or `powershell` for injected commands |
 
----
+The combined `description` and `when_to_use` text is cut at 1,536 characters in the listing, so put the key use case first.
 
-## Creating Your First Skill
+::: warning `allowed-tools` grants, it does not restrict
+It is tempting to read `allowed-tools: Read, Grep, Glob` as "this skill can only read". It does not mean that. `allowed-tools` pre-approves the listed tools for one turn; every other tool stays callable under your normal permission rules. To keep a skill from using a tool, list it in `disallowed-tools`, or add a deny rule. Note also that a project skill's `allowed-tools` applies even in a `-p` run in a folder you never trusted, so read the `allowed-tools` of skills checked into a repository before you run Claude Code there.
+:::
 
-This walkthrough creates a skill that generates a conventional git commit message from your staged changes.
+## Writing a task skill
 
-**Step 1: Create the skill directory**
-
-```bash
-mkdir -p ~/.claude/skills/commit
-```
-
-**Step 2: Write the SKILL.md**
+This skill commits staged changes. It is a task with side effects, so only you should trigger it:
 
 ```yaml
 ---
 name: commit
-description: Generate a conventional commit message from staged changes and commit
+description: Stage and commit the current changes with a conventional commit message
 disable-model-invocation: true
-allowed-tools: Bash(git *)
+allowed-tools: Bash(git add *) Bash(git commit *) Bash(git status *) Bash(git diff *)
 ---
 
-Generate and commit staged changes with a conventional commit message.
-
-1. Run `git diff --staged` to see what is staged
-2. Analyze the changes to understand what was modified and why
-3. Write a commit message following Conventional Commits format:
-   - `feat:` for new features
-   - `fix:` for bug fixes
-   - `refactor:` for code restructuring
-   - `docs:` for documentation changes
-   - `test:` for test changes
-   - `chore:` for maintenance tasks
-4. The subject line must be under 72 characters
-5. If there is a meaningful "why" behind the changes, add it as a body paragraph
-6. Run `git commit -m "<message>"` to create the commit
-7. Show the resulting commit with `git log --oneline -1`
+1. Run `git diff --staged` to see what is staged.
+2. Write a Conventional Commits message (`feat:`, `fix:`, `refactor:`, `docs:`,
+   `test:`, `chore:`). Subject under 72 characters. Add a body only if the
+   "why" is not obvious from the diff.
+3. Commit, then show the result with `git log --oneline -1`.
 ```
 
-**Step 3: Test it**
+If Claude tries to run a `disable-model-invocation` skill on its own, Claude Code blocks the call and tells it not to reproduce the steps another way. Expect Claude to suggest that you run `/commit` yourself.
 
-Stage some changes, then run:
+### Arguments
 
-```text
-/commit
-```
-
-Claude reads the diff, analyzes the changes, and produces a commit message like `feat: add rate limiting to authentication endpoints`.
-
-The `disable-model-invocation: true` flag is critical here. You do not want Claude to commit your code automatically when it thinks a task is done — only when you explicitly invoke `/commit`.
-
----
-
-## Passing Arguments
-
-Skills support arguments through the `$ARGUMENTS` placeholder:
+`$ARGUMENTS` expands to everything typed after the command. `$ARGUMENTS[0]`, or the shorthand `$0`, is the first argument, `$1` the second, and so on, with shell-style quoting:
 
 ```yaml
 ---
-name: fix-issue
-description: Fix a GitHub issue by number
-disable-model-invocation: true
-allowed-tools: Bash(gh *), Read, Edit, Bash(npm test)
-argument-hint: <issue-number>
+name: migrate-component
+description: Migrate a component from one framework to another
+argument-hint: <component> <from> <to>
 ---
 
-Fix GitHub issue $ARGUMENTS following our coding standards.
-
-1. Run `gh issue view $ARGUMENTS` to read the issue description
-2. Understand the requirements and acceptance criteria
-3. Find the relevant files in the codebase
-4. Implement the fix with tests
-5. Run the test suite to verify the fix
-6. Create a commit referencing the issue: `git commit -m "fix: <description> (#$ARGUMENTS)"`
+Migrate the $0 component from $1 to $2. Preserve all existing behavior and tests.
 ```
 
-Usage:
+`/migrate-component SearchBar React Vue` fills all three. If a skill gets arguments but has no placeholder, Claude Code appends `ARGUMENTS: <value>` so nothing is lost. Other substitutions include `${CLAUDE_SKILL_DIR}` (the skill's own folder, useful for bundled scripts), `${CLAUDE_PROJECT_DIR}` and `${CLAUDE_SESSION_ID}`.
 
-```text
-/fix-issue 847
-```
+### Bundled scripts without permission prompts
 
-For multiple positional arguments, use `$ARGUMENTS[0]`, `$ARGUMENTS[1]`, etc., or the shorthand `$0`, `$1`, `$2`:
+Use the same variable in the body and in `allowed-tools`, and the script runs without a prompt:
 
 ```yaml
 ---
-name: migrate-module
-description: Migrate a module from one framework to another
+name: render-chart
+description: Render a chart from a CSV file
+allowed-tools: Bash(${CLAUDE_SKILL_DIR}/scripts/render.sh *)
 ---
 
-Migrate the $0 module from $1 to $2.
-
-Keep all existing tests passing. Preserve the public API contract.
-Document any breaking changes in a MIGRATION.md file.
+Run `${CLAUDE_SKILL_DIR}/scripts/render.sh <csv-file>` to render the chart.
 ```
 
-Usage:
+### Shell injection, carefully
 
-```text
-/migrate-module UserAuth Express Fastify
+`` !`command` `` (or a fenced block opened with ` ```! `) runs before Claude sees the skill. Three rules catch people out:
+
+- A failing command aborts the whole invocation, and Claude never sees the skill. Append `|| true` to a check that exits non-zero on findings.
+- Injected commands never prompt. Outside auto mode, a command your rules would ask about aborts the invocation; pre-approve it with `allowed-tools`.
+- Organizations can turn injection off with `"disableSkillShellExecution": true`. Each command is then replaced with a placeholder.
+
+### Running a skill in a subagent
+
+`context: fork` runs the skill in a fresh subagent of the type named in `agent`. The subagent does not see your conversation, so the skill must stand on its own. Since 2.1.218 a forked skill runs in the background by default and its result arrives when done; set `background: false` when the next step needs the result. A forked skill that runs in the background edits outside your checkpoints, so `/rewind` will not undo its changes.
+
+## How skills stay in context
+
+Understanding the lifecycle explains most "Claude stopped following my skill" reports.
+
+- **The listing is always on.** Every skill Claude can invoke adds its name and description to every turn, used or not. The listing's budget is 1% of the model's context window. When it overflows, Claude Code drops descriptions from your least-used skills first, which removes the keywords Claude matches on.
+- **The body stays once loaded.** An invoked skill enters the conversation as one message and stays across turns. Claude Code does not re-read the file, so a step like "run the tests" is read once; "run the tests after every edit" keeps applying.
+- **Compaction keeps only the start.** After auto-compaction, Claude Code re-attaches the most recent invocation of each skill, keeping its first 5,000 tokens, within a combined 25,000-token budget filled from the most recent skill backward. Put the important rules at the top.
+- **`allowed-tools` is per turn.** The grant clears when you send your next message, even though the instructions stay.
+
+## Keeping a skill library healthy
+
+### Measure cost and use with `/skill-doctor`
+
+`/skill-doctor` (2.1.252 and later) shows what each of your skills costs in context and how often it is used. It flags listed skills that have never been invoked and tells you where to turn each one off. Start with the never-used skills that cost the most. In an interactive session the report opens in the `/plugin` manager's **Stats** tab; with `-p` it prints as text. It needs feature-flag fetching and does not run over Remote Control.
+
+`/doctor` also estimates the listing's total cost and its biggest contributors, and the Skills row in `/context` shows the size of the listing after the budget is applied.
+
+### Turn skills down without deleting them
+
+The `skillOverrides` setting changes visibility without editing `SKILL.md`, which is useful for skills checked into a shared repository. The `/skills` menu writes it for you: highlight a skill, press `Space` to cycle states, `Esc` to save to `.claude/settings.local.json`.
+
+```json
+{
+  "skillOverrides": {
+    "legacy-context": "name-only",
+    "deploy": "off"
+  }
+}
 ```
 
----
+| Value | Listed to Claude | In `/` menu |
+|---|---|---|
+| `"on"` | Name and description | Yes |
+| `"name-only"` | Name only | Yes |
+| `"user-invocable-only"` | Hidden | Yes |
+| `"off"` | Hidden | Hidden |
 
-## Dynamic Context with Shell Commands
+`name-only` is the useful middle ground: the skill stays available but stops spending description budget. Plugin skills ignore `skillOverrides`; manage those through `/plugin`.
 
-The `!`command`` `` syntax runs a shell command before the skill content is sent to Claude. The output is substituted inline, so Claude receives real data rather than the command itself.
+### Keep the body short
 
-```yaml
----
-name: pr-summary
-description: Summarize the changes in the current pull request
-context: fork
-agent: Explore
-allowed-tools: Bash(gh *)
----
-
-## Pull request context
-
-- PR diff: !`gh pr diff`
-- PR comments: !`gh pr view --comments`
-- Changed files: !`gh pr diff --name-only`
-- PR description: !`gh pr view --json title,body`
-
-## Your task
-
-Provide a concise summary of this pull request including:
-1. What changed and why (based on the description and diff)
-2. The key implementation decisions
-3. Potential risks or things reviewers should focus on
-```
-
-When this skill runs, the four shell commands execute first, their output is inserted, and Claude receives a fully-populated prompt with the actual PR data.
-
-This is preprocessing at skill invocation time. Claude never sees the backtick commands — only their results.
-
----
-
-## Controlling Who Invokes a Skill
-
-Two frontmatter fields let you control who can invoke a skill:
-
-**`disable-model-invocation: true`**: Only you can invoke the skill with `/skill-name`. Claude cannot trigger it automatically. Use for anything with side effects — deployments, commits, notifications.
-
-**`user-invocable: false`**: The skill is hidden from the `/` menu. Claude can load it automatically when relevant, but you cannot invoke it directly. Use for background reference material — things like "here are the API conventions for this codebase" that Claude should know about but that are not actions you would consciously take.
-
-| Configuration | You invoke | Claude invokes | When loaded |
-|---|---|---|---|
-| Default | Yes | Yes | Description always in context; full skill loads on invocation |
-| `disable-model-invocation: true` | Yes | No | Not loaded until you invoke |
-| `user-invocable: false` | No | Yes | Description always in context; full skill loads when Claude uses it |
-
----
-
-## Restricting Tools
-
-Use `allowed-tools` to limit what Claude can do when a skill is active:
-
-```yaml
----
-name: safe-audit
-description: Audit the codebase for issues without making any changes
-allowed-tools: Read, Grep, Glob
----
-
-Audit the codebase and produce a report of:
-1. Dead code (functions defined but never called)
-2. Duplicate logic that could be consolidated
-3. Missing error handling
-4. TODO comments that have been there over 6 months
-
-Do not make any changes. Report only.
-```
-
-With `allowed-tools: Read, Grep, Glob`, the skill cannot write, edit, or run bash commands — even if the user normally allows those tools.
-
----
-
-## Real-World Skill Examples
-
-**Code style enforcer** — automatically triggered when Claude edits Python files:
-
-```yaml
----
-name: python-style
-description: Python coding conventions for this project. Load when reading or writing Python code.
-user-invocable: false
----
-
-This project follows these Python conventions:
-
-- Type hints on all public function signatures
-- Docstrings in Google format for all public functions and classes
-- Maximum line length: 100 characters
-- Use `pathlib.Path` instead of `os.path`
-- Use `logging` not `print()` for any operational output
-- All exceptions must be caught explicitly; never use bare `except:`
-
-When generating or modifying Python code, verify these rules are followed.
-```
-
-**Changelog generator:**
-
-```yaml
----
-name: changelog
-description: Generate a changelog entry for the current release
-disable-model-invocation: true
-allowed-tools: Bash(git *)
-argument-hint: [version]
----
-
-Generate a changelog entry for version $ARGUMENTS.
-
-1. Run `git log $(git describe --tags --abbrev=0)..HEAD --oneline` to get commits since last tag
-2. Group commits by type: Features, Bug Fixes, Performance, Documentation, Internal
-3. Write the entry in Keep a Changelog format
-4. Prepend it to the CHANGELOG.md file
-5. Show the entry for review
-```
-
-**Database migration helper:**
-
-```yaml
----
-name: migration
-description: Generate a database migration file from a schema change description
-disable-model-invocation: true
-allowed-tools: Bash(python manage.py *), Read
-argument-hint: <description of schema change>
----
-
-Generate a Django database migration for: $ARGUMENTS
-
-1. Read the current models in `app/models.py`
-2. Understand what schema change is needed
-3. Write the migration operations in Django migration format
-4. Create the file at `app/migrations/XXXX_<snake_case_description>.py` using the correct sequential number
-5. Verify the migration is valid by running `python manage.py sqlmigrate app <migration_name> --no-color`
-```
-
----
-
-## Supporting Files
-
-When a skill needs substantial reference material, keep `SKILL.md` focused and move the detail into supporting files:
+Keep `SKILL.md` under 500 lines and move reference material to supporting files that Claude reads only when needed:
 
 ```text
 api-reference/
-├── SKILL.md            # Overview and navigation (keep under 500 lines)
-├── endpoints.md        # All endpoint documentation
-├── authentication.md   # Auth flows and examples
-└── error-codes.md      # Error reference
+├── SKILL.md            # overview and navigation
+├── endpoints.md        # loaded when needed
+├── error-codes.md      # loaded when needed
+└── scripts/
+    └── check.sh        # executed, not loaded
 ```
 
-In `SKILL.md`, reference the supporting files so Claude loads them when needed:
+Once loaded, every line of the body is a recurring token cost for the rest of the session. State what to do; skip the narration of why.
 
-```markdown
-## API Reference Skill
+### Audit for stale instructions
 
-When working with this API:
+Run `/doctor prompt-audit` after a model upgrade. It checks your `CLAUDE.md` files, skills, agents and commands for outdated or conflicting instructions and for prompting patterns written for older models. Addy Osmani makes the case in "Audit your Agent files" (August 2026): agent instructions have a half-life as models improve, files grow every time someone patches a misbehavior with a new rule, and the bloat lowers adherence. His advice is a diagnostic pass every few weeks to find forgotten, unused skills and outdated preferences.
 
-- For endpoint documentation, see [endpoints.md](endpoints.md)
-- For authentication flows, see [authentication.md](authentication.md)
-- For error handling, see [error-codes.md](error-codes.md)
+To find skills whose frontmatter does not parse, run:
 
-Apply the patterns in these files when generating or reviewing API calls.
+```bash
+claude plugin validate ~/.claude/skills
+claude plugin validate .claude/skills
 ```
 
-Claude only loads the referenced files when the task actually requires them, keeping context usage efficient.
+### Prove a skill helps
 
----
+Seeing a skill trigger proves Claude found it, not that it helped. The check is a baseline comparison: run a few realistic prompts in fresh sessions with the skill on and again with it set to `"off"` in `skillOverrides`, then compare. Two tools automate this. The `skill-creator` plugin (`/plugin install skill-creator@claude-plugins-official`) runs with-skill vs without-skill comparisons, blind A/B tests between two versions, and description tuning that measures how often the skill triggers on prompts that should and should not trigger it. For a skill that ships in a plugin, `claude plugin eval` does the same with graders and a CI exit code; see [Plugins, Marketplace and Mods](/en/book2-advanced/04-plugins-marketplace-mods).
+
+## When a skill hurts
+
+A skill is not free, and some make things worse. Watch for these:
+
+- **It never runs.** It still pays the listing cost on every turn of every session. `/skill-doctor` finds these.
+- **It triggers on the wrong requests.** A vague description ("helps with code") pulls the skill into unrelated work and loads a body that steers Claude off course. Make the description specific, or set `disable-model-invocation: true`.
+- **It encodes a rule that must always hold.** Skills are guidance Claude applies with judgment, and Claude can drift from them, especially after compaction. If a rule must never be broken (no edits to `migrations/`, always run the formatter), make it a [hook](/en/book2-advanced/09-hooks). You can keep the hook with the skill through its `hooks` frontmatter.
+- **It duplicates what the model already does.** A baseline run that scores the same with and without the skill means the skill is only adding tokens. Instructions written to coax an older model are the usual suspects, which is why `/doctor prompt-audit` looks for them.
+- **It conflicts with another instruction.** Two skills, or a skill and `CLAUDE.md`, that disagree make behavior depend on which one loaded last. `/doctor prompt-audit` flags many of these.
+- **It grants more than it should.** A repository skill with broad `allowed-tools` widens what Claude can do without a prompt for anyone who runs Claude Code in that repo.
 
 ## Troubleshooting
 
-**Skill not appearing in `/` menu:** Verify the `SKILL.md` file exists in a properly named directory under `.claude/skills/` or `~/.claude/skills/`. Check that the `name` field uses only lowercase letters, numbers, and hyphens.
+**The skill is not in the `/` menu.** Check the path (`.claude/skills/<name>/SKILL.md`), that the frontmatter's opening `---` is the very first line, and that nested skills only load once Claude touches their directory. Run `/reload-skills` after adding a skill mid-session.
 
-**Claude not triggering the skill automatically:** Sharpen the `description` field with more specific trigger phrases. If a user says "how does this function work?", the description should contain phrases like "explaining how code works" or "understanding code behavior."
+**Claude does not use the skill.** Ask "What skills are available?" to see whether it is listed, then sharpen the description with words users actually say. If you have many skills, the description may have been dropped from the listing; check `/context` and `/skill-doctor`.
 
-**Skill triggering when you do not want it:** Add `disable-model-invocation: true` to the frontmatter, or make the description more specific about when it applies.
+**The skill triggers too often.** Narrow the description, add `paths`, or set `disable-model-invocation: true`.
 
-**Too many skills overloading context:** Skill descriptions are loaded at startup up to a budget of approximately 2% of the context window (with a fallback of 16,000 characters). If you have many skills, less-used ones may be excluded. Run `/context` to check for warnings. You can override the limit with the `SLASH_COMMAND_TOOL_CHAR_BUDGET` environment variable.
+**Personal skills disappeared.** Look in `~/.claude/skills/.trash/` and move the folder back before the 30-day retention sweep.
 
----
+### Check that it worked
 
-**Next up:** [Chapter 3 — Skill Composition](./03-skill-composition.md) — Chaining skills together, building workflow libraries, and patterns for advanced skill design.
+1. Create the `summarize-changes` skill above, edit any file in a git repository, start `claude`, and ask "What did I change?". Claude should invoke the skill and summarize your real diff.
+2. Run `/skills` and confirm the skill is listed; press `t` to sort by token count.
+3. Run `/skill-doctor` and confirm the new skill shows a context cost and a usage count of at least one.
+4. Run `claude plugin validate ~/.claude/skills` in your shell. It should end with `✔ Validation passed`.
+
+## Sources
+
+- Extend Claude with skills, Anthropic, accessed 2026-10-04. https://code.claude.com/docs/en/skills
+- Commands reference (`/skill-doctor`, `/skills`, `/doctor`), Anthropic, accessed 2026-10-04. https://code.claude.com/docs/en/commands
+- What's new, Week 36 (August 31 – September 4, 2026): `/skill-doctor`, Anthropic. https://code.claude.com/docs/en/whats-new/2026-w36
+- Claude Code changelog, 2.1.283 (2026-09-25): `/doctor prompt-audit`, Anthropic. https://code.claude.com/docs/en/changelog
+- Agent Skills open standard, agentskills.io, accessed 2026-10-04. https://agentskills.io
+- Addy Osmani, "Audit your Agent files", 2026-08-27. https://addyo.substack.com/p/audit-your-agent-files

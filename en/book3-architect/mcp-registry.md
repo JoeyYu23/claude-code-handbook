@@ -1,203 +1,122 @@
-# Appendix B: MCP Server Registry
+# MCP Server Registry
 
-A curated reference of popular MCP servers for Claude Code. For the full live registry, run `claude mcp add` and browse, or visit the [MCP server registry](https://github.com/modelcontextprotocol/servers).
+> Verified on 2026-10-04 with Claude Code 2.1.289.
 
----
+A short, checked list of MCP servers that exist today. Each remote URL below was read from the vendor's own documentation on 2026-10-04. This is not a ranking and not an endorsement. Before you decide whether you need a server at all, read [MCP, CLI or Skill?](/en/book2-advanced/11-mcp-cli-or-skill); for setup in practice, read [MCP in Practice](/en/book2-advanced/12-mcp-in-practice).
 
-## Development Tools
+## Where to look first
 
-| Server | What It Does | Install Command | Use Case |
-|--------|-------------|-----------------|----------|
-| **GitHub** | Read/write issues, PRs, repos, code reviews. | `claude mcp add --transport http github https://api.githubcopilot.com/mcp/` | Automate PR creation, issue triage, code review |
-| **GitLab** | Manage GitLab issues, MRs, pipelines. | `claude mcp add --transport stdio gitlab -- npx -y @gitbeaker/mcp` | GitLab-based teams; CI/CD integration |
-| **Sentry** | Query error events, stack traces, releases. | `claude mcp add --transport http sentry https://mcp.sentry.dev/mcp` | Debug production errors; trace error origins |
-| **Playwright** | Browser automation, screenshots, forms, JS execution. | `claude mcp add --transport stdio playwright -- npx -y @playwright/mcp@latest` | E2E testing, UI verification, visual regression |
-| **Browserbase** | Cloud browser automation with session management. | See [browserbase.com/docs](https://docs.browserbase.com) | Scraping, automated browser testing at scale |
-| **Nx** | Monorepo graph analysis, affected project detection. | `claude mcp add --transport stdio nx -- npx -y @nx/mcp` | Large monorepo workflows, dependency analysis |
+- The official MCP Registry at https://registry.modelcontextprotocol.io/ is the discovery index for published servers.
+- The `modelcontextprotocol/servers` repository now maintains seven reference servers (Everything, Fetch, Filesystem, Git, Memory, Sequential Thinking, Time). Thirteen others were moved to a `servers-archived` repository, including GitHub, GitLab, Google Drive, PostgreSQL, Puppeteer, Redis, Sentry, Slack and SQLite. The first edition of this appendix listed the archived PostgreSQL server; do not install it for new work.
+- Claude Code reference: https://code.claude.com/docs/en/mcp
 
----
+## The spec changed in July 2026
 
-## Databases
+The MCP specification dated 2026-07-28 turns the protocol from a stateful session into stateless request/response, according to the [MCP project's release post](https://blog.modelcontextprotocol.io/posts/2026-07-28/). What it says changed:
 
-| Server | What It Does | Install Command | Use Case |
-|--------|-------------|-----------------|----------|
-| **DBHub (PostgreSQL/MySQL/SQLite)** | Query any SQL database, explore schema, analyze data. | `claude mcp add --transport stdio db -- npx -y @bytebase/dbhub --dsn "postgresql://user:pass@host/db"` | General SQL database access |
-| **Postgres (official)** | PostgreSQL-specific, exposes schema as resources. | `claude mcp add --transport stdio postgres -- npx -y @modelcontextprotocol/server-postgres postgresql://user:pass@host/db` | PostgreSQL schema exploration |
-| **MongoDB** | MongoDB query, aggregation, collection management. | `claude mcp add --transport stdio mongo -- npx -y @mongodb-js/mcp-server-mongodb` | Document database access |
-| **Supabase** | Supabase database, auth, storage, edge functions. | `claude mcp add --transport http supabase https://mcp.supabase.com` | Supabase projects |
-| **Neon** | Neon serverless Postgres with branching. | See [neon.tech/docs](https://neon.tech/docs/ai/mcp) | Serverless Postgres development |
-| **Turso** | LibSQL/SQLite at the edge. | See [turso.tech](https://turso.tech) | Edge database access |
+- The `initialize` handshake and the `Mcp-Session-Id` header are retired. Each request carries the protocol version, client identity and capabilities itself, so any request can go to any server instance behind a load balancer.
+- Server-initiated asks (elicitation, sampling, roots) are replaced by a multi-round-trip pattern: the server returns an `input_required` result and the client retries with the answers.
+- New `Mcp-Method` and `Mcp-Name` HTTP headers let gateways route and authorize without parsing JSON; list responses can carry cache hints (`ttlMs`, `cacheScope`).
+- Authorization tightens (issuer validation per RFC 9207) and Dynamic Client Registration is deprecated in favor of Client ID Metadata Documents. Roots, Sampling, Logging and the legacy HTTP+SSE transport are deprecated with a 12-month window.
 
----
+What this means for you: remote servers are getting easier to host and scale, and servers you already use will migrate on their own schedule. Vercel, for example, has announced support in its changelog. I could not confirm from Claude Code's documentation which spec revisions your installed version speaks, so if a server stops connecting after an update, check both sides' versions first. Simon Willison's post [Stateless MCP has recaptured my interest](https://simonwillison.net/2026/Jul/31/stateless-mcp/) (2026-07-31) is a readable take on why the change matters.
 
-## Cloud Providers
-
-| Server | What It Does | Install Command | Use Case |
-|--------|-------------|-----------------|----------|
-| **AWS** | Query AWS services, manage resources, read CloudWatch logs. | `claude mcp add --transport stdio aws -- npx -y @aws/mcp-server-aws` | AWS infrastructure management |
-| **Cloudflare** | Manage Workers, KV, R2, D1, Pages. | `claude mcp add --transport http cloudflare https://mcp.cloudflare.com/sse` | Cloudflare-based deployments |
-| **Vercel** | Deploy, manage projects, read logs, environment variables. | `claude mcp add --transport http vercel https://mcp.vercel.com/sse` | Vercel deployment management |
-| **Fly.io** | Manage apps, secrets, deployments on Fly. | See [fly.io/docs](https://fly.io/docs) | Fly.io deployment |
-| **GCP** | Google Cloud resource management. | `claude mcp add --transport stdio gcp -- npx -y @google-cloud/mcp-server` | GCP infrastructure |
-
----
-
-## Project Management
-
-| Server | What It Does | Install Command | Use Case |
-|--------|-------------|-----------------|----------|
-| **Linear** | Read/write Linear issues, projects, cycles. | `claude mcp add --transport http linear https://mcp.linear.app/mcp` | Linear-based team workflows |
-| **Jira** | Read/write Jira issues, sprints, boards. | `claude mcp add --transport http jira https://mcp.atlassian.com/rest/mcp/sse` | Atlassian Jira workflows |
-| **Asana** | Read/write Asana tasks, projects, teams. | `claude mcp add --transport sse asana https://mcp.asana.com/sse` | Asana task management |
-| **Notion** | Read/write Notion pages, databases, blocks. | `claude mcp add --transport http notion https://mcp.notion.com/mcp` | Notion-based documentation/PM |
-| **GitHub Projects** | GitHub project boards and issues (via GitHub MCP). | `claude mcp add --transport http github https://api.githubcopilot.com/mcp/` | GitHub Projects-based workflows |
-| **Shortcut** | Read/write Shortcut stories, epics, sprints. | See [shortcut.com](https://shortcut.com) | Shortcut-based teams |
-
----
-
-## Communication
-
-| Server | What It Does | Install Command | Use Case |
-|--------|-------------|-----------------|----------|
-| **Slack** | Read channels, post messages, search conversations. | `claude mcp add --transport http slack https://mcp.slack.com/mcp` | Slack-based team communication |
-| **Gmail** | Read, send, and manage Gmail email. | `claude mcp add --transport http gmail https://mcp.gmail.com` | Email automation, digest creation |
-| **Google Calendar** | Read/write calendar events, check availability. | See [Google MCP docs](https://developers.google.com/workspace/mcp) | Scheduling automation |
-| **SendGrid** | Send transactional email, manage templates. | `claude mcp add --transport stdio sendgrid -- npx -y @sendgrid/mcp` | Email integration in apps |
-
----
-
-## Productivity and Knowledge
-
-| Server | What It Does | Install Command | Use Case |
-|--------|-------------|-----------------|----------|
-| **Google Drive** | Read/write Google Docs, Sheets, Slides, Drive files. | `claude mcp add --transport stdio gdrive -- npx -y @modelcontextprotocol/server-gdrive` | Document and spec access |
-| **Obsidian** | Read/write Obsidian vault notes. | `claude mcp add --transport stdio obsidian -- npx -y mcp-obsidian --vault /path/to/vault` | Personal knowledge base access |
-| **Confluence** | Read/write Confluence pages and spaces. | `claude mcp add --transport http confluence https://mcp.atlassian.com/rest/mcp/sse` | Atlassian documentation |
-| **Figma** | Access Figma designs, components, comments. | `claude mcp add --transport http figma https://mcp.figma.com/mcp` (verify the current endpoint in [official Figma MCP docs](https://help.figma.com/hc/en-us/articles/32132810816535-Use-Figma-MCP) — it may change) | Design-to-code workflows |
-
----
-
-## Payments and Business
-
-| Server | What It Does | Install Command | Use Case |
-|--------|-------------|-----------------|----------|
-| **Stripe** | Query transactions, customers, invoices, subscriptions. | `claude mcp add --transport http stripe https://mcp.stripe.com` | Payment and billing integration |
-| **PayPal** | Query orders, payments, subscriptions. | `claude mcp add --transport http paypal https://mcp.paypal.com/mcp` | PayPal integration |
-| **HubSpot** | CRM contacts, deals, companies, activities. | `claude mcp add --transport http hubspot https://mcp.hubspot.com/anthropic` | CRM-driven development |
-| **Salesforce** | Query SFDC objects, reports, custom objects. | See [Salesforce MCP](https://developer.salesforce.com/mcp) | Salesforce integration |
-
----
-
-## File Systems and Storage
-
-| Server | What It Does | Install Command | Use Case |
-|--------|-------------|-----------------|----------|
-| **Filesystem** | Read/write files with configurable scope. | `claude mcp add --transport stdio fs -- npx -y @modelcontextprotocol/server-filesystem /path/to/dir` | Controlled file access beyond working dir |
-| **AWS S3** | Read/write S3 buckets and objects. | `claude mcp add --transport stdio s3 -- npx -y @aws/mcp-server-aws-s3` | S3 object management |
-| **Google Cloud Storage** | Read/write GCS buckets and objects. | See [GCP MCP docs](https://cloud.google.com/mcp) | GCS storage integration |
-
----
-
-## Observability and Monitoring
-
-| Server | What It Does | Install Command | Use Case |
-|--------|-------------|-----------------|----------|
-| **Sentry** | Error events, stack traces, release tracking. | `claude mcp add --transport http sentry https://mcp.sentry.dev/mcp` | Production error investigation |
-| **Datadog** | Metrics, logs, traces, monitors, dashboards. | See [Datadog MCP](https://docs.datadoghq.com/integrations/mcp/) | Full observability stack |
-| **Grafana** | Query dashboards, explore metrics and logs. | `claude mcp add --transport http grafana https://mcp.grafana.com` | Metrics-driven debugging |
-| **PagerDuty** | Read incidents, escalations, on-call schedules. | See [PagerDuty MCP](https://developer.pagerduty.com/mcp) | Incident response workflows |
-
----
-
-## Scope Selection Quick Reference
+## Adding a server
 
 ```bash
-# Local (default) — private to you in this project
-claude mcp add --scope local ...
+# Remote (recommended): HTTP transport
+claude mcp add --transport http <name> <url>
 
-# Project — shared with team via .mcp.json (never include credentials)
-claude mcp add --scope project ...
+# Local process: everything after -- is the server command
+claude mcp add --transport stdio <name> -- <command> [args...]
 
-# User — available across all your projects
-claude mcp add --scope user ...
+claude mcp list
+claude mcp get <name>
+claude mcp remove <name>
 ```
 
-**Rule of thumb:**
-- Anything with credentials → `local`
-- Shared tools your whole team uses → `project` (store credentials in env vars, not in the config)
-- Personal utilities you use everywhere → `user`
+Authenticate OAuth servers by running `/mcp` inside Claude Code, or `claude mcp login <name>`. SSE (`--transport sse`) is deprecated in Claude Code's docs; use HTTP where the vendor offers it. Scopes are `local` (default, private to you in this project), `project` (shared through `.mcp.json`) and `user` (all your projects). Put secrets in environment variables; `.mcp.json` supports `${VAR}` expansion.
 
----
+## Servers checked on 2026-10-04
 
-## Security Checklist for MCP Servers
+All remote servers use OAuth unless noted. "Docs say" means the command is quoted from the vendor page.
 
-Before adding any MCP server to your workflow:
+### Code, issues and projects
 
-```
-Before installing:
-☐ Server is from a known organization or has verifiable open-source code
-☐ You understand what data the server can read or modify
-☐ Production/sensitive connections use read-only credentials
+| Server | Endpoint or command | Notes |
+| --- | --- | --- |
+| GitHub | `https://api.githubcopilot.com/mcp/` | OAuth (recommended) or a personal access token in an `Authorization: Bearer` header. Maintained at github.com/github/github-mcp-server. |
+| Linear | `claude mcp add --transport http linear-server https://mcp.linear.app/mcp` | Docs say. |
+| Atlassian (Jira, Confluence) | `https://mcp.atlassian.com/v2/mcp` | The docs describe a v2 endpoint and say that on 2027-03-01 existing v1 usage will start to expose v2 tools. Old `/sse` URLs from the first edition are not confirmed; use v2. |
+| Asana | `https://mcp.asana.com/v2/mcp` | The beta `/sse` server is documented as shut down on 2026-05-11, so first-edition configs pointing at it no longer work. |
+| Notion | `claude mcp add --transport http notion https://mcp.notion.com/mcp` | Docs say. Authenticate with `/mcp`. |
+| Sentry | `https://mcp.sentry.dev/mcp` | Docs show an organization- and project-scoped form: `https://mcp.sentry.dev/mcp/{organizationSlug}/{projectSlug}`. |
+| Slack | `https://mcp.slack.com/mcp` | Only apps published in the Slack Marketplace or internal apps may use MCP, so an unlisted client may be refused. |
 
-When configuring:
-☐ Credentials passed via --env flags, not hardcoded in commands
-☐ Database connections use a dedicated, least-privilege user
-☐ Project-scope .mcp.json reviewed by team before committing
+### Browsers and design
 
-Ongoing maintenance:
-☐ Update MCP server packages regularly
-☐ Remove servers no longer in use: `claude mcp remove <name>`
-☐ Rotate API keys used by MCP servers quarterly
-```
+| Server | Endpoint or command | Notes |
+| --- | --- | --- |
+| Playwright | `npx @playwright/mcp@latest` (docs show `claude mcp add playwright npx @playwright/mcp@latest`) | Local browser automation, from Microsoft. The stdio form from the section above, `claude mcp add --transport stdio playwright -- npx @playwright/mcp@latest`, follows the syntax in Claude Code's docs. |
+| Figma | `claude mcp add --transport http figma https://mcp.figma.com/mcp` | Docs say. Figma states that only clients in its MCP catalog can connect. |
 
----
+### Data and infrastructure
 
-## Installing from Claude Desktop
+| Server | Endpoint or command | Notes |
+| --- | --- | --- |
+| Supabase | `claude mcp add --scope project --transport http supabase "https://mcp.supabase.com/mcp"` | Supabase's own page warns about prompt injection from database content and recommends project scoping and read-only mode; avoid pointing it at production data. |
+| Neon | `https://mcp.neon.tech/mcp` | Neon's page also offers `npx neon@latest mcp` for setup. |
+| DBHub | `npx @bytebase/dbhub@latest --dsn "<connection string>"` | Open source, from Bytebase. Supports PostgreSQL, MySQL, SQL Server, MariaDB, Oracle and SQLite, with read-only mode, row limits and query timeouts. Use a least-privilege database user. |
+| Cloudflare | `https://mcp.cloudflare.com/mcp` (whole API) and per-product servers such as `https://docs.mcp.cloudflare.com/mcp`, `https://observability.mcp.cloudflare.com/mcp`, `https://bindings.mcp.cloudflare.com/mcp` | Cloudflare publishes a catalog of managed servers; see its page. |
+| Vercel | `claude mcp add --transport http vercel https://mcp.vercel.com` | Docs say. Vercel allows only clients it has reviewed; Claude Code is on its list. |
+| Grafana | `uvx mcp-grafana` (also Docker and binary) | Runs locally against your Grafana instance; open source at github.com/grafana/mcp-grafana. |
 
-If you have already configured MCP servers in Claude Desktop, import them to Claude Code:
+### Payments
 
-```bash
-claude mcp add-from-claude-desktop
-```
+| Server | Endpoint or command | Notes |
+| --- | --- | --- |
+| Stripe | `claude mcp add --transport http stripe https://mcp.stripe.com/` | OAuth, or an Agent API key in a bearer header. Stripe says that from 2026-10-31 it stops accepting full-access or untagged restricted keys, and it requires human confirmation for actions such as refunds. |
 
-Select which servers to import interactively. Works on macOS and WSL.
+## Left out on purpose
 
----
+I did not re-verify these first-edition entries, so they are dropped rather than carried over: GitLab, AWS, GCP, MongoDB, Turso, Nx, Browserbase, Fly.io, PayPal, HubSpot, Salesforce, Datadog, PagerDuty, Shortcut, S3 and Google Cloud Storage. Check the MCP Registry or the vendor before relying on any of them.
 
-## Building Your Own
+## Security checklist
 
-When no existing server meets your needs, build a custom MCP server. See [Chapter 14 — Building Custom MCP Servers](/en/book2-advanced/14-custom-mcp) in Book 2.
+- Read what the server can read and change before you connect it. A connected MCP server acts with your account's permissions.
+- Prefer OAuth and read-only credentials; give databases a dedicated least-privilege user.
+- Treat any text a server returns (rows, tickets, web pages) as untrusted input. Prompt injection through tool results is the main risk vendors themselves warn about.
+- Review a project's `.mcp.json` before approving it; project servers require workspace trust.
+- Remove what you no longer use: `claude mcp remove <name>`.
 
-**Quick-start template:**
+## Build your own
 
-```bash
-# 1. Initialize project
-mkdir my-mcp-server && cd my-mcp-server
-npm init -y
-npm install @modelcontextprotocol/sdk zod
+Use the official SDKs (TypeScript, Python, Go and C# were updated for the 2026-07-28 spec, per the release post), then register the result with `claude mcp add`. The walkthrough is in [MCP in Practice](/en/book2-advanced/12-mcp-in-practice).
 
-# 2. Create server.js
-cat > server.js << 'EOF'
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { z } from "zod";
+### Check that it worked
 
-const server = new McpServer({ name: "my-server", version: "1.0.0" });
+Run `claude mcp list`. A healthy server shows as connected. Inside a session, `/mcp` lists each server with its tools and lets you authenticate; ask Claude to call one tool from the server and confirm the answer matches what you see in the vendor's own UI.
 
-server.tool(
-  "my_tool",
-  "Description of what this tool does",
-  { input: z.string().describe("The input parameter") },
-  async ({ input }) => ({
-    content: [{ type: "text", text: `Processed: ${input}` }]
-  })
-);
+## Sources
 
-await server.connect(new StdioServerTransport());
-EOF
-
-# 3. Register with Claude Code
-claude mcp add --transport stdio my-server -- node server.js
-```
-
-Community MCP servers: [github.com/modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers)
+- Model Context Protocol servers repository, modelcontextprotocol (accessed 2026-10-04): https://github.com/modelcontextprotocol/servers
+- Official MCP Registry (accessed 2026-10-04): https://registry.modelcontextprotocol.io/
+- MCP 2026-07-28 specification release, MCP blog, 2026-07-28: https://blog.modelcontextprotocol.io/posts/2026-07-28/
+- Simon Willison, "Stateless MCP has recaptured my interest", 2026-07-31: https://simonwillison.net/2026/Jul/31/stateless-mcp/
+- Connect Claude Code to tools via MCP, Anthropic: https://code.claude.com/docs/en/mcp
+- GitHub MCP server: https://github.com/github/github-mcp-server
+- Linear MCP: https://linear.app/docs/mcp
+- Atlassian Rovo MCP server getting started: https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/
+- Asana MCP server: https://developers.asana.com/docs/using-asanas-mcp-server
+- Notion MCP: https://developers.notion.com/guides/mcp/get-started-with-mcp
+- Sentry MCP: https://mcp.sentry.dev/
+- Slack MCP server: https://docs.slack.dev/ai/mcp-server
+- Playwright MCP: https://github.com/microsoft/playwright-mcp
+- Figma MCP server: https://developers.figma.com/docs/figma-mcp-server/remote-server-installation/
+- Supabase MCP: https://supabase.com/docs/guides/getting-started/mcp
+- Neon MCP server: https://neon.com/docs/ai/neon-mcp-server
+- DBHub: https://github.com/bytebase/dbhub
+- Cloudflare managed MCP servers: https://developers.cloudflare.com/agents/model-context-protocol/mcp-servers-for-cloudflare/
+- Vercel MCP (page last updated 2026-09-15): https://vercel.com/docs/agent-resources/vercel-mcp
+- Grafana MCP: https://github.com/grafana/mcp-grafana
+- Stripe MCP: https://docs.stripe.com/mcp

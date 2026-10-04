@@ -1,306 +1,247 @@
-# Chapter 4: Installation
+# Installation
 
-## Before We Begin
+> Verified on 2026-10-04 with Claude Code 2.1.289.
 
-Installation is the most "technical" part of this book — but it is more straightforward than it looks. You will type a few commands, and then you will be done. The whole process takes most people under ten minutes.
+## Before we begin
 
-This chapter covers installation on Mac, Windows, and Linux. Jump to your operating system's section. If you hit any problems, the troubleshooting section at the end of this chapter covers the most common issues.
+Installation is the most technical part of this book, and it is shorter than it looks: one command, one sign-in, one check. Most people are done in ten minutes.
 
----
+You have three ways in. Pick one now; you can add the others later.
 
-## What You Need
+| Option | Good for | Needs a terminal? |
+|---|---|---|
+| **Terminal (CLI)** | The full feature set; this book's examples | Yes |
+| **Desktop app** | Working on files on your computer with a visual interface | No |
+| **Web (claude.ai/code)** | Running tasks on a cloud machine against a GitHub repository | No |
 
-**An account.** Claude Code requires a Claude subscription (Pro, Max, Teams, or Enterprise) or an Anthropic Console account (API access with pre-paid credits). If you do not have one yet, go to [claude.com](https://claude.com) and sign up before starting. The free Claude.ai plan does not include Claude Code access.
+This chapter covers all three, terminal first.
 
-**Which plan should I pick?** Here is a quick comparison to help you decide before installing. You can always change your plan later.
+## What you need
 
-| Plan | Price | Best For | Context Window |
-|------|-------|----------|----------------|
-| Pro | $20/month | Occasional use, a few hours per week | 200K tokens |
-| Max 5 | $100/month | Daily development, regular usage | 1M tokens |
-| Max 20 | $200/month | Primary dev tool, parallel agents, heavy usage | 1M tokens |
-| API Direct | Pay per token | CI/CD pipelines, automation, bursty usage | Depends on model |
-| Team | $25+/user/month | Team collaboration with admin controls | 1M tokens |
-| Enterprise | Custom pricing | Large organizations, compliance needs | 1M tokens |
+**A paid Claude account, or API access.** Claude Code needs one of:
 
-> **Important note on Team plans:** The $25/user/month Team Standard tier does **not** include Claude Code access. Claude Code requires Team Premium seats at a higher price point. Check [claude.ai/pricing](https://claude.ai/pricing) for the latest details.
+- A Claude **Pro, Max, Team or Enterprise** subscription. The free Claude plan does not include Claude Code.
+- A **Claude Console** account (pay-as-you-go API billing with pre-paid credits).
+- Access through **Amazon Bedrock, Google Cloud or Microsoft Foundry**, if your company uses one of those. Your administrator will give you the settings.
 
-**Quick decision:** Try the water → Pro ($20). Serious daily use → Max 5 ($100). All-in → Max 20 ($200). For a deep dive into real usage costs and leverage calculations, see [Chapter 23: Cost Reality](../book3-architect/09-cost-reality.md).
+As a rough guide at the time of writing, Pro costs $20 a month billed monthly and Max starts at $100 a month, with more usage. Prices and what each plan includes change, so check [claude.com/pricing](https://claude.com/pricing) before you buy. If you are unsure, start with Pro and upgrade if you hit the usage limits often. Book 3's [Cost Reality, Measured](/en/book3-architect/10-cost-reality-measured) chapter shows how to work out what you actually use.
 
-**A terminal.** This is the text-based interface you type commands into. Every computer has one built in:
-- Mac: Terminal (search "Terminal" in Spotlight, or find it in Applications > Utilities)
-- Windows: PowerShell or Command Prompt (search "PowerShell" in the Start menu)
-- Linux: Any terminal emulator (usually accessible by pressing Ctrl+Alt+T)
+**A supported computer.** The terminal version runs on:
 
-**An internet connection.** Claude Code needs to connect to Anthropic's servers.
+- macOS 13 or later
+- Windows 10 (version 1809) or later, or Windows Server 2019 or later
+- Ubuntu 20.04+, Debian 10+, or Alpine Linux 3.19+
+- 4 GB of RAM or more, on an x64 or ARM64 processor
 
-**4 GB of RAM or more.** Almost every computer made in the last ten years meets this requirement.
+**An internet connection,** and a location in one of [Anthropic's supported countries](https://www.anthropic.com/supported-countries).
 
-That is it. No other software is required for the basic installation.
+**A terminal.** Every computer has one:
 
----
+- **Mac:** press Command + Space, type "Terminal", press Enter.
+- **Windows:** open the Start menu and type "PowerShell".
+- **Linux:** usually Ctrl+Alt+T, or find "Terminal" in your applications.
 
-## Installing on Mac
+If the terminal is new to you, Anthropic's [terminal guide](https://code.claude.com/docs/en/terminal-guide) walks through opening one and pasting a command.
 
-Mac installation is the simplest. Open your Terminal and run one command.
+## Install on Mac or Linux
 
-### Step 1: Open Terminal
+### Step 1: Run the installer
 
-Press Command + Space to open Spotlight search, type "Terminal," and press Enter. A window will appear with a prompt — something like:
-
-```
-yourusername@MacBookPro ~ %
-```
-
-That blinking cursor is waiting for you to type.
-
-### Step 2: Run the Installer
-
-Copy and paste this command exactly, then press Enter:
+Paste this into your terminal and press Enter:
 
 ```bash
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
-What does this do? It downloads the official Claude Code installer from Anthropic's servers and runs it. You will see some output as it downloads and installs. It looks something like this:
+This downloads Anthropic's official installer and runs it. It places the `claude` program at `~/.local/bin/claude`. You do not need `sudo`.
 
-```
-Downloading Claude Code...
-Installing to /Users/yourusername/.local/bin/claude
-Installation complete!
-Claude Code has been added to your PATH.
-```
+The same command works inside WSL on Windows.
 
-The exact output may vary. As long as you do not see any red error messages, things are going well.
+### Step 2: Open a new terminal and check
 
-### Step 3: Verify the Installation
-
-Close your Terminal window and open a new one (this makes sure your system picks up the new installation). Then type:
+Close the terminal window and open a new one, so it picks up the new program. Then run:
 
 ```bash
 claude --version
 ```
 
-You should see a version number printed, like:
+You should see a version number followed by `(Claude Code)`, for example:
 
 ```
-Claude Code 2.x.x
+2.1.289 (Claude Code)
 ```
 
-If you see that, installation succeeded. Move to Step 4.
+Your number will be the same or newer. If you see `command not found`, jump to [Troubleshooting](#troubleshooting) below.
 
-### Step 4: Start Claude Code
+## Install on Windows
 
-Navigate to a folder you want to work in (or just stay in your home directory for now) and type:
+You can run Claude Code natively on Windows or inside WSL (the Windows Subsystem for Linux). If you are not sure, choose native.
 
-```bash
-claude
-```
+### Step 1 (recommended): Install Git for Windows
 
-The first time you run this, Claude Code will prompt you to log in. It will open a browser window where you authenticate with your Claude account. Follow the prompts, come back to your terminal, and you are in.
+[Git for Windows](https://git-scm.com/downloads/win) gives Claude Code a Bash shell to run commands in. It is optional: without it, Claude Code uses PowerShell instead. Most guides and examples assume Bash, so installing it saves confusion later. Accept the installer's defaults.
 
----
+### Step 2: Run the installer
 
-## Installing on Windows
-
-Windows installation has two approaches. We recommend the native Windows installation, which works in PowerShell or Command Prompt. If you are already a developer familiar with WSL (Windows Subsystem for Linux), that works too.
-
-### Step 1: Install Git for Windows (Required)
-
-Claude Code requires Git for Windows. If you are not sure whether you have it, you probably do not. Download and install it from:
-
-```
-https://git-scm.com/downloads/win
-```
-
-Run the installer. During installation, accept the defaults — you do not need to change any settings. Once it is installed, proceed.
-
-### Step 2: Open PowerShell
-
-Click the Start menu, type "PowerShell," and click "Windows PowerShell." You do not need to run it as Administrator.
-
-### Step 3: Run the Installer
-
-In PowerShell, run:
+Open **PowerShell** (you do not need to run it as Administrator) and run:
 
 ```powershell
 irm https://claude.ai/install.ps1 | iex
 ```
 
-If you prefer the Command Prompt over PowerShell, use this instead:
+If you prefer the older **Command Prompt** (CMD), use this instead:
 
 ```batch
 curl -fsSL https://claude.ai/install.cmd -o install.cmd && install.cmd && del install.cmd
 ```
 
-Wait for the installation to complete. You will see progress output in the window.
+How to tell which one you are in: PowerShell's prompt starts with `PS`, like `PS C:\Users\you>`. CMD's does not. Two common errors give it away:
 
-### Step 4: Verify the Installation
+- `The token '&&' is not a valid statement separator` means you pasted the CMD command into PowerShell.
+- `'irm' is not recognized` means you pasted the PowerShell command into CMD.
 
-Close your PowerShell window and open a new one. Then run:
+### Step 3: Open a new window and check
+
+Close PowerShell, open it again, and run:
 
 ```powershell
 claude --version
 ```
 
-You should see a version number. If you do, great — move on.
+You should see a version number followed by `(Claude Code)`.
 
-### Step 5: Start Claude Code
+### Using WSL instead
 
-Navigate to a project folder and type:
+If you already work in WSL, open your WSL terminal and use the Mac/Linux command above. Install and run `claude` inside WSL, not from PowerShell. WSL 2 is needed for Claude Code's optional sandbox, which Book 3 covers.
 
-```
-claude
-```
+## Other ways to install
 
-On first run, Claude Code will open a browser window for you to log in with your Claude account. Complete the login and return to PowerShell.
+The installer above is the one Anthropic recommends, because it updates itself in the background. Package managers work too, but most of them do not auto-update.
 
-### Alternative: WSL (Windows Subsystem for Linux)
-
-If you already use WSL and prefer a Linux-style environment, Claude Code works great there. Open your WSL terminal and follow the Linux installation instructions in the next section. WSL 2 is recommended (it also supports Claude Code's optional sandboxing feature for enhanced security).
-
----
-
-## Installing on Linux
-
-Linux installation is the same single-command approach as Mac.
-
-### Step 1: Open Your Terminal
-
-Most Linux desktops have a terminal accessible from the applications menu, or by pressing Ctrl+Alt+T.
-
-### Step 2: Run the Installer
-
-```bash
-curl -fsSL https://claude.ai/install.sh | bash
-```
-
-For **Ubuntu, Debian, and most mainstream distributions**, this will work as-is. No additional dependencies needed.
-
-For **Alpine Linux** and other musl-based distributions, you need to install a few additional packages first:
-
-```bash
-apk add libgcc libstdc++ ripgrep
-```
-
-Then run the installer.
-
-### Step 3: Verify and Start
-
-```bash
-claude --version
-claude
-```
-
-Same as Mac — verify you see a version number, then start Claude Code and log in on first launch.
-
----
-
-## Alternative Installation: Homebrew (Mac/Linux)
-
-If you use Homebrew as your package manager, you can install Claude Code through it:
+**Homebrew (Mac and Linux):**
 
 ```bash
 brew install --cask claude-code
 ```
 
-One important note: Homebrew installations do **not** auto-update. When new versions of Claude Code are released, you will need to run this command to update:
+There are two casks: `claude-code` follows the *stable* channel, usually about a week behind and skipping releases with major problems; `claude-code@latest` gets each release as it ships. Update with `brew upgrade claude-code` (or `claude-code@latest`).
 
-```bash
-brew upgrade claude-code
-```
-
-The native installer (the `curl` command above) handles updates automatically in the background, which is why we recommend it for most people.
-
----
-
-## Alternative Installation: WinGet (Windows)
-
-If you use WinGet on Windows:
+**WinGet (Windows):**
 
 ```powershell
 winget install Anthropic.ClaudeCode
 ```
 
-Same caveat as Homebrew — WinGet installations do not auto-update. Run `winget upgrade Anthropic.ClaudeCode` periodically to stay current.
+Update with `winget upgrade Anthropic.ClaudeCode`.
 
----
+**Linux package managers.** apt, dnf and apk repositories exist for Debian, Fedora, RHEL and Alpine. Follow the "Install with Linux package managers" section of Anthropic's [setup guide](https://code.claude.com/docs/en/setup), which has the repository details. Alpine also needs a few extra packages; the same page lists them.
 
-## What Happened Behind the Scenes?
+## Sign in
 
-If you are curious: the installer placed a program called `claude` in a folder that your terminal knows how to find (usually `~/.local/bin/claude` on Mac/Linux, or a similar location on Windows). When you type `claude`, your terminal finds and runs that program.
-
-Claude Code stores your login credentials and settings in a folder called `~/.claude` on Mac/Linux, or the equivalent on Windows. You do not need to go in there, but it is good to know it exists.
-
----
-
-## Troubleshooting Common Issues
-
-### "command not found: claude" after installation
-
-Your terminal does not know where to find the `claude` program. This usually means the installation folder is not in your system's PATH — the list of places your terminal looks for programs.
-
-**Fix:** Close your terminal completely and open a new window. Installation updates the PATH, but the change only takes effect in new terminal sessions.
-
-If a fresh terminal still shows the error, the installer may have added the PATH update to your shell configuration file (like `~/.bashrc` or `~/.zshrc`) but your terminal is not reading it. Try running:
+Go to a folder you want to work in and start Claude Code:
 
 ```bash
-source ~/.bashrc    # if you use bash
-source ~/.zshrc     # if you use zsh (default on newer Macs)
+cd ~/Documents
+claude
 ```
 
-Then try `claude --version` again.
+The first time, Claude Code asks you to sign in. It opens a browser window where you log in with your Claude account (or your Console account) and approve access. Then return to the terminal.
 
-### "Permission denied" error during installation
+A few things that can happen here:
 
-Do **not** use `sudo` with the Claude Code installer. The installer is designed to work without elevated privileges. Using `sudo` can cause permission problems.
+- **The browser does not open.** Press `c` to copy the sign-in link, then paste it into a browser yourself.
+- **You are on a remote machine, in WSL 2 or in a container.** The browser may open on a different machine. After you sign in, the page shows a code instead of redirecting; paste that code into the terminal where it says `Paste code here if prompted`.
+- **You have an `ANTHROPIC_API_KEY` environment variable set.** Claude Code skips the browser and asks you once to approve that key instead. If you meant to use your subscription, unset the variable first; an API key bills your Console account, not your plan.
 
-If you see permission errors, it usually means your user account does not have write access to the installation directory. The installer uses `~/.local/bin`, which should always be writable by your own account. Try logging out and logging back in, then running the installer again.
+Claude Code may also ask whether you trust the files in the folder. Say yes only for folders you know. Chapter 6 explains why this matters.
 
-### "curl: command not found" on Windows
+You can also sign in or switch accounts without starting a session:
 
-The `curl` command may not be available in your version of Windows. Use the PowerShell command instead:
-
-```powershell
-irm https://claude.ai/install.ps1 | iex
+```bash
+claude auth login            # sign in with a Claude subscription (the default)
+claude auth login --console  # sign in with a Console (API billing) account
+claude auth status --text    # show how you are signed in
 ```
 
-Or install [Git for Windows](https://git-scm.com/downloads/win) first, which includes curl.
+Inside a session, `/login` switches accounts and `/logout` signs out.
 
-### Login does not open a browser window
+## The desktop app
 
-Claude Code tries to open your default browser for authentication. If no browser opens:
+If you would rather not use a terminal, the Claude desktop app includes Claude Code.
 
-1. Check if your default browser is set. Try opening any website manually first.
-2. Look in the terminal — Claude Code may have printed a URL. Copy and paste that URL into your browser manually.
-3. Make sure you have an active internet connection.
+1. Download it from [claude.com/download](https://claude.com/download) (macOS for Intel and Apple Silicon, Windows x64 and ARM64; a Linux build for Ubuntu and Debian is in beta).
+2. Install, open it and sign in with your Claude account.
+3. Click the **Code** tab at the top. If it asks you to upgrade, Claude Code needs a paid plan.
+4. Choose **Local**, click **Select folder**, and pick a project folder.
 
-### "Claude Code is not available in your region"
+The app has three tabs: **Chat** (ordinary conversation, no file access), **Cowork** (a background agent for general tasks) and **Code** (Claude Code). You do not need the CLI installed for the Code tab. If you have both, running `/desktop` in a terminal session hands it over to the app.
 
-Anthropic's services are not available in all countries. Check [anthropic.com/supported-countries](https://www.anthropic.com/supported-countries) for the current list of supported regions.
+## The web version
 
-### Installation succeeded but Claude Code is very slow on first start
+[claude.ai/code](https://claude.ai/code) runs Claude Code on a cloud machine instead of your computer. It is available on Pro, Max and Team plans, and for Enterprise users with the right seat type.
 
-The first time Claude Code starts, it downloads some additional components. This is normal and only happens once. Subsequent starts will be fast.
+1. Go to claude.ai/code and sign in.
+2. Connect GitHub when asked. The session clones your repository into a fresh virtual machine. For private repositories, install the Claude GitHub App on that account or organization.
+3. Describe a task. Claude works, then pushes a branch you can review and turn into a pull request.
 
-### Getting more help
+Cloud sessions keep running if you close the tab, and you can follow them from the Claude mobile app. They do not see your local files or settings, only the repository. Book 2's [Desktop and Web](/en/book2-advanced/19-desktop-and-web) chapter covers both apps in depth.
 
-If you are stuck, run this command — it performs a diagnostic check of your installation:
+## Keeping it up to date
+
+The native installer updates Claude Code in the background; new versions take effect the next time you start it. To update right away:
+
+```bash
+claude update
+```
+
+It reports either `Successfully updated from <old> to version <new>` or that you are already up to date. If you prefer fewer, better-tested updates, switch to the stable channel in `/config` under **Auto-update channel**.
+
+## What happened behind the scenes
+
+On Mac and Linux the installer put a small launcher at `~/.local/bin/claude` that points into `~/.local/share/claude/versions/`. On Windows it lives under `%USERPROFILE%\.local\bin\`. Your settings and conversation history live in a folder called `~/.claude` in your home directory. You do not need to touch it, but it is useful to know where it is.
+
+## Troubleshooting
+
+**`command not found: claude` (or `'claude' is not recognized`).** The install folder is not on your PATH, the list of places your terminal looks for programs. First, close the terminal and open a new one. If that does not help on a Mac (which uses the Zsh shell), run:
+
+```bash
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+On Linux with Bash, use `~/.bashrc` in place of `~/.zshrc`. Then try `claude --version` again.
+
+**The install command prints HTML or `syntax error near unexpected token '<'`, or a 403 error.** Something between you and the download server, often a corporate proxy, returned a web page instead of the script. Anthropic's [installation troubleshooting page](https://code.claude.com/docs/en/troubleshoot-install) has a table that maps each error message to a fix.
+
+**`App unavailable in region`.** Claude Code is not available in your country.
+
+**Login loops or fails.** Run `/logout`, close Claude Code, start it again and sign in fresh.
+
+**Anything else.** Run the built-in checkup:
 
 ```bash
 claude doctor
 ```
 
-This will tell you what is working and what is not, and often suggests how to fix the issue. If `claude doctor` itself does not work, check the official troubleshooting page at [code.claude.com/docs/en/troubleshooting](https://code.claude.com/docs/en/troubleshooting).
+It checks your installation and settings without starting a session. Inside a session, `/doctor` runs a fuller checkup and can fix some problems for you.
 
----
+### Check that it worked
 
-## You're In
+Run these two commands in a new terminal:
 
-Once you see the Claude Code welcome screen after running `claude`, you have everything you need. The hard part is done.
+```bash
+claude --version
+claude doctor
+```
 
-In the next chapter, we will walk through your very first conversation with Claude Code — from saying hello to watching it create a real file on your computer.
+The first should print a version number followed by `(Claude Code)`. The second should end with `No installation issues found.` Then start `claude` in any folder and confirm you reach a prompt with no sign-in request. On the desktop app, the check is simpler: the **Code** tab opens and lets you select a folder.
 
----
+## Sources
 
-**Next up:** [Chapter 5 — Your First Conversation](./05-first-conversation.md) — Starting Claude Code, asking your first questions, and watching it take real actions.
+- "Advanced setup" (system requirements, install methods, updates), Claude Code Docs, Anthropic, accessed 2026-10-04. https://code.claude.com/docs/en/setup
+- "Quickstart" (sign-in and account types), Claude Code Docs, Anthropic, accessed 2026-10-04. https://code.claude.com/docs/en/quickstart
+- "Troubleshoot installation and login", Claude Code Docs, Anthropic, accessed 2026-10-04. https://code.claude.com/docs/en/troubleshoot-install
+- "Get started with the desktop app", Claude Code Docs, Anthropic, accessed 2026-10-04. https://code.claude.com/docs/en/desktop-quickstart
+- "Get started with Claude Code in the cloud", Claude Code Docs, Anthropic, accessed 2026-10-04. https://code.claude.com/docs/en/web-quickstart
+- "Plans and pricing", Anthropic, accessed 2026-10-04. https://claude.com/pricing
+- `claude --help`, `claude auth login --help`, `claude doctor`, Claude Code 2.1.289, run 2026-10-04.

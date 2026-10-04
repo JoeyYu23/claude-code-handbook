@@ -1,331 +1,159 @@
 # Troubleshooting
 
-Solutions to the most common problems you will encounter with Claude Code. Organized by category. Start with the error message you are seeing and follow the steps.
+> Verified on 2026-10-04 with Claude Code 2.1.289.
 
----
+Find the message you are seeing, then follow the steps. Two commands help with almost anything:
 
-## Authentication Problems
+- `/doctor` inside a session checks your installation, settings, extensions and context usage, and proposes fixes you can approve.
+- `claude doctor` from your shell does a health check when `claude` will not start a session.
+
+## Usage limits and errors from the service
+
+### "You've hit your session limit" (or weekly, Opus, Sonnet limit)
+
+Messages look like `You've hit your session limit · resets 3:45pm`. Your subscription's rolling allowance is used up. It is not a fault.
+
+1. Wait until the reset time shown.
+2. Run `/usage` to see your limits and reset times.
+3. Run `/model` to switch model family. The Opus and Sonnet limits are counted per model.
+4. Run `/usage-credits` to buy extra usage on Pro or Max, or to ask your admin on Team or Enterprise.
+
+If the message says `You've hit your monthly spend limit`, raise the limit in your usage settings at claude.ai/settings/usage, or ask your admin.
+
+### "API Error: Request rejected (429)"
+
+You hit a rate limit on your API key or cloud project. Run `/status` to confirm which credential is active, and check your provider's console for limits. If you run many agents at once, fewer in parallel will help.
+
+### "529 Overloaded" or "500 Internal server error"
+
+The service is busy or having a problem on its side; your usage is not the cause. Check status.claude.com, wait a minute, and type `try again`. For 529 you can also switch models with `/model`, since capacity is tracked per model.
+
+### "Prompt is too long" or "Context limit reached"
+
+The conversation no longer fits in Claude's working memory. Run `/compact` to summarize it, or `/clear` to start fresh. If you see `Autocompact is thrashing`, a file or tool output keeps refilling the window: ask Claude to read big files in smaller pieces, or run `/compact keep only the plan and the diff`.
+
+## Login problems
 
 ### "Not logged in" or "Authentication required"
 
-**Symptom:** Claude Code says you need to log in, or immediately asks you to authenticate when you run `claude`.
+Run `/login` in a session, or `claude auth login` in your terminal, and finish sign-in in the browser. If Claude Code prints a URL, copy it into your browser. `claude auth status` shows who you are signed in as.
 
-**Solution:**
-1. Run `claude auth login` in your terminal
-2. A browser window will open — complete the sign-in
-3. Return to your terminal; it should confirm you are logged in
-4. Try running `claude` again
+### "Invalid API key" or `401`
 
-If the browser does not open automatically, Claude Code will print a URL. Copy and paste it into your browser manually.
+Run `/status` to see which credential is active. A stray `ANTHROPIC_API_KEY` in your environment can override your subscription login. Remove it, or run `/login`.
 
----
-
-### "Authentication expired" or "Session invalid"
-
-**Symptom:** Claude Code was working before but now says your session has expired.
-
-**Solution:**
-1. Run `claude auth logout` to clear the old session
-2. Run `claude auth login` to sign in again
-3. Check your account status at claude.ai — make sure your subscription is active
-
----
-
-### "API key not found" or "ANTHROPIC_API_KEY not set"
-
-**Symptom:** You are trying to use Claude Code with a direct API key instead of a Claude.ai account, and it cannot find the key.
-
-**Solution:**
-1. Set the environment variable in your terminal: `export ANTHROPIC_API_KEY=your-key-here`
-2. To make this permanent, add that line to your `~/.zshrc` or `~/.bashrc` file
-3. After editing the file, run `source ~/.zshrc` (or restart your terminal)
-
----
-
-## Installation Problems
+## Installation problems
 
 ### "claude: command not found"
 
-**Symptom:** You type `claude` and the terminal says the command does not exist.
+On macOS and Linux the installer places `claude` at `~/.local/bin/claude`. If that folder is not on your PATH, add it:
 
-**Solution:**
-
-First, check if Claude Code is installed:
 ```bash
-which claude
-ls ~/.claude/bin/
-```
-
-If it is not installed, install it:
-```bash
-curl -fsSL https://claude.ai/install.sh | bash
-```
-
-If it is installed but the command is not found, the installation directory might not be in your PATH. Add it:
-```bash
-echo 'export PATH="$HOME/.claude/bin:$PATH"' >> ~/.zshrc
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
-Restart your terminal after making PATH changes.
+(Use `~/.bashrc` if you use Bash.) Open a new terminal afterward. If you have only installed the VS Code extension, there is no `claude` command: the extension keeps its own private copy. Install the CLI separately (see [Installation](/en/book1-getting-started/04-installation)).
 
----
+For other install errors, such as `EACCES` or certificate errors, see Anthropic's page "Troubleshoot installation and login".
 
-### Claude Code installs but immediately crashes
+## Permission problems
 
-**Symptom:** Running `claude` causes an error before anything happens, or it exits immediately.
+### Claude asks for permission too often, or not at all
 
-**Solution:**
-1. Check if Node.js is installed and up to date: `node --version` (needs version 18 or higher)
-2. Try updating Claude Code: `claude update`
-3. Try a clean reinstall: uninstall with the uninstall script, then reinstall with the install script
-4. Check the error message — it often tells you exactly what is wrong
+Press `Shift+Tab` to see and change the permission mode. Auto mode is the starting mode in recent versions for interactive terminal and VS Code sessions, so a session that "edits files without asking" is usually working as designed. See [Auto Mode and Permissions](/en/book1-getting-started/06-auto-mode-and-permissions).
 
----
+### An action was blocked in auto mode
 
-### "Permission denied" during installation
+In auto mode a separate classifier model checks each action, and it can block one.
 
-**Symptom:** The install script fails with a permission error.
+1. A blocked action produces a notification and appears in `/permissions` under the **Recently denied** tab. Press `r` there to retry it with a manual approval.
+2. If the classifier blocks 3 actions in a row or 20 in total, auto mode pauses and Claude Code goes back to asking you. Approve the action it asks about to resume auto mode.
+3. If you said something like "don't push yet" earlier in the conversation, the classifier treats it as a boundary and blocks matching actions until you lift it in a later message.
+4. To override a block, tell Claude that the specific action is allowed and name what makes it risky (for example the branch of a force push). Saying only "you can force-push" does not clear it, and an approval covers one action.
+5. For a step that stays blocked, leave auto mode with `Shift+Tab` and answer the normal prompt yourself.
 
-**Solution:**
-Do NOT use `sudo` with the Claude Code install script. The native installer is designed to install to your home directory, which does not require administrator privileges.
+Messages such as `auto mode cannot determine the safety of <tool> right now` mean the classifier could not give an answer. Wait a few seconds and ask again. If the classifier's own context is full, run `/compact`. If it keeps happening, run `claude --debug` for details or leave auto mode.
 
-If you see permission errors, check:
-1. Do you have write access to `~/.claude/` ?
-2. Is your home directory on a read-only filesystem?
-3. Try: `mkdir -p ~/.claude && chmod u+w ~/.claude`
+### "Denied by permission rules"
 
----
+Run `/permissions` to see the allow, ask and deny rules, and which settings file each comes from. Deny rules win in every mode.
 
-## Runtime Errors
+## Memory and instruction problems
 
-### "Rate limit exceeded"
+### Claude ignores my CLAUDE.md
 
-**Symptom:** Claude Code stops mid-task with a message about rate limits or "too many requests."
+1. Run `/context` and look under **Memory files**. If your file is not listed, Claude cannot see it. `/memory` lets you open and edit the files.
+2. Check the location: `./CLAUDE.md` or `./.claude/CLAUDE.md` for the project, `~/.claude/CLAUDE.md` for you.
+3. Make the wording specific ("Use 2-space indentation") and look for contradictions between files.
+4. Remember that instructions are context, not a guarantee. If something must always happen, use a hook.
 
-**What it means:** You have sent too many requests in a short period. This is a limit imposed by Anthropic's API to prevent abuse.
+### Claude ignores my AGENTS.md
 
-**Solution:**
-1. Wait a few minutes and try again
-2. For long automated tasks, consider adding pauses between requests
-3. If you hit rate limits regularly, check your usage at console.anthropic.com (if using API key billing)
-4. Claude.ai subscription users have usage limits that reset on a billing cycle — check your usage dashboard
+By default Claude reads `AGENTS.md` only when there is no `CLAUDE.md` or `CLAUDE.local.md` in your working folder or any folder above it. Check, in order:
 
----
+1. Is there a `CLAUDE.md`, `.claude/CLAUDE.md` or `CLAUDE.local.md` in your folder or above it (other than `~/.claude/CLAUDE.md`)? If so, Claude reads that instead. Either set **Project instructions** to `claude-md-and-agents-md` in `/config`, or add `@AGENTS.md` at the top of that CLAUDE.md.
+2. Run `claude --version`. Direct AGENTS.md reading needs 2.1.277 or later, and some sessions (for example on Amazon Bedrock, or with telemetry off) needed 2.1.281.
+3. In `/config`, make sure **Project instructions** is not `claude-md` or `managed-only`. If the setting is missing entirely, your session cannot read AGENTS.md directly; import it from a CLAUDE.md.
 
-### "Context length exceeded" or "Conversation too long"
+To confirm, run `/memory` and look for the AGENTS.md path in the list.
 
-**Symptom:** Claude Code says the conversation is too long, or responses become truncated or low quality after a very long session.
+### Edits to CLAUDE.md are not picked up
 
-**What it means:** The conversation has exceeded Claude's context window — it can no longer hold the entire history of what was said.
+CLAUDE.md is read when a session starts. Start a new session, or confirm the version Claude loaded with `/memory`.
 
-**Solution:**
-1. Run `/compact` to compress the conversation history. Claude will summarize earlier parts while keeping recent context.
-2. For a fresh start: run `/clear` to start a new conversation (you will need to re-establish context)
-3. For large codebases: focus each session on one task rather than trying to do everything in one long conversation
-4. Avoid pasting large files repeatedly — reference them with `@filename` instead
+### Claude "forgot" something mid-session
 
----
+The conversation was probably compacted. Instructions that only existed in chat can be lost; the project-root CLAUDE.md is reloaded from disk. Put anything important there.
 
-### "Tool execution failed" or "Command failed"
+## Editor problems
 
-**Symptom:** Claude Code tried to run a command and it failed.
+### VS Code: no spark icon, or the extension does not respond
 
-**Solution:**
-1. Read the error message — it usually tells you exactly what failed
-2. Ask Claude: "Why did that command fail? Can you try a different approach?"
-3. Run the command yourself (use `!` prefix) to see the full error output
-4. Check that required tools are installed: `which npm`, `which python`, etc.
+1. You need VS Code 1.94.0 or later (Help, About).
+2. The toolbar icon appears only when a file is open. The **Claude Code** item in the bottom-right Status Bar always works.
+3. Run "Developer: Reload Window" from the Command Palette.
+4. Run `claude` in the integrated terminal for more detailed error messages.
+5. On macOS Tahoe and later, `Cmd+Esc` may do nothing because the system's Game Overlay uses it. Free the shortcut in system settings or rebind **Claude Code: Focus input** in VS Code's Keyboard Shortcuts editor.
 
----
+### JetBrains: IDE not detected
 
-### "File not found" or "No such file or directory"
+Confirm the plugin is installed and enabled, restart the IDE completely, and start `claude` from the IDE's integrated terminal (or run `/ide`).
 
-**Symptom:** Claude Code cannot find a file it is trying to read or edit.
+## Speed and stability
 
-**Solution:**
-1. Make sure you are in the right directory (`pwd` to check)
-2. Check if the file name or path is spelled correctly
-3. Ask Claude: "What directory are you looking in? What files exist here?"
-4. Run `ls` or `find . -name "filename"` to locate the file
+### Claude Code is slow or using a lot of memory
 
----
+Run `/compact`, or restart and use `claude --continue` to resume in a fresh process. To see whether a plugin, MCP server or hook is the cause, start with `claude --safe-mode`, which disables all customizations for that session.
 
-## Permission Problems
+### Garbled text in an editor's terminal
 
-### "Permission denied" when editing a file
+Run `/terminal-setup` inside Claude Code, which turns off the terminal's GPU renderer setting that causes it.
 
-**Symptom:** Claude Code tries to edit a file and gets a permission denied error from the operating system.
+### Claude Code hangs
 
-**Solution:**
-1. Check file permissions: `ls -la filename`
-2. Make the file writable: `chmod u+w filename`
-3. If the file is owned by root or another user, you may need `sudo` — but be careful using `sudo` with Claude Code
+Press `Ctrl+C`. If it does not respond, close the terminal. You do not lose the conversation: run `claude --resume` in the same folder to pick it up.
 
----
+## Git problems
 
-### "Denied by permission rules" — Claude refuses to do something
+`gh: command not found` means the GitHub CLI is not installed; install it from cli.github.com and run `gh auth login`. `No remote configured` means the project is not connected to a GitHub repository yet; ask Claude to help connect it. For "nothing to commit", run `git status` to see what git sees. See [Git Workflows](/en/book1-getting-started/10-git-workflows).
 
-**Symptom:** Claude Code tells you it is not allowed to perform a specific action because of your settings.
+## Getting more help
 
-**Solution:**
-1. Run `/permissions` to view the current allow/deny rules
-2. Find the deny rule that is blocking the action
-3. Either remove the deny rule, or add a more specific allow rule
-4. Check both your user settings (`~/.claude/settings.json`) and project settings (`.claude/settings.json`)
+1. Ask Claude directly. It can read its own documentation.
+2. Run `/feedback` to report a problem to Anthropic.
+3. Search the issues at github.com/anthropics/claude-code.
+4. For billing or account problems, use Get help at claude.ai.
 
----
+### Check that it worked
 
-### Claude keeps asking permission for the same command repeatedly
+After any fix, repeat the action that failed. For installation and login problems, `claude --version` and `claude auth status` should both answer without errors.
 
-**Symptom:** You have approved `npm run test` before but Claude asks again in the next session.
+## Sources
 
-**Solution:**
-Add the command to your allowlist so it is always approved:
-
-In `.claude/settings.json`:
-```json
-{
-  "permissions": {
-    "allow": ["Bash(npm run test)"]
-  }
-}
-```
-
-Or when Claude asks for permission, look for a "don't ask again" option.
-
----
-
-## VS Code Extension Problems
-
-### The Claude Code extension is not visible
-
-**Symptom:** You installed the extension but cannot find the spark icon.
-
-**Solution:**
-1. Make sure you have a file open in the editor — the toolbar icon only appears with a file open
-2. Check VS Code version: requires 1.98.0 or higher (Help → About)
-3. Restart VS Code: Command Palette → "Developer: Reload Window"
-4. Try disabling other AI extensions (Cline, Continue, GitHub Copilot) temporarily — they can sometimes conflict
-5. The Status Bar icon (bottom right: "✱ Claude Code") is always visible even without a file open
-
----
-
-### Claude Code extension never responds to prompts
-
-**Symptom:** You type a prompt and nothing happens.
-
-**Solution:**
-1. Check your internet connection
-2. Start a new conversation to rule out a stale session
-3. Try running `claude` in VS Code's integrated terminal — more detailed errors appear there
-4. Reinstall the extension: uninstall via Extensions panel, reload VS Code, reinstall
-
----
-
-## Git and GitHub Problems
-
-### "gh: command not found" when trying to create a pull request
-
-**Symptom:** Claude Code cannot create a pull request because the `gh` CLI is not installed.
-
-**Solution:**
-1. Install the GitHub CLI: https://cli.github.com/
-2. Mac: `brew install gh`
-3. After installing, authenticate: `gh auth login`
-4. Try the pull request command again
-
----
-
-### "Remote origin not found" or "No remote configured"
-
-**Symptom:** Claude Code cannot push to GitHub because there is no remote repository configured.
-
-**Solution:**
-1. Create a new repository on github.com first
-2. Then add the remote: `git remote add origin https://github.com/username/repo-name.git`
-3. Or ask Claude: "Help me connect this project to a new GitHub repository"
-
----
-
-### Git says "nothing to commit"
-
-**Symptom:** You ask Claude to commit but git says there is nothing to commit.
-
-**What it means:** All your files are either already committed or excluded by `.gitignore`.
-
-**Solution:**
-1. Run `git status` to see what git sees
-2. If you have new files that git is not tracking, run `git add .` to stage them
-3. Ask Claude: "What is the current git status? Why does it say nothing to commit?"
-
----
-
-## CLAUDE.md Problems
-
-### Claude is not following instructions in CLAUDE.md
-
-**Symptom:** You have instructions in CLAUDE.md but Claude seems to be ignoring them.
-
-**Solution:**
-1. Run `/memory` to verify the CLAUDE.md file is actually being loaded — it will be listed there if it is
-2. Make sure the file is in the right location: either `./CLAUDE.md` or `./.claude/CLAUDE.md`
-3. Make instructions more specific: "Use 2-space indentation" works better than "write clean code"
-4. Keep the file under 200 lines — longer files have lower adherence
-5. Check for contradictions: two rules saying different things may cancel each other out
-
----
-
-### CLAUDE.md changes are not being picked up
-
-**Symptom:** You edited CLAUDE.md but Claude seems to be using the old version.
-
-**Solution:**
-1. Start a new Claude Code session — CLAUDE.md is read at the start of each session
-2. Run `/memory` to confirm which version is loaded
-3. Make sure you saved the file before starting the session
-
----
-
-## Performance and Slow Responses
-
-### Claude Code is responding very slowly
-
-**Symptom:** Responses take 30 seconds or more; it feels sluggish.
-
-**Possible causes and solutions:**
-1. **High demand:** Anthropic's servers may be under high load. Wait a few minutes and try again.
-2. **Very long conversation:** Use `/compact` to compress history. Long conversations slow things down.
-3. **Large files in context:** Avoid having Claude hold very large files in memory unnecessarily.
-4. **Network issues:** Check your internet connection. Try `ping claude.ai`.
-
----
-
-### Claude Code seems to "forget" things mid-session
-
-**Symptom:** Claude stops referencing context it knew earlier in the same conversation.
-
-**What it means:** The conversation may have been compacted automatically (Claude summarized older messages to free up context space).
-
-**Solution:**
-1. Remind Claude of key context: "Earlier in this session you were working on X. Here's a quick summary of where we are..."
-2. Keep important facts in CLAUDE.md so they survive compaction
-3. Use `/compact` manually before starting a new major task to compact on your terms
-
----
-
-## Getting More Help
-
-If none of the above solves your problem:
-
-1. **Ask Claude directly:** "I'm having trouble with [description]. What should I try?" Claude has access to its own documentation and can help troubleshoot itself.
-
-2. **Check the official docs:** https://code.claude.com/docs
-
-3. **File an issue:** For bugs, the GitHub repository at https://github.com/anthropics/claude-code accepts issues with detailed bug reports.
-
-4. **Community:** The developer community around Claude Code shares tips and solutions in online forums and Discord servers — search for "Claude Code community."
-
----
-
-*Found a problem not listed here? The debugging mindset from Chapter 12 applies: describe the symptom precisely, note what you have already tried, and use Claude itself to help diagnose the issue.*
+- Anthropic, Claude Code "Error reference", accessed 2026-10-04. https://code.claude.com/docs/en/errors
+- Anthropic, Claude Code "Troubleshooting", accessed 2026-10-04. https://code.claude.com/docs/en/troubleshooting
+- Anthropic, "Troubleshoot installation and login", accessed 2026-10-04. https://code.claude.com/docs/en/troubleshoot-install
+- Anthropic, "Choose a permission mode" (auto mode blocks), accessed 2026-10-04. https://code.claude.com/docs/en/permission-modes
+- Anthropic, "How Claude remembers your project" (AGENTS.md troubleshooting), accessed 2026-10-04. https://code.claude.com/docs/en/memory
+- Anthropic, "Use Claude Code in VS Code" and "JetBrains IDEs", accessed 2026-10-04. https://code.claude.com/docs/en/vs-code

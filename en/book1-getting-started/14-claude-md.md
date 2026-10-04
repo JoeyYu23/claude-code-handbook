@@ -1,291 +1,181 @@
-# Chapter 14: CLAUDE.md — Your AI's Instruction Manual
+# CLAUDE.md and AGENTS.md
 
-## The Problem Claude Code Doesn't Know You Yet
+> Verified on 2026-10-04 with Claude Code 2.1.289.
 
-Every time you start a new Claude Code session, Claude begins fresh. It does not know that you prefer TypeScript over JavaScript. It does not know that you use Prettier for formatting and Vitest for tests. It does not know that your project's API handlers live in `src/api/handlers/` or that you never commit directly to main.
+## The problem: Claude does not know you yet
 
-In a short session, this is fine — you give Claude context as you work. But across a long project, repeating the same context in every session is tedious. And on a team, ensuring every developer gets the same Claude behavior requires something more systematic.
+Every time you start a new Claude Code session, Claude begins fresh. It does not know that you prefer TypeScript, that your tests run with Vitest, or that the project's API code lives in `src/api/handlers/`. In a short session you can just say so. Across a long project, repeating yourself gets old, and on a team it means everyone gets slightly different behavior.
 
-That something is `CLAUDE.md`.
+The fix is a plain text file that Claude reads at the start of every session. Claude Code's own name for it is `CLAUDE.md`. Many other coding tools read a similar file called `AGENTS.md`, and Claude Code can now read that too. This chapter covers both.
 
----
+You do not need to be a programmer to write one. If you can write a checklist for a new colleague, you can write a CLAUDE.md.
 
-## What CLAUDE.md Is
+## What CLAUDE.md is
 
-`CLAUDE.md` is a plain text file written in Markdown that you place in your project. Claude Code reads it automatically at the start of every session.
+`CLAUDE.md` is a Markdown text file. You put it in your project folder, and Claude Code loads it into the conversation at the start of each session. Think of it as an onboarding note for a very fast, very literal new hire who forgets everything overnight.
 
-Think of it as an employee onboarding document — except this employee is Claude, and it reads the document flawlessly every single time without forgetting anything.
+Two honest limits, straight from the documentation:
 
-You can also generate a starting CLAUDE.md automatically. Inside a Claude Code session, run:
+- Claude treats CLAUDE.md as context, not as enforced configuration. It tries to follow it, but there is no guarantee. If something must happen every time (for example "run the formatter before every commit"), use a hook instead. Hooks are covered in [Hooks](/en/book2-advanced/09-hooks).
+- The more specific and short your instructions are, the more reliably Claude follows them.
+
+### Generate a first draft with /init
+
+Inside a Claude Code session, run:
 
 ```
 /init
 ```
 
-Claude will analyze your project and create a `CLAUDE.md` with build commands, test instructions, and conventions it discovers. From there, you refine it with things Claude would not discover on its own: business context, team preferences, architectural decisions.
+Claude looks at your project and writes a starting `CLAUDE.md` with the build commands, test instructions, and conventions it can discover. If you already have one, `/init` suggests improvements instead of overwriting it. `/init` also reads other tools' rule files (Cursor rules in `.cursor/rules/` or `.cursorrules`, and Copilot rules in `.github/copilot-instructions.md`) and folds the useful parts in.
 
-Whatever you put in CLAUDE.md, Claude treats as context for the current session. Write good instructions and Claude will follow them consistently. Write vague instructions and results will vary.
+Treat the result as a draft. Then add what Claude cannot discover on its own: why you made a decision, what must never happen, who the users are.
 
----
+## Where CLAUDE.md files can live
 
-## The Hierarchy: Managed Policy, Global, Project, Directory
+There are four places, from broadest to most specific:
 
-CLAUDE.md files can exist in four different locations, each with different scope.
+| Scope | Location | Who it applies to |
+| --- | --- | --- |
+| Managed policy | macOS: `/Library/Application Support/ClaudeCode/CLAUDE.md`; Linux and WSL: `/etc/claude-code/CLAUDE.md`; Windows: `C:\Program Files\ClaudeCode\CLAUDE.md` | Everyone on a company-managed machine |
+| User | `~/.claude/CLAUDE.md` | You, in every project |
+| Project | `./CLAUDE.md` or `./.claude/CLAUDE.md` | Everyone working on the project (usually committed to git) |
+| Local | `./CLAUDE.local.md` | You, in this project only. Add it to `.gitignore` |
 
-### Managed Policy CLAUDE.md — Deployed by Administrators (Highest Priority)
+Two things the first edition of this handbook got wrong or left out:
 
-Located at:
-- macOS: `/Library/Application Support/ClaudeCode/CLAUDE.md`
-- Linux: `/etc/claude-code/CLAUDE.md`
+**Precedence is not "highest wins."** Claude Code does not pick one file and discard the others. It concatenates every file it finds into the context, ordered from broadest scope to most specific, so the project file is read after your user file, and `CLAUDE.local.md` is read last at its level. If two files disagree, Claude may follow either one. Keep them consistent rather than counting on one to override the other. The one exception is the managed policy file: individual users cannot exclude it.
 
-This is a machine-wide instruction file deployed by IT or DevOps administrators. It has the highest priority — its rules override all other CLAUDE.md files. Individual users cannot modify it without elevated permissions.
+**Folders above you count too.** Claude Code loads `CLAUDE.md` and `CLAUDE.local.md` from the folder you started in and every folder above it. Files in subfolders below you are loaded on demand, when Claude reads a file in that subfolder. That makes a subfolder CLAUDE.md a good place for rules that only matter in one part of a large project.
 
-Use this for enforcing organization-wide policies: security requirements, approved tooling, compliance rules, or any instructions that must apply to every Claude Code session on a managed machine.
+## Share one file with other tools: AGENTS.md
 
-### Global CLAUDE.md — Applies to All Your Projects
+`AGENTS.md` is a Markdown file of instructions for AI coding agents, used by several tools. If your repository already has one, you do not need to copy it into a second file for Claude.
 
-Located at: `~/.claude/CLAUDE.md`
+Starting with Claude Code 2.1.277, Claude reads `AGENTS.md` as your project instructions when there is no `CLAUDE.md`. Here is the default behavior:
 
-This is your personal instruction set that applies everywhere, across all your projects. Good candidates:
+| Your repository has | Claude reads |
+| --- | --- |
+| An `AGENTS.md` and no `CLAUDE.md` or `CLAUDE.local.md` in your folder or above it | The `AGENTS.md` |
+| An `AGENTS.md` and a `CLAUDE.md` (or `CLAUDE.local.md`) | The `CLAUDE.md` files only |
+| A `CLAUDE.md` that imports `AGENTS.md` | The `CLAUDE.md`, with the `AGENTS.md` included through the import |
 
-- Your coding style preferences (tabs vs. spaces, quote style)
-- Your preferred libraries for common tasks
-- Personal workflow shortcuts you want Claude to know
-- How you like explanations structured
+Your personal `~/.claude/CLAUDE.md`, a company-managed CLAUDE.md, and `.claude/rules/` files do not count for this check. They keep loading alongside `AGENTS.md`.
 
-Example:
-```markdown
-## Personal Preferences
+When Claude reads `AGENTS.md` this way, you see a line in the conversation such as `no CLAUDE.md found; AGENTS.md loaded: /path/to/AGENTS.md`.
 
-- I prefer tabs for indentation, 2 spaces wide
-- Always use TypeScript, never plain JavaScript
-- I use pnpm as my package manager, not npm or yarn
-- When writing tests, use Vitest and the describe/it pattern
-- Explain things at an intermediate level — I know the basics
-  but do not assume deep expertise
-```
+### The best setup for a team that uses several tools
 
-### Project CLAUDE.md — Applies to One Project
-
-Located at: `./CLAUDE.md` or `./.claude/CLAUDE.md` (in your project folder)
-
-This is the most important one for day-to-day work. It lives in your project repository and is usually committed to version control so your whole team shares it.
-
-Good candidates:
-- Build and test commands
-- Project architecture overview
-- Coding standards for this project
-- Important file locations
-- What to never do in this project
-
-This file is shared with your whole team through git, so focus on project-level standards rather than personal preferences.
-
-### Directory-Specific CLAUDE.md — Applies to a Subdirectory
-
-You can also put CLAUDE.md files inside subdirectories. Claude loads them when it reads files in those directories.
-
-This is useful in large projects where different parts of the codebase have different conventions — the frontend might have different rules than the backend, for example.
-
----
-
-## The Rules Directory: `.claude/rules/`
-
-For larger projects, a single CLAUDE.md file can become unwieldy. The `.claude/rules/` directory provides a modular alternative: place individual `.md` files inside it, each covering one topic (e.g., `testing.md`, `api-design.md`).
-
-Rules files support optional `paths:` frontmatter for path-scoped activation. A rule with `paths:` only loads into context when Claude is working with files matching those glob patterns, reducing noise and saving context space:
+Keep `AGENTS.md` as the one shared file, and add a small `CLAUDE.md` next to it that imports it:
 
 ```markdown
----
-paths:
-  - src/api/**/*.ts
-  - src/handlers/**/*.ts
----
-All API handlers must validate input with Zod schemas.
-Return 400 with a structured error object for validation failures.
+@AGENTS.md
+
+## Claude Code
+
+Use plan mode for changes under `src/billing/`.
 ```
 
-This rule loads only when Claude reads or edits files under `src/api/` or `src/handlers/`. Rules without `paths:` frontmatter are loaded globally, just like CLAUDE.md content.
+Claude reads the imported file first, then your Claude-specific notes below. Other tools keep reading `AGENTS.md` and never see the Claude section. If you do not need any Claude-specific notes, a symlink also works (`ln -s AGENTS.md CLAUDE.md`), but on Windows use the import instead, because symlinks there need special permissions.
 
-Rules files are loaded alongside CLAUDE.md, not instead of it. The directory also supports symlinks, so you can maintain shared rules across multiple projects.
+### Make Claude read both files
 
----
+Type `/config` in a session and change **Project instructions**. The values are:
 
-## Writing Your First CLAUDE.md
+| Value | What Claude reads |
+| --- | --- |
+| `claude-md-or-agents-md` (default) | `CLAUDE.md` files, or `AGENTS.md` if there is no CLAUDE.md |
+| `claude-md-and-agents-md` | Both, `CLAUDE.md` first |
+| `claude-md` | `CLAUDE.md` only |
+| `managed-only` | Only your organization's managed CLAUDE.md, plus auto memory |
 
-Create a file named `CLAUDE.md` in your project root. Here is a solid template to start from:
+Watch for one trap: adding a personal `CLAUDE.local.md` to a project that relies on `AGENTS.md` counts as having a CLAUDE.md, so Claude stops reading `AGENTS.md`. Set the option to `claude-md-and-agents-md` to keep both.
+
+If Claude does not seem to know what your AGENTS.md says, see [Troubleshooting](/en/book1-getting-started/troubleshooting#claude-ignores-my-agents-md).
+
+## Writing your first CLAUDE.md
+
+Create a file named `CLAUDE.md` in your project folder. Here is a small, realistic example for a personal portfolio site:
 
 ```markdown
 # My Portfolio Site
 
-## Build & Run
+## Build and run
 
-- `npm install` — install dependencies
-- `npm run dev` — start dev server on port 3000
-- `npm run build` — production build
-- `npm test` — run tests (must pass before committing)
+- `npm install` installs dependencies
+- `npm run dev` starts the preview on port 3000
+- `npm test` runs the tests; they must pass before any commit
 
-## Tech Stack
+## Rules for this project
 
-React 18 + TypeScript + Vite. Styling with Tailwind CSS (no CSS modules, no styled-components). State management with Zustand — no Redux. Deployment on Vercel, auto-deploys from main branch.
+- Images go in `public/images/` and must be WebP, under 200 KB
+- The site has exactly four pages: Home, Work, About, Contact. Ask before adding one
+- Colors come from `tailwind.config.ts`. Never hard-code a hex value
+- All page text lives in `src/content/data.ts`. The owner edits that file directly, so keep its format simple
 
-## Project-Specific Rules
+## Context
 
-- Image assets go in `public/images/` and must be WebP format, max 200KB each
-- The site has exactly 4 pages: Home, Work, About, Contact — do not add new pages without asking
-- Color palette is defined in `tailwind.config.ts` under `theme.extend.colors` — use those tokens, never hardcode hex values
-- Contact form submits to Formspree (endpoint in `.env`), do not build a backend
-- All text content lives in `src/content/data.ts` — the client updates this file directly, so keep the format simple
-
-## Architecture Decisions
-
-- No SSR — this is a fully static SPA, pre-rendered at build time via `vite-plugin-ssr`
-- No authentication — the site is public, no login needed
-- No database — all content is in `data.ts`
-- We chose Zustand over React Context because the theme toggle and language state need to persist across page navigations without prop drilling
-
-## What Claude Should Know
-
-This is a portfolio for a graphic designer. Visual polish matters more than feature count. The client is not technical — any content they need to update must be editable in `data.ts` without touching React components. Performance budget: Lighthouse score must stay above 95.
+This is a portfolio for a graphic designer. Visual polish matters more than feature count. The owner is not technical.
 ```
 
-The key principle: **write things Claude cannot figure out by reading the code.** Build commands and file structure are discoverable — but "images must be WebP under 200KB" and "the client edits data.ts directly" are decisions only you know.
+The principle: **write down what Claude cannot work out by reading the code.** Build commands and folder layout are discoverable. "Images must be WebP under 200 KB" and "the owner edits `data.ts` by hand" are decisions only you know.
 
----
+### What makes an instruction work
 
-## Writing Effective Instructions
+- **Be concrete.** "Use 2-space indentation" beats "format code nicely." "API handlers live in `src/api/handlers/`" beats "keep files organized."
+- **Make it checkable.** "Run `npm test` before committing" is something you can verify. "Write robust code" is not.
+- **Keep it short.** Aim for under 200 lines per file. Long files use more of Claude's working memory and reduce how well it follows each rule. Claude Code warns you at startup if a file is over the recommended length, and skips a file larger than 4 MiB.
+- **Do not contradict yourself.** If two rules clash, Claude may pick either. Review your files from time to time.
+- **Leave notes for humans.** Block-level HTML comments (`<!-- note to maintainers -->`) are stripped before the file reaches Claude, so they cost nothing.
 
-The way you write instructions significantly affects how well Claude follows them. Here are the patterns that work best:
+To have Claude audit your instruction files for stale or conflicting content, run `/doctor prompt-audit` (needs Claude Code 2.1.283 or later). It reports findings and proposes edits; nothing changes until you ask.
 
-### Be concrete and specific
+### Split a long file: imports and rules
 
-Not specific: "Format code properly."
-Specific: "Use 2-space indentation. Single quotes for strings. Trailing commas in multi-line arrays and objects."
-
-Not specific: "Keep things organized."
-Specific: "API handlers live in `src/api/handlers/`. Database models live in `src/models/`. Utility functions live in `src/utils/`."
-
-### Use verifiable instructions
-
-Instructions that describe something you can check work better than instructions about abstractions:
-
-Good: "Every API endpoint must include a try/catch block"
-Hard to verify: "Write robust code"
-
-### Keep the file concise
-
-Target under 200 lines. Claude reads the entire CLAUDE.md at the start of every session. A bloated file:
-1. Consumes more context (the context window has limits)
-2. Dilutes the signal — important rules get lost in noise
-3. Is harder for Claude to adhere to consistently
-
-If you have a lot to document, use references to other files:
+**Imports.** Write `@path/to/file` inside a CLAUDE.md and Claude loads that file too:
 
 ```markdown
-## Architecture
-
-See @docs/architecture.md for the full architecture overview.
-
-## API Guidelines
-
-See @docs/api-guidelines.md for API design standards.
+See @README for the project overview and @docs/git-instructions.md for our git workflow.
 ```
 
-The `@` syntax tells Claude to also read those files.
+Relative paths are resolved from the file that contains the import, and imports can chain up to four levels deep. Imports help you organize, but they do not save space: imported files load at startup like everything else. To mention a path without importing it, wrap it in backticks.
 
-### Avoid contradictions
-
-If two rules say different things about the same situation, Claude may pick one arbitrarily. Review your CLAUDE.md periodically for conflicts.
-
----
-
-## Common Patterns From Real Projects
-
-### Pattern: Team workflow rules
+**Rules.** For instructions that only matter in part of the project, put one Markdown file per topic in `.claude/rules/`, for example `testing.md`. A rule file can include a `paths` list at the top, and then it loads only when Claude works with matching files:
 
 ```markdown
-## Git Workflow
-
-- Branch naming: `feature/description`, `fix/description`, `chore/description`
-- Commit messages follow Conventional Commits format
-- PRs require at least one review before merging
-- Never force-push to main or develop branches
-- Squash commits when merging feature branches
-```
-
-### Pattern: Code style rules
-
-```markdown
-## Code Style
-
-- TypeScript strict mode is enabled — no `any` types
-- Use explicit return types on all functions
-- Prefer named exports over default exports
-- Keep files under 400 lines; split large files into modules
-- No console.log in production code; use the logger utility
-```
-
-### Pattern: Project context for better suggestions
-
-```markdown
-## Project Context
-
-This is a B2B SaaS application for construction project management.
-Users are primarily project managers and site supervisors, not
-technical users. Design decisions should prioritize clarity over
-cleverness. The main user action is reviewing and approving material
-orders.
-
-## Performance Constraints
-
-- This app is used on construction sites with slow mobile connections
-- Keep bundle size small; avoid large dependencies
-- Prefer lazy loading for non-critical features
-```
-
-### Pattern: Do/don't lists
-
-```markdown
-## Do
-
-- Use the existing `Button` component for all buttons
-- Check the `src/utils/validators.js` file before writing new validation
-- Add JSDoc comments to all exported functions
-
-## Don't
-
-- Don't install new dependencies without team discussion
-- Don't modify files in `src/generated/` — they are auto-generated
-- Don't use the old `fetch` wrapper in `src/legacy/` — use `src/api/client.js`
-```
-
+---
+paths:
+  - "src/api/**/*.ts"
 ---
 
-## Viewing Your Loaded Instructions
-
-To see which CLAUDE.md files are currently loaded and take effect in your session, run:
-
-```
-/memory
+- All API endpoints must validate their input
+- Use the standard error response format
 ```
 
-This shows every instruction file that Claude has loaded, from all three levels. If an instruction is not being followed, check here first — the file might not be in the right location.
+Rules without `paths` load at startup like CLAUDE.md. Personal rules that apply to every project go in `~/.claude/rules/`. Instructions that are a multi-step procedure are better packaged as a skill, which loads only when needed (see [Custom Skills](/en/book2-advanced/02-custom-skills)).
 
----
+## CLAUDE.md or just telling Claude in chat?
 
-## CLAUDE.md vs. Just Telling Claude in Chat
+For a one-off request, chat is fine. CLAUDE.md wins when you want the instruction to apply every time:
 
-You might wonder: why not just tell Claude what you need at the start of each conversation?
+1. **Consistency.** Every session and every teammate gets the same instructions.
+2. **History.** In git, a change to the standards comes with a commit message saying why.
+3. **It survives `/compact`.** When a long conversation is summarized to free up space, the project-root CLAUDE.md is re-read from disk. Something you only said in chat may be lost.
 
-You can, and for one-off tasks, that is often fine. But CLAUDE.md has several advantages:
+A good habit from the documentation: add a line to CLAUDE.md when Claude makes the same mistake twice, when a code review catches something Claude should have known, or when you catch yourself typing the same correction again.
 
-1. **Consistency.** Every session, every team member, every agent subprocesses — they all get the same instructions automatically.
+### Check that it worked
 
-2. **It is version-controlled.** When you update the standards, the update is in git with a commit message explaining why.
+1. Start a new session in the project folder and run `/context`. Under **Memory files** you should see your `CLAUDE.md` (or `AGENTS.md`).
+2. Run `/memory`. It lists the instruction files and auto memory locations Claude can see; open any of them from there.
+3. Ask Claude something your file answers, such as "What command runs the tests in this project?" The answer should match what you wrote.
 
-3. **It does not consume your attention.** You are not spending mental energy on "did I remember to tell Claude my preferences?" — they are always there.
+If a file is missing from the list, it is in a location that is not loaded for this session. If it is listed but ignored, make the wording more specific and look for contradictions.
 
-4. **It persists across context.** If you run `/compact` to compress a long conversation, your CLAUDE.md instructions survive. One-off instructions in the chat do not.
+## Sources
 
----
+- Anthropic, "How Claude remembers your project" (CLAUDE.md, AGENTS.md, rules, imports, troubleshooting), Claude Code documentation, accessed 2026-10-04. https://code.claude.com/docs/en/memory
+- Anthropic, Claude Code Glossary (AGENTS.md, CLAUDE.md, system reminder), accessed 2026-10-04. https://code.claude.com/docs/en/glossary
+- Anthropic, Claude Code commands reference (`/init`, `/memory`, `/context`, `/doctor`), accessed 2026-10-04. https://code.claude.com/docs/en/commands
 
-**Next up:** [Chapter 15 — Memory System](./15-memory.md) — How Claude builds up knowledge about your project over time, automatically.
+Next: [Memory](/en/book1-getting-started/15-memory)

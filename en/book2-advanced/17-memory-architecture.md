@@ -1,87 +1,63 @@
-# Chapter 17: Memory Architecture
+# Memory Architecture
 
-## Two Memory Systems, One Goal
+> Verified on 2026-10-04 with Claude Code 2.1.289.
 
-Claude Code has no persistent memory between sessions by default. Each conversation begins with a fresh context window. But two complementary systems carry knowledge across that boundary:
+Every Claude Code session starts with an empty context window. What carries knowledge from one session to the next is a small set of files that load at startup, plus whatever Claude reads on demand. Memory architecture is deciding which knowledge lives where.
 
-**CLAUDE.md files** — instructions you write, loaded at the start of every session. Human-authored, deliberate, structured.
+Claude Code has two built-in systems. CLAUDE.md files (or AGENTS.md) are instructions you write. Auto memory is notes Claude writes for itself. A third layer has grown up around them: external memory plugins and code-graph indexes, some of them among the most-starred Claude Code repositories on GitHub. This chapter covers the built-ins as they work today, then when an external layer earns its place and when it makes things worse.
 
-**Auto memory** — notes Claude writes itself based on what it learns during sessions. Automatic, accumulative, stored in `~/.claude/projects/<project>/memory/`.
+For the beginner view of the same features, see [Memory](/en/book1-getting-started/15-memory) and [CLAUDE.md and AGENTS.md](/en/book1-getting-started/14-claude-md).
 
-Understanding how each system works, what it is suited for, and how they interact lets you design a memory architecture that makes Claude progressively more effective on your project over time — rather than starting from scratch each session.
+## Instruction files: CLAUDE.md and AGENTS.md
 
----
+### Scopes
 
-## The CLAUDE.md System
+| Scope | Location | Shared with |
+|---|---|---|
+| Managed policy | macOS `/Library/Application Support/ClaudeCode/CLAUDE.md`; Linux and WSL `/etc/claude-code/CLAUDE.md`; Windows `C:\Program Files\ClaudeCode\CLAUDE.md` | Everyone in the organization |
+| User | `~/.claude/CLAUDE.md` | Just you, all projects |
+| Project | `./CLAUDE.md` or `./.claude/CLAUDE.md` (or `AGENTS.md`, see below) | The team, through version control |
+| Local | `./CLAUDE.local.md` (add it to `.gitignore`) | Just you, this project |
 
-CLAUDE.md files are plain markdown files that Claude reads at session start. Think of them as a briefing document: they tell Claude what it needs to know before the conversation begins.
+Two details changed how people should think about this table:
 
-### Scope Hierarchy
+- **Files are concatenated, not overridden.** Claude Code loads CLAUDE.md and CLAUDE.local.md from the working directory and every directory above it, ordered from the filesystem root down, with each directory's CLAUDE.local.md after its CLAUDE.md. Instructions closer to where you launched are read last. Two conflicting files do not resolve cleanly; the docs warn Claude may pick one arbitrarily.
+- **Subdirectory files load on demand.** A `src/api/CLAUDE.md` loads when Claude first reads a file in `src/api/`, not at launch.
 
-CLAUDE.md files can exist at multiple levels, each with a different scope:
+### AGENTS.md
 
-| Location | Scope | Shared with |
-|----------|-------|-------------|
-| `/Library/Application Support/ClaudeCode/CLAUDE.md` (macOS) or `/etc/claude-code/CLAUDE.md` (Linux) | Organization-wide (managed policy) | All users on the machine |
-| `~/.claude/CLAUDE.md` | Personal (all projects) | Just you |
-| `./CLAUDE.md` or `./.claude/CLAUDE.md` | Project | Team via version control |
-| Subdirectory `./src/api/CLAUDE.md` | Subdirectory (loaded on demand) | Team via version control |
+Since v2.1.277, Claude Code reads `AGENTS.md`, the file Codex and other agents use, when there is no `CLAUDE.md`, `.claude/CLAUDE.md`, or `CLAUDE.local.md` in the working directory or above it. If any of those exist, it reads the CLAUDE.md files instead. To read both, set **Project instructions** to `claude-md-and-agents-md` in `/config`. The alternative that works everywhere is a one-line CLAUDE.md that imports `@AGENTS.md`.
 
-The organization-wide managed policy location is deployed by IT administrators. Individual users cannot override it.
+One trap: adding a personal `CLAUDE.local.md` to a repository that relies on `AGENTS.md` makes Claude stop reading `AGENTS.md` for you, because CLAUDE.local.md counts in that check. [Portability](/en/book3-architect/11-portability) covers running one setup across several tools.
 
-More specific locations take precedence. The hierarchy lets you set organization-wide standards, personal preferences, and project-specific conventions all in the same coherent system.
+### What belongs in instruction files
 
-### What Belongs in CLAUDE.md
+Instruction files load into every session and are resent on every turn, so the bar is high. Anthropic's July 2026 guidance for Claude 5 generation models is to keep CLAUDE.md for repository-specific gotchas and leave out what Claude can discover from the code. The `/doctor` checkup now proposes trims along exactly that line: it cuts directory layouts, dependency lists, and architecture overviews, and keeps pitfalls, rationale, and conventions that differ from tool defaults.
 
-CLAUDE.md is loaded into every session — consuming tokens every time. This means you should include only content that genuinely improves Claude's output and would not be obvious from reading the code.
-
-**Good CLAUDE.md content:**
+Good content:
 
 ```markdown
-# Build and Test
-- Build: `npm run build`
-- Test: `npm test -- --testPathPattern=` (run single test file, not full suite)
-- Lint: `npm run lint` (always run after file edits)
-- Type check: `npm run typecheck`
+# Build and test
+- Test one file: `pnpm test -- --testPathPattern=<path>` (the full suite takes 9 minutes)
+- `pnpm typecheck` after any change under packages/schema
 
-# Architecture
-- API handlers live in src/api/handlers/ — one file per resource
-- Business logic lives in src/services/ — handlers should be thin
-- Database queries go in src/db/queries/ — never write SQL in handlers
-
-# Code Conventions
-- Use named exports, not default exports
-- Prefer functional components in React
-- Error handling: throw domain-specific errors, catch at handler level
-
-# Non-obvious Gotchas
-- POSTGRES_URL must be set in .env for tests to run
-- Running tests requires the Redis container: `docker compose up redis -d`
-- The payment service uses webhooks in dev — start ngrok before testing
+# Gotchas
+- Integration tests need Redis: `docker compose up redis -d`
+- The payments service uses webhooks in dev; start the tunnel first
+- Never edit files under src/generated/; run `pnpm codegen`
 ```
 
-**Poor CLAUDE.md content** (either obvious, irrelevant, or too detailed):
-- "Write clean code" (Claude already tries to do this)
-- Detailed API documentation for public libraries (link to docs instead)
-- Information that changes every day
-- Instructions for every possible scenario (causes the important ones to get lost)
+Poor content: "write clean code", documentation for public libraries, anything that changes daily, and long procedures. Procedures belong in skills, which load only when used.
 
-**The conciseness test:** For each line, ask: "Would removing this cause Claude to make a specific mistake on this project?" If not, cut it.
+The docs' size target is under 200 lines per file. Three tools help you stay there:
 
-### `.claude/rules/` — Modular, Path-Scoped Instructions
+- **Path-scoped rules.** Files in `.claude/rules/` with `paths:` frontmatter load only when Claude reads a matching file.
+- **Imports** with `@path` organize a long file but do not save context, because imported files load at launch. Import depth is limited to four hops.
+- **HTML block comments** are stripped before injection, so maintainer notes cost nothing.
 
-For larger projects, break instructions into topic-specific files in `.claude/rules/`. These can be path-scoped so they only load when Claude is working with matching files:
+Run `/doctor prompt-audit` (v2.1.283 or later) after every model change to find instructions written for older models, references to files that no longer exist, and files that contradict each other. [Context Engineering](/en/book2-advanced/15-context-engineering) covers the audit in detail.
 
-```
-.claude/
-├── CLAUDE.md           # Core project instructions (short)
-└── rules/
-    ├── testing.md      # Test patterns (always loaded)
-    ├── api.md          # API conventions (always loaded)
-    └── migrations.md   # Database migration rules (always loaded)
-```
-
-With path-scoped rules:
+### Path-scoped rules
 
 ```markdown
 <!-- .claude/rules/api-handlers.md -->
@@ -90,198 +66,163 @@ paths:
   - "src/api/handlers/**/*.ts"
 ---
 
-# API Handler Rules
-- Validate all inputs with zod before any processing
+# API handler rules
+- Validate all input with zod before any processing
 - Return 422 for validation errors, 400 for malformed requests
-- Never throw raw database errors to the client
-- Include request ID in all error responses
+- Never return raw database errors to the client
 ```
 
-This rule only loads into context when Claude is editing files in `src/api/handlers/`, keeping it out of context when Claude is working on unrelated files.
+This loads only when Claude reads a file under `src/api/handlers/`. The trade-off: path-scoped rules and nested CLAUDE.md files enter the conversation history when they load, so compaction summarizes them away until Claude reads a matching file again. A rule that must always hold belongs in the root CLAUDE.md. A rule that must never be broken belongs in a hook, because instruction files are context, not enforcement.
 
-### Importing External Files
+## Auto memory
 
-CLAUDE.md can pull in other files using `@path/to/file` syntax:
+Auto memory is on by default in local sessions. As Claude works, it saves notes for itself in `~/.claude/projects/<project>/memory/`. The `<project>` path is derived from the git repository, so all worktrees and subdirectories of one repo share a memory directory.
 
-```markdown
-# Project Overview
-See @README.md for project architecture.
-Available npm scripts: @package.json
+### What Claude saves, and what it skips
 
-# Team Workflow
-@docs/git-workflow.md
-```
+The first edition said auto memory collects build commands and code patterns. That is no longer the design. Claude now saves four kinds of note, recorded as a `type` in each file's frontmatter:
 
-This keeps your CLAUDE.md short while allowing Claude to access detailed reference material when needed. Imported files are loaded at session start alongside the CLAUDE.md that references them.
+| Type | Contents |
+|---|---|
+| `user` | Your role, expertise, and working preferences |
+| `feedback` | Corrections you give and approaches you confirm |
+| `project` | Ongoing work, deadlines, and decisions that cannot be derived from the code or git history |
+| `reference` | Where to find things outside the project, such as an issue tracker or dashboard |
 
----
+Claude skips anything it can derive from the codebase (architecture, file paths, debugging fixes) and anything your CLAUDE.md already says. That division is the core of the architecture: code and git are the source of truth for the code; instruction files hold rules; auto memory holds what lives only in your head.
 
-## Auto Memory
+### How it loads
 
-Auto memory is Claude Code's built-in learning system. As you work, Claude observes patterns, corrections, and discoveries and saves notes to a per-project memory directory.
-
-### Storage Location
-
-Auto memory is stored in:
-```
+```text
 ~/.claude/projects/<project>/memory/
-├── MEMORY.md          # Index file (first 200 lines loaded each session)
-├── debugging.md       # Debugging patterns Claude has learned
-├── api-conventions.md # API design patterns observed
-└── environment.md     # Environment setup notes
+├── MEMORY.md            # index, one line per memory, loaded every session
+├── user_role.md         # one memory per file
+├── feedback_testing.md
+└── ...
 ```
 
-The `<project>` identifier is derived from the git repository, so all subdirectories and worktrees of the same repo share one memory directory.
+The first 200 lines or 25KB of `MEMORY.md`, whichever comes first, load at session start. Topic files do not; Claude reads them when it needs them. When the index nears the limit, Claude Code reminds Claude to shorten it; past the limit, it tells Claude to rewrite it, because anything beyond is dropped on the next load. Since v2.1.214, Claude Code stamps a `modified` timestamp in the frontmatter of memory files it writes, so you and Claude can see how current a fact is.
 
-### What Claude Saves
+Auto memory is machine-local. It is not shared across machines or cloud environments, and it is excluded from the transcript cleanup sweep, so files stay until you or Claude delete them.
 
-Claude saves things that would be useful to know at the start of a future session:
+### Control it
 
-- Build commands that were discovered to work
-- Test commands for specific modules
-- Environment setup steps (discovered when something failed)
-- Code patterns observed in the codebase
-- Architectural insights from exploring the code
-- Preferences you corrected Claude on ("I told Claude to stop doing X, it saved that")
+- `/memory` lists your instruction files, toggles auto memory, and opens the memory folder.
+- "Remember that the API tests need a local Redis" saves to auto memory. "Add this to CLAUDE.md" writes to the instruction file instead.
+- Turn it off per project with `"autoMemoryEnabled": false` in the project settings, or everywhere with `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`.
+- Background sessions and sessions started by another Claude Code session can turn auto memory off but not back on.
 
-Claude does not save every observation — it is selective about what is worth remembering. A correction you make ("please use single quotes, not double") is likely to be saved. A casual comment is not.
+### Subagent memory
 
-### Viewing and Editing Auto Memory
+A subagent can keep its own memory with the `memory` frontmatter field. Scopes are `user` (`~/.claude/agent-memory/<name>/`), `project` (`.claude/agent-memory/<name>/`, the recommended default because it can be committed), and `local` (`.claude/agent-memory-local/<name>/`). The main conversation's auto memory is not loaded into subagents, except forks, which inherit the parent's context.
 
-```text
-/memory
+```yaml
+---
+name: code-reviewer
+description: Reviews code for quality and best practices
+memory: project
+---
+Before reviewing, check your memory for patterns seen before.
+After reviewing, save new recurring issues to your memory.
 ```
 
-This command shows all CLAUDE.md files loaded in the current session, lets you toggle auto memory on or off, and provides a link to open the auto memory folder. You can view, edit, or delete any memory file — they are plain markdown.
+### Shared memory across related projects
 
-To explicitly ask Claude to remember something:
-```text
-Remember that this project uses pnpm, not npm. Always use pnpm commands.
-```
-
-Claude saves this to auto memory and applies it in future sessions.
-
-To add something to CLAUDE.md instead:
-```text
-Add this to CLAUDE.md: always use pnpm, not npm.
-```
-
-### Enabling and Disabling Auto Memory
-
-Auto memory requires Claude Code v2.1.59 or later. It is enabled by default. To disable it:
+`autoMemoryDirectory` redirects where auto memory lives, and it is read from any settings scope. Point a frontend and its API server at the same directory and they share what Claude learns:
 
 ```json
-// .claude/settings.json
 {
-  "autoMemoryEnabled": false
+  "autoMemoryDirectory": "~/shared-memory/platform-team"
 }
 ```
 
-Or via environment variable:
+The value must be absolute or start with `~/`. When the setting comes from a repository's `.claude/settings.json`, Claude Code applies the same workspace-trust rule it applies to hooks in settings files, for good reason: a repository that chooses where your memory is read from can feed instructions into every session. Use this only for projects that genuinely share conventions.
+
+## Which layer holds what
+
+| Mechanism | Written by | Loaded | Best for |
+|---|---|---|---|
+| CLAUDE.md / AGENTS.md | You | Every session | Rules, commands, gotchas |
+| Path-scoped rules | You | When matching files are read | Area-specific rules |
+| Skills | You | When invoked | Procedures |
+| Auto memory | Claude | Index every session; topics on demand | Preferences, corrections, project context not in code |
+| Task files (`TODO.md`, `SPEC.md`, handoff notes) | You or Claude | When read | Current work, session continuity |
+| Hooks | You | At lifecycle events | Rules that must be enforced |
+
+## External memory and code graphs
+
+Two kinds of third-party tool sit on top of the built-ins, and both were among the most-starred Claude Code ecosystem repositories on GitHub in early October 2026.
+
+**Session memory** tools capture what happened in past sessions and bring relevant parts back. The best known is [claude-mem](https://github.com/thedotmack/claude-mem) (Apache-2.0). Per its README, it uses lifecycle hooks (SessionStart, UserPromptSubmit, PostToolUse, Stop, SessionEnd) to record tool usage, compresses observations into summaries with a model, stores them in SQLite with Chroma for vector search, and gives Claude MCP search tools that return a compact index first and full details only for chosen IDs. It installs as a plugin:
+
+```text
+/plugin marketplace add thedotmack/claude-mem
+/plugin install claude-mem
+```
+
+or with `npx claude-mem install`.
+
+**Code graphs** pre-index the repository's symbols, call edges, and dependencies so the agent can ask one structural question instead of running grep and reading file after file. [CodeGraph](https://github.com/colbymchenry/codegraph) (MIT) is one; it runs locally, keeps the index in a `.codegraph/` directory, re-syncs on file changes, and exposes an MCP server:
+
 ```bash
-CLAUDE_CODE_DISABLE_AUTO_MEMORY=1 claude
+npm i -g @colbymchenry/codegraph   # or the install script in its README
+codegraph install                  # wires the MCP server into your agents
+cd your-project && codegraph init  # builds the index
 ```
 
-For most projects, leaving auto memory enabled is beneficial. The memory accumulates useful project knowledge passively. The only reason to disable it is if you want strict control over what Claude knows between sessions (for example, in a security-sensitive environment).
+Before either, try the official layer: **code intelligence plugins** connect Claude to a language server (for example `typescript-lsp`, `pyright-lsp`, `gopls-lsp` from the official marketplace), so it jumps to definitions, finds references, and sees type errors after edits without scanning files. The docs recommend them for large codebases. If your organization already runs a code search or RAG index, the docs suggest exposing it as an MCP tool. [Large Projects](/en/book2-advanced/18-large-projects) covers that setup.
 
----
+### When an external layer helps
 
-## Memory vs CLAUDE.md vs Tasks
+- **Very large or unfamiliar codebases** where most of a task's tokens go to discovery. CodeGraph's own benchmark (seven open-source repos, Claude Opus 4.8, headless runs, median of four per arm, August 2026) reports 44% lower cost and 62% fewer tokens on average for one architecture question each. These are the vendor's numbers on its chosen questions; treat them as a hypothesis to test, not a result.
+- **Long-running work across many sessions** where the same investigations keep being redone, and handoff files are not enough.
+- **Several agent tools on one codebase.** Both projects support other agents such as Codex, which built-in auto memory does not.
 
-These three mechanisms serve different purposes and should not be conflated:
+### When it hurts
 
-| Mechanism | Written by | When loaded | Best for |
-|-----------|-----------|-------------|----------|
-| CLAUDE.md | You | Every session start | Persistent rules, conventions, standards |
-| Auto memory | Claude | Every session start (first 200 lines of MEMORY.md) | Learned patterns, discovered commands |
-| Task files (TODO.md, SPEC.md) | You or Claude | On demand (when Claude reads them) | Current work items, session continuity |
+- **It can grow your context, not shrink it.** CodeGraph's README is unusually candid here: its benchmarks measure tokens processed, but in multi-turn sessions its responses left about 80% more retrieval context resident at the end (67K tokens against 18K on VS Code), because one dense answer stays in the window where small grep results would have been evicted. Session memory tools inject context at session start and on prompts by design. Measure the baseline with `/context` before and after.
+- **Stale or wrong memories propagate.** An automatically captured "fact" from a failed experiment can steer every later session. Built-in auto memory is plain files you can read in a minute; a vector store of compressed observations is harder to audit.
+- **Two sources of truth.** If CLAUDE.md, auto memory, and an external store disagree, behavior gets less predictable, and "why did it do that?" gets harder to answer.
+- **Data leaves your machine unless you check.** Read each tool's data handling before installing. claude-mem's installer, per its README, offers a hosted "observer" with sign-in and lets you choose your own OpenRouter or Gemini key, or your Anthropic plan, instead; passing an explicit `--provider` flag or setting `CLAUDE_MEM_ONLINE_OPTIN=false` skips the sign-in. CodeGraph states it is fully local, with anonymous usage telemetry you can turn off with `codegraph telemetry off`.
+- **Plugins run code.** Hooks and MCP servers from a plugin run with your user permissions. Treat a memory plugin like any dependency with that much access. [Plugins, Marketplace and Mods](/en/book2-advanced/04-plugins-marketplace-mods) covers vetting.
 
-A common pattern for complex projects: CLAUDE.md contains rules and standards, auto memory accumulates project knowledge, and you maintain a TASKS.md file for the current sprint's work that Claude reads at the start of each session:
+### Run a trial, then decide
 
-```markdown
-# CLAUDE.md (bottom section)
-At the start of each session, read TASKS.md to understand current priorities.
-```
+Do not install memory tools on reputation or star counts. Test on your own repository, the same way CodeGraph measured itself:
 
----
+1. Pick five real questions or small tasks from your backlog.
+2. Run each headless without the tool and record cost and outcome:
+   ```bash
+   claude -p "How does a request reach the billing service?" --output-format json > before.json
+   ```
+3. Install the tool, run the same prompts, and save `after.json`. Compare `total_cost_usd`, the number of turns, and whether the answers were correct.
+4. Run `/context` in a fresh interactive session with and without the tool to see the baseline it adds.
+5. Keep it only if it wins on correctness and cost on your work. Uninstall cleanly if it does not (CodeGraph provides `codegraph uninstall`).
 
-## Advanced Pattern: Cross-Project Memory
+## Troubleshooting
 
-The `autoMemoryDirectory` setting lets you redirect where auto memory is stored. This enables a cross-project memory pattern where related projects share a common knowledge base:
+**Claude ignores a CLAUDE.md rule.** Run `/context` and check the list under **Memory files**. If the file is not there, Claude cannot see it. Make the rule concrete ("use 2-space indentation", not "format nicely") and look for conflicts across files. If it must always happen, write a hook.
 
-```json
-// .claude/settings.json in project-a
-{
-  "autoMemoryDirectory": "~/shared-memory/platform-team"
-}
-```
+**AGENTS.md is not loading.** Look for a `CLAUDE.md`, `.claude/CLAUDE.md`, or `CLAUDE.local.md` on the path, confirm v2.1.281 or later with `claude --version`, and check **Project instructions** in `/config`.
 
-```json
-// .claude/settings.json in project-b
-{
-  "autoMemoryDirectory": "~/shared-memory/platform-team"
-}
-```
+**You do not know what auto memory saved.** Open `/memory`, choose the auto memory folder, and read the files. Edit or delete anything wrong; they are plain markdown.
 
-Both projects now accumulate to and read from the same memory directory. Claude's learnings from one project automatically inform work in the other.
+**An instruction vanished after `/compact`.** Root CLAUDE.md is re-read from disk after compaction. Instructions given only in chat, path-scoped rules, and nested CLAUDE.md files are not, until a matching file is read. Move the instruction to the root CLAUDE.md.
 
-This is useful for:
-- A frontend and its API server (same domain knowledge)
-- Multiple microservices owned by the same team
-- A library and its consumer application
+## Check that it worked
 
-**Caution:** cross-project memory can cause confusion if the projects have fundamentally different conventions. Use this pattern only when the projects are genuinely related and share conventions.
+1. Run `/context` in a fresh session. Under **Memory files** you should see exactly the instruction files you expect, and no more.
+2. Run `/memory`, open the auto memory folder, and confirm `MEMORY.md` is short and each entry is still true.
+3. If you trialed an external tool, you should have a before-and-after comparison on your own tasks that justifies keeping or removing it.
 
----
+## Sources
 
-## Memory File Format and Management
-
-Memory files are plain markdown. Claude uses its standard file tools to read and update them. There is no special format required — Claude creates and maintains the structure naturally.
-
-A typical auto-generated MEMORY.md might look like:
-
-```markdown
-# Project Memory
-
-## Build and Environment
-- Use `pnpm` not `npm` (corrected 2025-03-08)
-- Redis must be running for tests: `docker compose up redis -d`
-- POSTGRES_URL must be set in .env
-
-## Testing
-- Run single test: `pnpm test -- --testPathPattern=src/api/handlers`
-- Integration tests are in tests/integration/ and require DB connection
-- See debugging.md for common test failure patterns
-
-## Architecture Notes
-- See api-conventions.md for API handler patterns
-- Service layer is thin — most logic in domain objects
-```
-
-You can edit this file directly. Prune outdated entries, correct wrong information, and add notes yourself. Claude treats your edits as authoritative.
-
-The 200-line limit on the MEMORY.md index is intentional — it forces the index to stay concise while detailed notes live in topic files that Claude reads on demand.
-
----
-
-## Troubleshooting Memory Issues
-
-**Claude is not following a rule from CLAUDE.md:**
-
-Run `/memory` to verify the file is loaded. Check for conflicting instructions across multiple CLAUDE.md files. Make instructions more specific: "Use 2-space indentation" outperforms "Format code properly." For critical rules, add emphasis: "IMPORTANT: always use pnpm, not npm."
-
-**Claude keeps forgetting something between sessions:**
-
-If Claude keeps re-asking a question you have answered multiple times, the answer has not been saved to memory. Tell Claude explicitly: "Remember for future sessions: [the thing]."
-
-**Memory contains incorrect information:**
-
-Open `/memory`, navigate to the memory folder, and edit the relevant file. Claude's future sessions will use the corrected version.
-
-**Instructions are lost after /compact:**
-
-CLAUDE.md fully survives compaction — Claude re-reads it fresh after compacting. If an instruction was lost, it was given only in conversation (not in CLAUDE.md). Add it to CLAUDE.md to make it persist.
-
----
-
-**Next up:** [Chapter 18 — Multi-session Workflows](./18-multi-session.md) — Planning and executing work that spans multiple days or weeks.
+- "How Claude remembers your project" (CLAUDE.md, AGENTS.md, auto memory, troubleshooting), Claude Code Docs, accessed 2026-10-04. https://code.claude.com/docs/en/memory
+- "Create custom subagents" (Enable persistent memory), Claude Code Docs, accessed 2026-10-04. https://code.claude.com/docs/en/sub-agents
+- "Code intelligence plugins", Claude Code Docs, accessed 2026-10-04. https://code.claude.com/docs/en/plugins/code-intelligence
+- "Set up Claude Code in a monorepo or large codebase", Claude Code Docs, accessed 2026-10-04. https://code.claude.com/docs/en/large-codebases
+- "Explore the context window" (What survives compaction), Claude Code Docs, accessed 2026-10-04. https://code.claude.com/docs/en/context-window
+- "The new rules of context engineering for Claude 5 generation models", Thariq Shihipar, Anthropic (Claude blog), 2026-07-24. https://claude.dev/blog/the-new-rules-of-context-engineering-for-claude-5-generation-models/
+- thedotmack/claude-mem, README, GitHub, accessed 2026-10-04 (last push 2026-10-04). https://github.com/thedotmack/claude-mem
+- colbymchenry/codegraph, README (benchmarks re-measured 2026-08-05; note on context; telemetry), GitHub, accessed 2026-10-04. https://github.com/colbymchenry/codegraph
+- GitHub search snapshot of Claude Code ecosystem repositories by stars, compiled for this edition on 2026-10-04 (claude-mem about 96K stars, CodeGraph about 73K).
